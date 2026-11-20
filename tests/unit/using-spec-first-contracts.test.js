@@ -78,7 +78,9 @@ describe('using-spec-first entry-governor contracts', () => {
     expect(skill).toContain('at most one route-changing question');
     expect(skill).toContain('Recommended entrypoint: <spec-*, standalone skill, or terminal command>');
     expect(skill).toContain("Use the repository's configured user language");
-    expect(skill).toContain('**Checkpoint — wait:** after any recommendation, stop and yield; enter the recommended entrypoint only after the user asks to continue');
+    expect(skill).toContain('只请求推荐、比较或询问下一步时');
+    expect(skill).toContain('明确要求执行时，选择入口后继续已授权的工作');
+    expect(skill).not.toContain('after any recommendation, stop');
     expect(skill).toContain('If a standalone skill is user-invoked only, recommend it and wait.');
     expect(routeMap).toContain('`spec-explain`');
     expect(routeMap).toContain('Direct Lane');

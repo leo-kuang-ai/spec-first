@@ -1,6 +1,6 @@
 # Review Finding 合同
 
-`review-finding.v1` 是 code、document 和 app consistency reviews 共享的最小 compact finding envelope。它用于 downstream handoff、summary-first artifact 和跨 workflow mapped summary，不是 `spec-code-review` reviewer JSON 返回 schema。`spec-code-review` reviewer schema 仍以 `skills/spec-code-review/references/findings-schema.json` 为准，使用 P0-P3 severity 与 0/25/50/75/100 confidence anchors。
+`review-finding.v1` 是代码审查与文档审查共享的最小发现记录格式。它用于 downstream handoff、summary-first artifact 和跨 workflow mapped summary，不是 `spec-code-review` reviewer JSON 返回 schema。`spec-code-review` reviewer schema 仍以 `skills/spec-code-review/references/findings-schema.json` 为准，使用 P0-P3 severity 与 0/25/50/75/100 confidence anchors。
 
 ## 目标
 

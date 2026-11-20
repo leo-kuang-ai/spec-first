@@ -6,7 +6,7 @@ const {
 const {
   commandSucceeded,
 } = require('./process-runner.cjs');
-const { providerDisplayFacts } = require('./provider-display.cjs');
+const { providerDisplayFacts, providerHeadline } = require('./provider-display.cjs');
 
 const RUNTIME_MARKERS = Object.freeze([
   ['codex', ['CODEX_CI', 'CODEX_MANAGED_BY_NPM', 'CODEX_THREAD_ID', 'CODEX_SANDBOX']],
@@ -154,7 +154,7 @@ function renderDiagnosticHuman(payload, pluginVersion) {
   } else {
     for (const provider of payload.provider_readiness) {
       const display = providerDisplayFacts(provider);
-      lines.push(`- ${provider.provider || provider.id || 'unknown'}: ${display.currentness_status} (${display.reason_code})`);
+      lines.push(providerHeadline(provider, display));
       lines.push(`  readiness_scope: ${display.readiness_scope}; probe_status: ${display.probe_status}`);
     }
   }

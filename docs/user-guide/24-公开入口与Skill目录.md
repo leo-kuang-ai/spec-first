@@ -57,7 +57,6 @@
 | `spec-optimize` | 指标驱动的迭代优化环 | 有可测目标的实验；不是普通 feature 实现 |
 | `spec-dogfood` | 面向当前分支/PR 的 hands-off 浏览器 QA | 变更流的自主 dogfood；协作式 UI polish 用 `spec-polish` |
 | `spec-polish` | 起 dev server、在浏览器里打磨 UI | 用户明确要 polish 时；默认 user-invoked |
-| `spec-app-consistency-audit` | 移动 App PRD/Figma/源码静态一致性审查 | 进模拟器/真机/打包前；不是普通 code review 或 PRD 写作 |
 | `spec-write-skill` | 创建 / 修改 / 迁移项目拥有的 Agent Skill package，或只读 readiness 校验 | skill 包治理；一次性问答、纯第三方安装、手改 generated runtime 不要走这里 |
 
 
@@ -75,8 +74,6 @@
 | `spec-pov` | 对外部输入给出**项目语境下的**采纳 / 否决 verdict |
 | `spec-strategy` | 创建或更新 `STRATEGY.md` |
 | `spec-simplify-code` | 在行为不变前提下简化近期改动 |
-| `spec-rule-miner` | 从代码证据挖掘项目约定，写入 `docs/ai/project-rules.md` 等 |
-| `spec-project-rules` | 建立/refresh/增量回写多端 monorepo 架构知识库，写入 `docs/architecture.md`（含 AGENTS.md/CLAUDE.md 内嵌块） |
 | `spec-product-pulse` | 按时间窗从配置信号生成产品 pulse 报告 |
 | `spec-sweep` | 扫配置的反馈源（如 Slack、GitHub Issues） |
 | `spec-riffrec-feedback-analysis` | 分析 Riffrec / 音视频反馈采集 |

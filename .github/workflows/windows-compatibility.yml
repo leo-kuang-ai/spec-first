@@ -101,3 +101,29 @@ jobs:
       - name: Validate installed cmd shim
         shell: cmd
         run: '"%RUNNER_TEMP%\spec-first-windows-prefix\spec-first.cmd" --help'
+
+      - name: 验证安装包重复初始化与宿主检查
+        shell: pwsh
+        run: |
+          $cli = Join-Path $env:RUNNER_TEMP 'spec-first-windows-prefix/spec-first.cmd'
+          $env:HOME = $env:USERPROFILE = Join-Path $env:RUNNER_TEMP 'spec-first-home'
+          $env:CODEX_HOME = Join-Path $env:HOME '.codex'
+          $env:SPEC_FIRST_NO_UPDATE_NOTIFIER = '1'
+          $project = Join-Path $env:RUNNER_TEMP 'spec-first test project'
+          New-Item -Type Directory -Path $project,$env:HOME -Force | Out-Null
+          Set-Location -LiteralPath $project
+          Set-Content AGENTS.md '# user-owned'
+          foreach ($attempt in 1..2) {
+            & $cli init --codex --cursor -y -u ci --lang zh
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            if (-not (Select-String -Quiet -SimpleMatch '# user-owned' AGENTS.md)) { throw 'User instructions lost' }
+            $current = (Get-FileHash AGENTS.md).Hash
+            if ($attempt -eq 2 -and $current -ne $previous) { throw 'Repeated init changed instructions' }
+            $previous = $current
+          }
+          foreach ($hostId in 'codex','cursor') {
+            $report = & $cli doctor "--$hostId" --json
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $report | node (Join-Path $env:GITHUB_WORKSPACE 'tests/fixtures/assert-installed-runtime.cjs') $hostId
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

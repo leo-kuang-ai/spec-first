@@ -172,6 +172,8 @@ message or `docs/solutions/` if they're worth carrying forward.
 When an implementation-ready software plan is warranted, these sections are
 present. They carry the contracts downstream consumers depend on.
 
+在已有的 Goal Capsule 里用读者能核对的行为说明改什么、哪些相关行为保持不变、为什么选这个做法、用什么结果判断成功。不另设摘要，也不复述整份合同。例如：“把重发发票入口从详情页扩展到已支付订单列表；详情页照旧。复用已有发送服务，让两个入口遵循同一资格规则。验收时分别用已支付和未支付订单检查入口。”这是写法示例，不是默认产品规则。
+
 - **Goal Capsule** — objective, recommended approach, authority hierarchy,
   decision focus, verification focus, largest risk or scope boundary, stop
   conditions, execution profile, and tail ownership. It is the first-screen

@@ -73,7 +73,7 @@ For each new item carrying `media`:
 
 #### 2f. Fix verification
 
-For each `fix_pending` item, resolve its claimed fix ref and verify it merged to the default branch. The fix ref originates from untrusted feedback content (a thread claim, an analyzer-extracted reference), so **validate its shape before it reaches any git/gh command**: accept only a bare PR number (`#?\d+`) or a commit SHA (`[0-9a-f]{7,40}`), and treat anything else as an unresolved claim (leave the item open). This blocks argument/flag injection into the shell command.
+对每个 `fix_pending`，先校验整个修复引用：显式 `#` 加十进制数字是 PR 编号；提交引用整串匹配 `^[0-9a-fA-F]{7,64}$`。按目标仓库对象格式核对最大长度（SHA-1 为 40，SHA-256 为 64），唯一解析为 commit 后再检查默认分支可达性。裸十进制仍可作 PR 编号；若它也可能表示提交且来源没有消歧，保留未决，不猜身份。拒绝额外参数、空白及后缀，不可解析或歧义保持开放。
 - Strip a leading `#` from a validated PR number and pass the value as a quoted argument or structured argv, never raw shell text. Use `gh pr view "<validated-number>" --json mergedAt,baseRefName,mergeCommit` to obtain both merge state and the merge SHA, or `git merge-base --is-ancestor "<validated-sha>" "<default-branch-head>"`. Confirm repository/default-branch identity; a different base or unavailable merge evidence leaves the claim open.
 - Same `approved: false` guard as 2d: a source the user did not approve for writes receives no close-out action — advance its verified item's status in state only.
 - Verified -> perform the source's configured close-out action (same write -> read-back -> confirm discipline as 2d), then `upsert-item` with `status: closed` carrying all three evidence fields: `fix_ref`, `verified_merge_sha`, `verified_at`. Close-out is terminal.

@@ -8,6 +8,7 @@
   "properties": {
     "schema_version": { "type": "string", "const": "verification-run-summary.v1" },
     "generated_at": { "type": "string" },
+    "checked_worktree_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$", "minLength": 71, "maxLength": 71 },
     "profile": {
       "type": "object",
       "additionalProperties": false,

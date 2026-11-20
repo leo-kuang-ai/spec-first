@@ -111,4 +111,4 @@ When `intent=validate`, design evidence remains read-only. An already available,
 
 ## Route-Out Boundary
 
-`spec-prd` extracts PRD facts from design sources. It does not audit implementation consistency across PRD, Figma, and source. When the user asks for consistency, drift, visual implementation accuracy, or app-vs-design verification, route to `spec-app-consistency-audit`.
+`spec-prd` 从设计材料提取需求事实，不负责验证实现是否与 PRD 或 Figma 一致。

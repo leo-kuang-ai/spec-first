@@ -1,0 +1,177 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index b8b9050670a3010c3b61657caf351f0989b423ae..9a93e924a0e61b2cbdbf678d1150eb6205fb7958 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,4 +1,5 @@
+ # Changelog
++- v1.15.3 2026-11-18 23:06:05 zcode: fix(skills): PR 结论绑定远端提交；保留 goal 交付授权上限，拆分只读评审与串行修复；澄清 PRD 残项、计划收尾职责、入口等待与轻量讨论出口。 (user-visible)
+ - v1.15.3 2026-11-12 18:28:15 claude: fix(deps): 修复 Dependabot 6 条依赖告警（均为 dev 依赖；本包 `dependencies` 为空，发布产物不含 `node_modules`）。`js-yaml` 3.15.1 → 3.15.2（GHSA-2883-xcg3-v3hh / CVE-2026-84375，空 merge 源下 `maxTotalMergeKeys` 不限 CPU；`package.json` 的 `overrides` 原先把版本钉在受影响区间，同步改为 3.15.2 才生效）；`fast-uri` 3.1.7 → 3.1.9（GHSA-wjr9-j795-jxcr、GHSA-w74x-v6f9-j3xg、GHSA-333x-w4r6-6crp、GHSA-xhq7-xmqj-769h 四条 host confusion / scheme 欺骗 / scheme 注入 / 相对引用路径等价性）；`brace-expansion` 1.1.18 → 1.1.22（GHSA-q2hr-2g5m-vwhr，`{a},b}` 重写二次时间膨胀）。三者都落在既有 semver 范围（`^3.0.1`、`^1.1.7`）内的补丁升级，`package-lock.json` 仅 3 条版本与完整性哈希变化、未新增包。`npm audit` 由 3 high / 1 moderate / 6 low 降为 0 high / 0 moderate / 6 low；剩余 low 均在 `jest-config → deepmerge` 链，只能把 jest 降到 25 才能「修复」，不属本次告警，未处理。验证：`npm run typecheck` 317 文件、`npm run test:unit` 279/279 套件（3670 通过、1 跳过）、`npm run test:smoke` 5/5，均 exit 0。GitHub 默认分支（main）的 alert 需本次改动合并后才关闭。 (internal)
+ - v1.15.3 2026-11-12 16:36:00 claude: docs(review): 归档 2026-11-09 深度审查最终判断与 S3 续作证据。`docs/validation/2026-11-09-harness-full-code-deep-review.md` 新增「最终判断与交付边界（2026-11-10）」：审查对象为分支当前磁盘源码（含未提交改动）、范围 38 个 Skill 入口加 `_shared` 共 39 目录 1292 文件全量读取或逐字节等价核验；结论为「具备实质机制、目前只能有条件采用，不能承诺无人监督端到端可靠交付」，最优先欠账为失败恢复内容保护、readiness 失败传播与评测判据自身可信度；同时收录独立复核修订（SUP-32 等同批更正）与验证限制，明确未修被审实现、未跑付费模型矩阵。S3 行为层汇总、S4 终版报告与 fix-ledger 同步续作结果（两批十例 8 PASS/2 FAIL/0 ERROR、intake bootstrap 候选、能力提示对照、降级自审候选撤回等），保留真实语义缺口与「历史 154/155 不变」口径，并归档 `continuation-2026-11-05/` 原始结果（212 文件）。删除已完成历史的 `.agents/tasks/2026-10-27-ce-upstream-sync-plan-review.md`（内容保留在 git 历史）。仅文档与证据归档，未改实现、未运行新评测。 (internal)
+ - v1.15.3 2026-11-12 16:31:00 claude: fix(spec-prd): OQ 来源类引用列识别。`skills/spec-prd/scripts/check-prd-artifact.js` 的 `recommended_default` 别名新增合并列名 `recommended_default/deferred_reason`，使模板合并列可被 checker 识别；`prd-output-template.md` 说明来源类证据引用优先写入 `recommended_default/deferred_reason`、`PRD write target` 保留需求写入目标，并声明 checker 仍兼容问题列中的形似引用内容、只检查引用形态不验证来源真实性。新增回归 1 例（`tests/unit/spec-prd-finding-schema-freeze.test.js`）：推荐列引用与问题列引用均可闭合、问题列单独引用仍计未闭合。验证：`npm run test:unit` 279/279 通过。 (internal)
+diff --git a/skills/spec-brainstorm/SKILL.md b/skills/spec-brainstorm/SKILL.md
+index 54f2a936da071e01605d903d408f1a606e7b4023..07ffefbb01f87584bd529b6641773aee29b0e5fe 100644
+--- a/skills/spec-brainstorm/SKILL.md
++++ b/skills/spec-brainstorm/SKILL.md
+@@ -19,7 +19,7 @@ This skill does not implement code. It explores, clarifies, and documents decisi
+ ## Workflow Contract Summary
+ 
+ - **Inputs:** unresolved product ideas, users, constraints, and traceable repository or external evidence.
+-- **Outputs:** a requirements-only unified plan with a Product Contract, scope, success criteria, open questions, and evidence limitations.
++- **Outputs:** 小而明确的讨论可在聊天中交付产品决定、理由和仍未确定的事项，不要求文件或稳定编号。需要持久交接时才交付 requirements-only unified plan，包含 Product Contract、范围、成功标准、未决问题和证据限制。
+ - **Hard exits:** unresolved product decisions, target repository or document ownership, unsupported claims, or work owned by planning, implementation, debugging, or review.
+ - **Authority:** the current user confirms product meaning; the LLM explores and synthesizes; scripts and providers supply advisory facts. This workflow does not authorize implementation, commits, or landing.
+ - **Consumers:** `spec-plan`, `spec-doc-review`, product owners, and downstream requirements reviewers.
+diff --git a/skills/spec-code-review/SKILL.md b/skills/spec-code-review/SKILL.md
+index a30b38d13bd43d352c11e91616f18b7eaba97ffb..10cad99dd2ad9b53a0a6e50971a6b0e9df0646f2 100644
+--- a/skills/spec-code-review/SKILL.md
++++ b/skills/spec-code-review/SKILL.md
+@@ -10,7 +10,7 @@ argument-hint: "[mode:agent] [base:<ref>] [plan:<path>] [task-pack:<path> task:<
+ 
+ Graph output is `provider_untrusted` candidate coverage, never a finding. Re-ground impact, affected-test, ownership, and relationship candidates in current source, diff, tests, logs, contracts, or owner evidence before writing a `Direct evidence:` finding; empty results do not prove absence. Direct source/`rg`/ast-grep is valid and provider failure is a disclosed fallback.
+ 
+-Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage.
++Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage. 普通模式下用户另有明确的本地修复请求时，先封存只读结论，再按 `references/scope.md` 交接符合条件的串行修复。
+ 
+ ## Workflow Contract Summary
+ 
+diff --git a/skills/spec-code-review/references/scope.md b/skills/spec-code-review/references/scope.md
+index 8666873c11705a1ca5a0f2c62bc544a91ad83b8b..517632c0654def285d18a8aa913260cf7449b6b0 100644
+--- a/skills/spec-code-review/references/scope.md
++++ b/skills/spec-code-review/references/scope.md
+@@ -119,14 +119,14 @@ Set `BASE:` to `pr:<number-or-url>` (logical marker — not a git SHA). Set `UNT
+ 
+ 1. `git rev-parse --abbrev-ref HEAD` equals `headRefName`.
+ 2. The PR is **not** cross-repository (`isCrossRepository` is false).
+-3. The PR head commit is contained in the local checkout: `git merge-base --is-ancestor <headRefOid> HEAD` exits 0. This confirms the working tree actually carries the PR head (allowing unpushed local fixes layered on top) rather than an unrelated same-named branch.
++3. `git rev-parse HEAD` 与本次取得的 `headRefOid` 完全相同，`git status --porcelain=v1 --untracked-files=all` 成功且输出为空，且本地可以解析本次取得的 `baseRefOid`。仅有祖先关系、索引或工作树有改动、身份不可核实，均走 `pr-remote`。本地未推送的修复可另列说明，不能关闭远端 finding。
+ 
+ - **`local-aligned`** — all three checks pass. Local Read/Grep/git blame against workspace files are valid for PR changed paths.
+ - **`pr-remote`** — any check fails. The working tree is **not** the PR head; workspace file contents for changed paths may be stale or unrelated.
+ 
+ **Diff by scope mode** (do not mix remote and local diffs — contradictory hunks cause false positives):
+ 
+-- **`local-aligned`:** Resolve `<resolved-base-ref>` from `baseRefName` (fetch if needed). Compute `BASE=$(git merge-base HEAD <resolved-base-ref>)`, then set `FILES:` from `git diff --name-only $BASE` and `DIFF:` from `git diff -U10 $BASE` (includes committed, staged, and unstaged changes on the PR branch). Do **not** call `gh pr diff` or append remote hunks — when unpushed fixes exist, the local tree is canonical. Note in Coverage: `scope: local-aligned (PR; local tree diff)`.
++- **`local-aligned`:** 以 `git merge-base <baseRefOid> <headRefOid>` 为 `BASE`；文件清单与补丁均比较 `BASE` 到 `headRefOid` 两个不可变提交，不使用移动分支名或工作树作为差异终点。无法求得共同祖先时走 `pr-remote`。两种 PR 模式的报告都标明实际审查的 base/head OID。开始验证或本地修复前复核本地对齐；对齐已失效则停止依赖工作树的动作。出具当前 PR 结论前复核远端两端身份，发生变化则重新取证；未经推送的本地修复不改变原 PR 结论。
+ - **`pr-remote`:** Set `FILES:` from the PR `files` array. Set `DIFF:` from `gh pr diff <number-or-url> --color=never`. If `gh pr diff` fails, stop with an actionable error — do not fall back to checkout.
+ 
+ When **`pr-remote`**, before Stage 4:
+@@ -250,4 +250,6 @@ Inline fallback output contract:
+ 3. Set `reviewers: ["inline-fallback"]`, `coverage.dispatch_reason_code` to the concrete fallback reason, and record independent/validator/cross-model coverage as not run. When no targeted command ran, use the Stage 5d `no-targeted-command-executed` evidence shape.
+ 4. Return `status: degraded` and `verdict: Not ready` even when no issue is found; single-model bounded coverage cannot close merge readiness. In task mode also set `required_gate_eligible: false`.
+ 
++**已授权的串行修复交接。** 先按 Stage 5e 冻结并复核只读报告，保留其 `degraded` 和未执行独立验证的事实。仅在普通模式、用户明确要求本地修复、当前范围是可核实的本地树、且未发现范围漂移时，交回已有执行 caller，或在同一会话实际进入 `spec-debug` 继续已授权的定位、局部修复与验证。交接须携带已审版本、范围、finding、直接证据与限制；执行者先复核当前文件和 dirty overlap。只交接可用直接证据独立核实的机械 P2/P3；需独立验证、涉及权限或公共契约、证据不足的项仍具名阻塞。`mode:agent`、只读请求和远端范围不触发修复。修复发生在审查之后，不倒改报告、不声称独立验证，不自动提交或发布。无法进入执行 owner 时保留报告并说明修复尚未开始。
++
+ The explicit Quick Review Short-Circuit is separate: when the user asked for a quick/light review and the harness has a built-in report-only reviewer, use that path as requested rather than labelling it a failed multi-agent run.
+diff --git a/skills/spec-plan/references/plan-handoff.md b/skills/spec-plan/references/plan-handoff.md
+index 5210970c2ae2a7f7c4e68e83cf3d7e7732eb7431..456d9d3677e98470b1763dcd597ef5fd3ac0da5d 100644
+--- a/skills/spec-plan/references/plan-handoff.md
++++ b/skills/spec-plan/references/plan-handoff.md
+@@ -93,7 +93,7 @@ Immediately before final delivery or caller return, and before acting on a selec
+ 
+ Based on selection:
+ - **Start `/spec-work`** -> Classify the artifact first. If it is not `artifact_readiness: implementation-ready` plus `execution: code`, do not execute it; route requirements-only artifacts back to `spec-plan` enrichment and non-code artifacts to their own workflow. If it is executable, invoke the `spec-work` skill via the platform's skill-invocation primitive, passing the plan path as the skill argument; `spec-work` then owns engine selection (inline/subagent vs goal-mode vs dynamic-workflow) and the implementation tail. That shipping-tail owner alone may perform the Markdown source plan `active → completed` closeout after verification/review/residual gates; Return-to-Caller returns a candidate for its caller instead of writing. If no skill-invocation primitive exists, load the owner's source Skill through a host-supported equivalent when execution is authorized. 源码来源须满足上方 canonical 约束，另一宿主的 generated runtime 镜像不能替代该来源。 Only if no supported execution path exists, report the limitation and provide a `spec-work` fallback prompt; tell the executor to read Goal Capsule, Verification Contract, Definition of Done, and active U-IDs (scanning headings to find them) rather than the whole document first. Do not merely tell the user to type `/spec-work` when a skill invocation primitive is available.
+-- **Run as a goal** -> Build a **thin** implementation objective from the plan (generated here at handoff, never written into the doc). It points to the plan's sections; do **not** copy the plan's resolved decisions, exact verification commands, or requirements into the prompt. **Deletion test:** if your draft names a specific command, file path, U-ID dependency relationship, stop condition, or DoD item, cut it — the objective should read identically for any plan except the substituted path. Don't hardcode an open-a-PR or do-not-open-a-PR directive; carry the PR-precedence line instead. The objective: *implement `<plan-path>` to its Definition of Done; the plan is the authority — scan headings, don't read it whole; read the Goal Capsule, then work the units in dependency order, reading each unit plus its cited R/F/AE/KTD and any Product Contract Key Decision whose exact `Governs R...` links name that unit's cited R-IDs; run the plan's Verification Contract gates and satisfy each unit's test scenarios; track progress outside the plan file; follow the plan's PR/landing strategy if it defines one, with the repo's conventions and the user's preferences overriding it; surface a genuine blocker (something that changes scope or contradicts the plan) instead of guessing, using judgment on details the plan leaves open.* Then select the actually available interface; `spec-work` does **not** also run:
++- **Run as a goal** -> Build a **thin** implementation objective from the plan (generated here at handoff, never written into the doc). It points to the plan's sections; do **not** copy the plan's resolved decisions, exact verification commands, or requirements into the prompt. **Deletion test:** if your draft names a specific command, file path, U-ID dependency relationship, stop condition, or DoD item, cut it — the objective should read identically for any plan except the substituted path. 交给原生 goal 的目标必须携带本次授权上限；若用户已明确授权具体交付动作，随目标传递其动作与范围，不从计划、仓库惯例或沉默补授权。 The objective: *implement `<plan-path>` to its Definition of Done; the plan is the authority — scan headings, don't read it whole; read the Goal Capsule, then work the units in dependency order, reading each unit plus its cited R/F/AE/KTD and any Product Contract Key Decision whose exact `Governs R...` links name that unit's cited R-IDs; run the plan's Verification Contract gates and satisfy each unit's test scenarios; track progress outside the plan file; 仅在用户对相应动作和范围有明确授权时才提交、推送、创建 PR 或合并；计划中的发布策略是交付建议，不是授权; surface a genuine blocker (something that changes scope or contradicts the plan) instead of guessing, using judgment on details the plan leaves open.* Then select the actually available interface; `spec-work` does **not** also run:
+   - **Goal tools available:** Inspect the current tool schemas for their exact invocation and state rules. Creation capability does not prove inspection or completion capability. Use a creation tool (for example, `create_goal`) only when the user explicitly requests a goal and no unfinished goal exists. Reuse an existing active goal only after verifying that it belongs to the current full task and this top-level owner is responsible for it; do not update an unrelated goal. If no goal exists and none was requested, deliver normally without goal calls. After the full goal, review, residual-risk, and required verification gates pass, perform the same Markdown source-plan closeout before terminal goal completion and use the available completion interface (for example, `update_goal`). Report missing inspection/completion capabilities instead of assuming success. Respect paused, blocked, and other actual state rules; do not fabricate a resume or a goal transition.
+   - **Only a documented user command is available:** Present the objective with that exact documented command and explain which operation the user must perform. Do not assume a literal `/goal` command exists or can be issued by the agent. Deliver this handoff without claiming that the goal started or completed, and without requiring a return to the menu.
+ 
+diff --git a/skills/spec-prd/SKILL.md b/skills/spec-prd/SKILL.md
+index a1ea73f10b1f998ad9d306d49ef683feafbe280c..fd0bfe3b32429ff77ebf07518f518711a5afc042 100644
+--- a/skills/spec-prd/SKILL.md
++++ b/skills/spec-prd/SKILL.md
+@@ -274,7 +274,7 @@ Before asking owner questions, run Product Expert Lens over the Requirement Anal
+ 
+ Before the first durable PRD Write in an authoring/refinement run, emit a compact run-local Decision Card: `write_mode` (reused as the readiness declaration), `highest_risk_gap`, `next_action` (`ask-owner-first` / `checkpoint-prd` / `final-prd` / `route-out`), and `why planning will not invent WHAT`. This card exposes the path choice before side effects. Persist the three Decision-Card-only elements into the PRD `Readiness Self-Check` as verifiable body declarations — `decision_card_highest_risk_gap:`, `decision_card_next_action:`, `decision_card_why_no_invention:` — so Phase 1 entry is machine-verifiable in the artifact, not just asserted in conversation. `write_mode` itself doubles as the Decision Card's `write_mode` element (do not redeclare). `decision_card_next_action` 必须与该路径完全一致；两个字段都有效但互相冲突时，checker 报告 `decision_card_path_mismatch`。When the PRD claims `ready-for-planning` or `write_mode=final-prd`, the checker reports `decision_card_undeclared` if any of the three fields is missing or empty. `checkpoint-prd` 在仍处于 grill 时只豁免字段完整性，不豁免已声明字段之间的路径矛盾。If the card cannot justify `final-prd`, choose `ask-owner-first`, `checkpoint-prd`, or `route-out` instead of writing a final PRD and waiting for Phase 4 to catch it.
+ 
+-Run the **Pre-Write Closure Gate** before durable PRD write-in. The write-mode semantics and the checkpoint fallback are owned by the `write_mode` definitions above and `Canonical: Four Legal Stop Points` — do not re-derive them here. This gate adds only the write-in preconditions: Outstanding Questions, Planning Recheck, blocker cluster, or route-out residue still in the PRD prevents `final-prd`; an owner who has not capped a branch that still has reachable sub-decisions prevents `final-prd`.
++Run the **Pre-Write Closure Gate** before durable PRD write-in. The write-mode semantics and the checkpoint fallback are owned by the `write_mode` definitions above and `Canonical: Four Legal Stop Points` — do not re-derive them here. This gate adds only the write-in preconditions: 仍需规划者替用户决定 WHAT、验收、权限或范围时，保留阻塞，不得写 `final-prd`。不要按 Outstanding Questions 或 Planning Recheck 是否有条目判断；按下文 Closure-disposition razor 核对处置和证据。已定产品行为的纯实现复核项应保留并交接。未被 owner 截止且仍有可追问的承重子决定，继续澄清。
+ 
+ 🔴 **STOP — Pre-Write Closure Gate**: Do not use `write_mode=final-prd` as a shortcut around semantic closure. The LLM may persist final intent only after this gate; it must keep `status: draft` and omit `readiness_*`. Claude hard-blocks direct machine-field mutation, Qoder projection is activation-unverified, and Codex/Cursor/Kiro use this as a loud convention. In every host, producer finalize remains mandatory before closeout can claim ready.
+ 
+diff --git a/skills/spec-work/SKILL.md b/skills/spec-work/SKILL.md
+index a050076122a85d4c61e7ec0db98c75950ab32557..e327d7af7d2621eca530f6efe0e400ba9c56be0a 100644
+--- a/skills/spec-work/SKILL.md
++++ b/skills/spec-work/SKILL.md
+@@ -120,7 +120,7 @@ If that read fails, preserve every changed file, commit, and workspace. Return o
+ 
+ - Execute settled scope from current source; ask once only when repo/docs cannot resolve a material ambiguity.
+ - Reuse the correct owner and keep slices observable. Do not trade evidence, safety, accessibility, observability, or required verification for speed or lower LOC.
+-- Track actual task/unit evidence and blockers; commits and plan status are not progress proof. A user phrasing like "close out / wrap up the plan" is a completion request, not lifecycle authorization: report the completion candidate (`plan_status_completion_candidate`), and leave the plan status transition itself to the shipping-tail owner or an explicit lifecycle instruction — never run the status migration yourself inside the run.
++- Track actual task/unit evidence and blockers; commits and plan status are not progress proof. “收尾计划”不单独授权状态迁移。实施阶段不写状态；Return-to-Caller 只返回 `plan_status_completion_candidate`。独立运行中只有实际承担最终收尾的 owner，才按 `references/shipping-workflow.md` §5.2 核对前置条件并处理状态。
+ - Finish every in-scope unit and required review/verification before a completion claim. Keep failed/not-run/degraded limitations explicit.
+ - Do not widen work into adjacent cleanup, imagined future abstractions, human-time “session phases,” or a new private decomposition. Return scope-changing discoveries to the plan/task owner.
+ - 按 shipping owner 的风险条件审查每个非机械 diff，保留低风险定向审查或真实不可用降级的依据；commit 与 landing 始终分别授权。
+diff --git a/skills/using-spec-first/SKILL.md b/skills/using-spec-first/SKILL.md
+index 65cac94f7082b23ee1d6a2be55dff7ed6fd38d37..e7fc14619975eb1a26d493790381b2770cf54aee 100644
+--- a/skills/using-spec-first/SKILL.md
++++ b/skills/using-spec-first/SKILL.md
+@@ -39,9 +39,7 @@ Reason: <one concrete reason>
+ Next action: <one action the user can take now>
+ ```
+ 
+-Use the repository's configured user language. **Checkpoint — wait:** after any recommendation, stop and yield; enter the recommended entrypoint only after the user asks to continue.
+-
+-此等待仅适用于用户询问下一步、要求推荐或比较入口的场景。用户已明确要求执行任务时，选择入口后继续履行该任务已获授权的工作，不再把入口推荐当成一次新的审批。
++Use the repository's configured user language. **Checkpoint — wait:** 只请求推荐、比较或询问下一步时，给出一个入口与理由后等待。明确要求执行时，选择入口后继续已授权的工作，不再把入口推荐当成一次新的审批；只有缺少影响路由的事实或新增副作用授权时才停下。
+ 
+ 首次实质结果按宿主、target、入口、时间、结果和来源说明完成与未完成范围；欢迎语、入口推荐、setup receipt或文件存在不证明成功。不为示例创建文件，不自动提交、发布或升级为已验证知识；后续由当前owner承接已有授权。
+ 
+diff --git a/tests/unit/core-skill-handoff-boundaries.test.js b/tests/unit/core-skill-handoff-boundaries.test.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a716ccc745562dfa7d736751f5b9258c2572a88
+--- /dev/null
++++ b/tests/unit/core-skill-handoff-boundaries.test.js
+@@ -0,0 +1,38 @@
++const fs = require('node:fs');
++const path = require('node:path');
++
++const read = (relative) => fs.readFileSync(path.join(__dirname, '../../skills', relative), 'utf8');
++
++describe('核心工作流在决策位置保留交接边界', () => {
++  test('PR 对齐既要求同一提交，也排除本地索引与工作树变化', () => {
++    const scope = read('spec-code-review/references/scope.md').split('**PR scope mode.**')[1].split('**If a branch name')[0];
++    expect(scope).toContain('`git rev-parse HEAD` 与本次取得的 `headRefOid` 完全相同');
++    expect(scope).toContain('git status --porcelain=v1 --untracked-files=all');
++    expect(scope).toContain('git merge-base <baseRefOid> <headRefOid>');
++    expect(scope).not.toContain('when unpushed fixes exist, the local tree is canonical');
++  });
++
++  test('发布授权限制在实际发送给 goal 的目标里，而非只在上游说明里', () => {
++    const objective = read('spec-plan/references/plan-handoff.md').split('The objective: *')[1].split('* Then select')[0];
++    expect(objective).toContain('仅在用户对相应动作和范围有明确授权时');
++    expect(objective).toContain('计划中的发布策略是交付建议，不是授权');
++  });
++
++  test('PRD 写入前按未决行为而非表内残项阻断', () => {
++    const gate = read('spec-prd/SKILL.md').split('This gate adds only the write-in preconditions:')[1].split('\n')[0];
++    expect(gate).toContain('WHAT、验收、权限或范围');
++    expect(gate).toContain('纯实现复核项应保留并交接');
++  });
++
++  test('无独立审查不授权写入；仅明确要求本地修复时再交接', () => {
++    const handoff = read('spec-code-review/references/scope.md').split('**已授权的串行修复交接。**')[1].split('\n')[0];
++    expect(handoff).toContain('用户明确要求本地修复');
++    expect(handoff).toContain('`mode:agent`、只读请求和远端范围不触发修复');
++    expect(handoff).toContain('需独立验证');
++  });
++
++  test('结果摘要承认聊天出口；实施阶段不接管调用方的计划状态', () => {
++    expect(read('spec-brainstorm/SKILL.md').split('- **Outputs:**')[1].split('\n')[0]).toContain('不要求文件或稳定编号');
++    expect(read('spec-work/SKILL.md')).toContain('Return-to-Caller 只返回 `plan_status_completion_candidate`');
++  });
++});
+diff --git a/tests/unit/using-spec-first-contracts.test.js b/tests/unit/using-spec-first-contracts.test.js
+index 92a8c1139a32542036b43993812b66b1e1d5765f..629276ec016bc20ec7a66fb0dcdedef4e592916b 100644
+--- a/tests/unit/using-spec-first-contracts.test.js
++++ b/tests/unit/using-spec-first-contracts.test.js
+@@ -78,7 +78,9 @@ describe('using-spec-first entry-governor contracts', () => {
+     expect(skill).toContain('at most one route-changing question');
+     expect(skill).toContain('Recommended entrypoint: <spec-*, standalone skill, or terminal command>');
+     expect(skill).toContain("Use the repository's configured user language");
+-    expect(skill).toContain('**Checkpoint — wait:** after any recommendation, stop and yield; enter the recommended entrypoint only after the user asks to continue');
++    expect(skill).toContain('只请求推荐、比较或询问下一步时');
++    expect(skill).toContain('明确要求执行时，选择入口后继续已授权的工作');
++    expect(skill).not.toContain('after any recommendation, stop');
+     expect(skill).toContain('If a standalone skill is user-invoked only, recommend it and wait.');
+     expect(routeMap).toContain('`spec-explain`');
+     expect(routeMap).toContain('Direct Lane');

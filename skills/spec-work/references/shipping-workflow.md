@@ -129,6 +129,7 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    现在才实际执行（actually run）Step 1 选择的最终 checks。每个 check 都记录真实 `command`、`ran`、`exit_code`、`status`、`required_tools`、`missing_tools` 和 `reason_code`，并把 bounded、secret-stripped 输出写为当前 run root 下的 repo-relative redacted log，例如 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/logs/<check-id>.log`。不要把 terminal transcript、session temp path 或未脱敏原始输出直接作为 durable log。
 
+   - 声明当前工作树通过时，在最终这组检查开始前和结束后，从目标仓库执行本 Skill 的 `scripts/working-tree-fingerprint.cjs`。仅当两次 `fingerprint` 一致，才将开始时的值写入摘要顶层 `checked_worktree_fingerprint`。中途有行为改动，丢弃本组作为最终证据的资格，改后重新验证；无法取得稳定指纹就保留历史结果和限制，不在收尾时倒填。
    - `passed` 只允许 `ran=true`、`exit_code=0` 且存在 repo-relative redacted log。
    - `failed` 必须保留真实非零 `exit_code` 与日志，不得因为后续解释而改写为 passed。
    - dry-run 或仅可调度但未执行的 check 必须是 `not-run` + `reason_code: schedulable`；不得升级为 passed。
@@ -157,6 +158,8 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
    保存返回的 `run_summary_ref`。Helper 不执行或重跑命令、不推断 exit code、不深度清洗日志；它只验证 payload、路径、日志前缀和 schema。`checks[].command` 必须逐字等于本次运行实际执行的命令串（含管道、重定向与前缀变量展开后的最终形态）；把实际执行过的 pipeline 改写成理想化的单命令字符串（如把 `grep -n … | tee log` 记成 `grep -c …`）属于伪造验证证据，即使结果数值一致。schema 将 `command` 上限设为 500 字符（`verification-run-summary.schema.json`）：真实验证需要更长命令时，先把验证逻辑物化为 run 目录下的脚本文件并执行该脚本，`command` 记录这条短调用的真实形态——为通过 schema 而截断或改写已执行的长命令同样属于伪造。`run-summary-schema-invalid` 拒绝后，按具体校验错误修正 payload（实际命令超长时改用可记录的真实短调用重新验证并记录其真实结果）；重试仍被拒、恢复需要新授权或工具不可用时，按本文件 Fallback 与 E 步合同以 `null` ref + `claim_limitations` 显式记录拒绝原因与已尝试的恢复收尾——record 失败不代表验证失败或验证通过，不得改写为成功。相同 workspace/run-id 的 summary 是 immutable；`run-summary-already-exists` 不能通过覆盖旧文件修复，必须保留 reason 并停止 verified closeout claim。
 
    **C. 校验 structured claims。** 使用实际 run summary 组装 validation claims；review/impact claims 只能引用 target repo 内真实存在的普通文件，例如上一步物化的 review summary、source/plan 或 changed-surface evidence。运行：
+
+   对当前代码的通过声明，输入必须带 `validation_scope: current-worktree`。若摘要未绑定、工作树已变或指纹不可得，原样返回限制或在当前版本复跑；不能改用 `recorded-run` 来解除阻塞。面向读者写清检查的版本、通过了哪些行为，以及哪些仍待复验。
 
    ```bash
    spec-first internal honest-closeout validate \

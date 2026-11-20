@@ -39,9 +39,7 @@ Reason: <one concrete reason>
 Next action: <one action the user can take now>
 ```
 
-Use the repository's configured user language. **Checkpoint — wait:** after any recommendation, stop and yield; enter the recommended entrypoint only after the user asks to continue.
-
-此等待仅适用于用户询问下一步、要求推荐或比较入口的场景。用户已明确要求执行任务时，选择入口后继续履行该任务已获授权的工作，不再把入口推荐当成一次新的审批。
+Use the repository's configured user language. **Checkpoint — wait:** 只请求推荐、比较或询问下一步时，给出一个入口与理由后等待。明确要求执行时，选择入口后继续已授权的工作，不再把入口推荐当成一次新的审批；只有缺少影响路由的事实或新增副作用授权时才停下。
 
 首次实质结果按宿主、target、入口、时间、结果和来源说明完成与未完成范围；欢迎语、入口推荐、setup receipt或文件存在不证明成功。不为示例创建文件，不自动提交、发布或升级为已验证知识；后续由当前owner承接已有授权。
 

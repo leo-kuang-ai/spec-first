@@ -120,7 +120,7 @@ If that read fails, preserve every changed file, commit, and workspace. Return o
 
 - Execute settled scope from current source; ask once only when repo/docs cannot resolve a material ambiguity.
 - Reuse the correct owner and keep slices observable. Do not trade evidence, safety, accessibility, observability, or required verification for speed or lower LOC.
-- Track actual task/unit evidence and blockers; commits and plan status are not progress proof. A user phrasing like "close out / wrap up the plan" is a completion request, not lifecycle authorization: report the completion candidate (`plan_status_completion_candidate`), and leave the plan status transition itself to the shipping-tail owner or an explicit lifecycle instruction — never run the status migration yourself inside the run.
+- Track actual task/unit evidence and blockers; commits and plan status are not progress proof. “收尾计划”不单独授权状态迁移。实施阶段不写状态；Return-to-Caller 只返回 `plan_status_completion_candidate`。独立运行中只有实际承担最终收尾的 owner，才按 `references/shipping-workflow.md` §5.2 核对前置条件并处理状态。
 - Finish every in-scope unit and required review/verification before a completion claim. Keep failed/not-run/degraded limitations explicit.
 - Do not widen work into adjacent cleanup, imagined future abstractions, human-time “session phases,” or a new private decomposition. Return scope-changing discoveries to the plan/task owner.
 - 按 shipping owner 的风险条件审查每个非机械 diff，保留低风险定向审查或真实不可用降级的依据；commit 与 landing 始终分别授权。

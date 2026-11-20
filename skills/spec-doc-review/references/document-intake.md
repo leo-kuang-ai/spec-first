@@ -47,6 +47,8 @@ Existing mandatory reasons retain their diagnostic meaning: task packs remain `t
 
 **Core classification rules (apply these first):**
 
+非任务包、非统一执行计划的 Markdown 若标记 `type: design-review` 且内容是在评审技术设计，沿用 `plan` 视角。按背景、现状、设计、兼容、验收及上线的实际内容定位问题；不以缺少 `Implementation Units` 等英文标题判为不合格。尤其区分「设计规定失败时怎么做」与「有测试能检出该失败」。若附来源，区分原方案缺口和改排丢失。结论只判断这份稿能否支持研发决策，不签发执行就绪，不把修订这份稿的权限扩展到其来源；既有写入策略不变。
+
 - **`task-pack`**: Frontmatter `type: task-pack`; derived metadata such as `generated_by: spec-write-tasks`, `mode: derived`, `source_plan`, `source_plan_hash`; headings `Task Pack Contract`, `Execution Waves`, `Task Cards`. Task-pack identity takes precedence even when content includes U-IDs, files, or verification.
 - **`requirements`**: Frontmatter fields like `actors:`, `flows:`, `acceptance_examples:`; headings like `Acceptance Examples`, `Actors`, `Key Flows`; IDs like `R1`, `A1`, `F1`, `AE1`; prose focused on user/business problem and scope. No implementation units, per-unit file lists, or test scenarios.
 - **`plan`**: Frontmatter fields like `type: feat|fix|refactor`, `origin:`, `product_contract_source:`; headings like `Implementation Units`, `Key Technical Decisions`, `Risks & Dependencies`; IDs like `U1`, `U2`; per-unit `Goal`, `Files`, `Approach`, `Test scenarios`, `Verification`; repo-relative paths.

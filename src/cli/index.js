@@ -99,6 +99,7 @@ async function runCli(argv) {
 }
 
 function shouldRunVersionReminder(cmd, subcommandArgs) {
+  if (cmd === 'update' && subcommandArgs.includes('--dry-run')) return false;
   if (cmd !== 'doctor' && cmd !== 'init' && cmd !== 'clean' && cmd !== 'update' && cmd !== 'quickstart') {
     return false;
   }

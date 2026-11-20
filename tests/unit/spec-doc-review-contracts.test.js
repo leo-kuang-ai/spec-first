@@ -99,6 +99,22 @@ describe('report-only document integrity judges', () => {
 });
 
 describe('spec-doc-review current contracts', () => {
+  test('示例的摘要、覆盖行及具体条目相互一致', () => {
+    const template = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-doc-review/references/review-output-template.md'), 'utf8');
+    const example = template.split('```markdown\n')[1].split('\n```')[0];
+    const coverage = [...example.matchAll(/^\| ([\w-]+) \| completed \| (\d+) \| (\d+) \| (\d+) \| (\d+) \| (\d+) \| (\d+) \|$/gm)];
+    const totals = [0, 0, 0, 0];
+    for (const row of coverage) {
+      const [count, ...buckets] = row.slice(2, 7).map(Number);
+      expect(buckets.reduce((sum, value) => sum + value, 0)).toBe(count);
+      buckets.forEach((value, index) => { totals[index] += value; });
+    }
+    const [applied, proposed, decisions, fyi] = totals;
+    expect(example).toContain(`Applied ${applied} fixes. ${proposed + decisions} items need attention`);
+    expect(example).toContain(`${fyi} FYI observations.`);
+    expect((example.match(/\| gated_auto \|$/gm) || []).length).toBe(proposed);
+    expect((example.match(/\| manual \|$/gm) || []).length).toBe(decisions);
+  });
   // --- Existing assertions (preserved) ---
 
   test('asks for or discovers a document when none is supplied', () => {

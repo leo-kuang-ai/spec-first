@@ -12,7 +12,8 @@ Turn raw product feedback into structured evidence for downstream agents. This s
 Route to the matching reference based on the input. Read only the selected mode reference; both analysis modes require the shared analyzer reference before execution.
 
 - **Setup** — user has no recording yet and asks how to install Riffrec, capture a session, or share feedback. Read `references/install-riffrec.md`.
-- **Quick bug report** — input is a short recording (under ~60 seconds), the user describes a single specific issue, or asks for "quick", "small", or "just transcribe". Read `references/quick-bug-report.md`. Emit one concise bug report; skip the full artifact set and brainstorm handoff. Discovering broader scope returns an escalation handoff and never authorizes a durable extensive rerun.
+- **仅转写**：用户只要逐字稿时优先走此出口，不按录制时长改成缺陷报告。有可核实的本地逐字稿就直接交付，保留时间戳及缺段；没有时，只有本次第三方转录授权成立才按 `references/analyzer.md` 在新临时目录运行转录，交付实际返回的文本。没有文本且不能转录时说明缺口并停止，不用事件或截图推测原话。
+- **Quick bug report** — input is a short recording (under ~60 seconds), the user describes a single specific issue, or asks for "quick" or "small". Read `references/quick-bug-report.md`. Emit one concise bug report; skip the full artifact set and brainstorm handoff. Discovering broader scope returns an escalation handoff and never authorizes a durable extensive rerun.
 - **Extensive analysis** — input is a longer recording, contains multiple issues / requirements / workflow walkthroughs, or the user wants requirements or brainstorm material. Read `references/extensive-analysis.md`. Produce a ready-to-brainstorm handoff; invoke `spec-brainstorm` only when the original request or a new confirmation authorizes that public workflow.
 
 When the input is ambiguous (e.g., a zip arrived without context), inspect the recording length and event count before choosing. If still unclear, ask the user which path applies before running anything heavy.
@@ -42,6 +43,6 @@ worker_bounded_parallelism: supported | unsupported | unknown
 
 ## Analyzer Entrypoint
 
-Before either analysis mode runs, read [Shared analyzer](references/analyzer.md). Pass an unpacked Riffrec capture directory itself so synchronized metadata and media remain together. Setup does not run the analyzer.
+Before either analysis mode runs, read [Shared analyzer](references/analyzer.md). Pass an unpacked Riffrec capture directory itself so synchronized metadata and media remain together. Setup does not run the analyzer. 仅转写且已有本地文本时不运行分析器；需要运行时沿用同一隐私与授权边界。
 
 Extensive output under `docs/brainstorms/riffrec-feedback/` remains a documented evidence/kickoff-artifact exception, not a durable brainstorm output. Quick output stays temporary. The extensive artifact format is defined in `references/spec-first-feedback-format.md`.

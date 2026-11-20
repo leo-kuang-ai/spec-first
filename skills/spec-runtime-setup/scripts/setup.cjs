@@ -856,6 +856,13 @@ function main(argv = process.argv.slice(2)) {
     process.stderr.write('警告：setup 场景指纹生成失败；已保留主执行结果并继续。\n');
   }
   if (parsed.options.json || result.mode === 'plan' || ['blocked', 'failed'].includes(result.mode)) {
+    if (!parsed.options.json && result.mode === 'plan') {
+      for (const action of result.payload.planned_operations || []) {
+        if (action.blocked_reason === 'host-config-conflict') {
+          process.stderr.write(`宿主配置冲突：${action.config_key}（字段：${action.conflict_fields.join(', ') || '未报告'}）\n`);
+        }
+      }
+    }
     process.stdout.write(renderJson(result.payload));
   } else {
     process.stdout.write(result.human || renderJson(result.payload));

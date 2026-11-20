@@ -400,7 +400,8 @@ checkFixture({
   }
 }, {"README.md":["Known rough edges","Known limitations"]});
 const envelope = finalObject();
-checkCloseout(envelope);
+const closeout = checkCloseout(envelope, { allowTempClaims: false });
+assert.equal(outputObject(closeout).validation_scope, 'current-worktree', 'Historical validation cannot close the current tree');
 
 assert.equal(envelope.status, 'complete');
 assert.equal(envelope.standalone_shipping_skipped, true);
@@ -501,6 +502,8 @@ function computeWorkingTreeFingerprint(cwd = process.cwd()) {
   hash.update(headSha);
   hash.update('\0status\0');
   hash.update(status);
+  hash.update('\0index-entries\0');
+  hash.update(runGit(repoRoot, ['ls-files', '--stage', '-z']));
   hash.update('\0tracked-diff\0');
   hash.update(trackedDiff);
   hash.update('\0');
@@ -521,5 +524,6 @@ function computeWorkingTreeFingerprint(cwd = process.cwd()) {
 return computeWorkingTreeFingerprint();
 })();
 assert.deepEqual(envelope.verified_worktree_fingerprint, currentFingerprint, 'Return fingerprint does not match the final tree');
+assert.equal(JSON.parse(regular(envelope.verification_run_summary_ref)).checked_worktree_fingerprint, currentFingerprint.fingerprint, 'Recorded checks belong to another tree');
 console.log('PASS: fixture state and required outcome evidence verified; semantic quality is not scored.');
 EVAL_JUDGE_NODE

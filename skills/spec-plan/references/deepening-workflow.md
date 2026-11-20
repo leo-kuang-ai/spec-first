@@ -218,20 +218,16 @@ If agent outputs conflict:
 
 Skip this step in auto mode — proceed directly to 5.3.7.
 
-In interactive mode, present each agent's findings to the user before integration. For each agent that returned findings:
+交互审阅按用户需要决定的问题组织，而不是按专家的返回顺序组织。对同一决定，把建议并列，写清可选做法、各自代价、依据和来源，以及采纳后哪段方案会改变。意见相反时保留分歧；不同建议分别可选，不把接受一项当作接受整组。
 
-1. **Summarize the agent and its target section** — e.g., "The architecture-strategist reviewed Key Technical Decisions and found:"
-2. **Present the findings concisely** — bullet the key points, not the raw agent output. Include enough context for the user to evaluate: what the agent found, what evidence supports it, and what plan change it implies.
-3. **Ask the user** using the platform's blocking question tool when available (see Interaction Method):
+对每项需要用户裁决的建议使用 Interaction Method：
    - **Accept** — integrate these findings into the plan
    - **Reject** — discard these findings entirely
    - **Discuss** — the user wants to talk through the findings before deciding
 
 If the user chooses "Discuss", engage in brief dialogue about the findings and then re-ask with only accept/reject (no discuss option on the second ask). The user makes a deliberate choice either way.
 
-When presenting findings from multiple agents targeting the same section, present them one agent at a time so the user can make independent decisions. Do not merge findings from different agents before showing them.
-
-After all agents have been reviewed, carry only the accepted findings forward to 5.3.7.
+仅将已接受的具体建议带入 5.3.7。
 
 If the user accepted no findings, report "No findings accepted — plan unchanged." Then proceed directly to Phase 5.4 (skip document-review and synthesis — the plan was not modified). This interactive-mode-only skip does not apply in auto mode; auto mode always proceeds through 5.3.7 and 5.3.8. No explicit scratch cleanup needed — `$SCRATCH_DIR` is OS temp and will be cleaned up by the OS; leaving it in place preserves the rejected agent artifacts for debugging.
 

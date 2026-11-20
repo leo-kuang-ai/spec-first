@@ -254,8 +254,8 @@ test('exit-code arming: missing host CLI blocks only when never initialized or a
       );
       const skillsRootCount = synced.skills.length + synced.internalSkills.length;
 
-      expect(skillsRootCount).toBe(21);
-      expect(synced.workflowSkills).toHaveLength(17);
+      expect(skillsRootCount).toBe(19);
+      expect(synced.workflowSkills).toHaveLength(16);
       expect(skillsCheck).toEqual({
         level: 'PASS',
         name: adapter.skillsRoot,

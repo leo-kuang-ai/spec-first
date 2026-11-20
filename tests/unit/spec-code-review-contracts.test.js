@@ -93,6 +93,21 @@ const deploymentVerificationActivationCases = JSON.parse(fs.readFileSync(
 ));
 
 describe('spec-code-review current contracts', () => {
+  test('示例中的每个展示编号只指向一个位置，行动表沿用主表编号', () => {
+    const example = outputTemplate.split('```markdown\n')[1].split('\n```')[0];
+    const byId = new Map();
+    const locationRows = section => [...section.matchAll(/^\| (H?\d+) \| `([^`]+)`/gm)];
+    for (const [, id, location] of locationRows(example)) {
+      if (byId.has(id)) expect(location).toBe(byId.get(id));
+      byId.set(id, location);
+    }
+    const [primary, remainder] = example.split('### Actionable Findings');
+    const primaryIds = new Map(locationRows(primary).map(([, id, location]) => [id, location]));
+    for (const [, id, location] of locationRows(remainder.split('### Pre-existing Issues')[0])) {
+      expect(primaryIds.get(id)).toBe(location);
+    }
+    expect(example).toContain('**Verdict:** Not ready');
+  });
   test('入口在行为执行前连接实际阶段 owner，过程不复制回入口', () => {
     for (const file of phaseFiles) {
       expect(skillEntry).toContain(`references/${file}`);

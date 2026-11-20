@@ -14,6 +14,7 @@
   "properties": {
     "schema_version": { "type": "string", "const": "honest-closeout.v1" },
     "generated_at": { "type": "string" },
+    "validation_scope": { "type": "string", "enum": ["recorded-run", "current-worktree"] },
     "overall": { "type": "string", "enum": ["verified", "degraded", "unsupported"] },
     "overall_reason_code": { "type": "string", "minLength": 1, "maxLength": 120 },
     "claims": {

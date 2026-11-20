@@ -26,15 +26,12 @@ const roster = (Array.isArray(governance) ? governance : governance.skills)
 const CLASSIFICATION = {
   H: [
     'autoresearch',
-    'spec-app-consistency-audit',
     'spec-code-review',
     'spec-compound',
     'spec-compound-refresh',
     'spec-debug',
     'spec-plan',
     'spec-prd',
-    'spec-project-rules',
-    'spec-rule-miner',
     'spec-work',
   ],
   I: [
@@ -102,8 +99,8 @@ describe('project intelligence consumption contract', () => {
     const classified = Object.values(CLASSIFICATION).flat();
     expect(new Set(classified).size).toBe(classified.length);
     expect(classified.slice().sort()).toEqual(roster);
-    expect(classified).toHaveLength(38);
-    expect(CLASSIFICATION.H).toHaveLength(11);
+    expect(classified).toHaveLength(35);
+    expect(CLASSIFICATION.H).toHaveLength(8);
     expect(CLASSIFICATION.I).toHaveLength(10);
     expect(CLASSIFICATION.O).toHaveLength(5);
     expect(CLASSIFICATION.N).toHaveLength(12);

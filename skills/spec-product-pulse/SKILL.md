@@ -60,7 +60,7 @@ Read `references/config.md`, `references/setup.md`, and `references/run.md` at t
 
 ### Phase 0: Route by Config State
 
-Read `references/config.md`. Resolve `<repo-root>` at runtime with `git rev-parse --show-toplevel`, then read `<repo-root>/.spec-first/config.local.yaml`. An absent root/config or unset `pulse_product_name` routes to the first-run interview; otherwise continue to the pulse run. An explicit `setup`, `reconfigure`, or `edit config` argument always routes to setup.
+Resolve `<repo-root>` at runtime with `git rev-parse --show-toplevel` as described in `references/config.md`. 找不到仓库时只请求目标路径，不开始访谈、查询或写入。根目录已确认且配置不存在或 `pulse_product_name` 未设，才进入首次访谈；显式 setup/reconfigure/edit config 同样需要已确认的仓库。已有有效配置则运行报告。
 
 The active keys include `pulse_product_name`, `pulse_lookback_default`, `pulse_primary_event`, `pulse_value_event`, `pulse_completion_events`, `pulse_quality_scoring`, `pulse_quality_dimension`, `pulse_analytics_source`, `pulse_tracing_source`, `pulse_payments_source`, `pulse_db_enabled`, `pulse_metric_sources`, `pulse_pending_metrics`, `pulse_excluded_metrics`, and `pulse_schedule`. Invalid or missing values use the defaults documented in `references/config.md`; do not guess.
 

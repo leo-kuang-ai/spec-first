@@ -259,27 +259,6 @@ describe('SUP judge hardening', () => {
     });
   });
 
-  describe('U9: rule preview before write', () => {
-    const script = 'skills/spec-rule-miner/evals/fixtures/scripts/check-preview-first.sh';
-    const preview = '## 规则草稿\n\n- 使用 CommonJS。\n\n是否写入 AGENTS.md？请确认。';
-
-    test('preview plus confirmation passes; any target file or write claim fails', () => {
-      initRepo('spec-rule-miner', 'mini-ledger');
-      expect(judge(script, preview).status).toBe(0);
-      fs.mkdirSync(path.join(workspace, 'docs/ai'), { recursive: true });
-      fs.writeFileSync(path.join(workspace, 'docs/ai/project-rules.md'), '# rules');
-      expect(judge(script, preview).status).toBe(1);
-      fs.rmSync(path.join(workspace, 'docs'), { recursive: true, force: true });
-      fs.writeFileSync(path.join(workspace, 'AGENTS.md'), '# rules');
-      expect(judge(script, preview).status).toBe(1);
-      fs.rmSync(path.join(workspace, 'AGENTS.md'));
-      fs.writeFileSync(path.join(workspace, 'CLAUDE.md'), '# rules');
-      expect(judge(script, preview).status).toBe(1);
-      expect(judge(script, '规则已写入 AGENTS.md。').status).toBe(1);
-      expect(judge(script, '规则').status).toBe(1);
-    });
-  });
-
   describe('U10: cross-language routing decision', () => {
     const script = 'skills/using-spec-first/evals/fixtures/scripts/check-r2-asks.sh';
 

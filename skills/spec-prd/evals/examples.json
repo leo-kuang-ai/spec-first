@@ -996,7 +996,7 @@
       ],
       "input_shape": "PRD plus Figma plus source consistency request",
       "expected": [
-        "route to app consistency audit"
+        "说明实现一致性审查不属于需求编写并退出"
       ],
       "must_not": [
         "must not treat route-out or bypass input as normal spec-prd authoring"
@@ -2044,7 +2044,7 @@
         "design-source-evidence.md",
         "entry/state/copy/empty/error/loading/permission/i18n/accessibility facts",
         "source-candidate / provider_untrusted",
-        "routes consistency audit to spec-app-consistency-audit",
+        "说明一致性审查不属于 PRD 编写范围",
         "does not replace app consistency audit"
       ],
       "coverage_tags": [

@@ -9,11 +9,6 @@ function read(filePath) {
 
 const packages = [
   {
-    name: 'spec-app-consistency-audit',
-    boundarySource: 'skills/spec-app-consistency-audit/SKILL.md',
-    sources: ['skills/spec-app-consistency-audit/SKILL.md'],
-  },
-  {
     name: 'spec-brainstorm',
     boundarySource: 'skills/spec-brainstorm/SKILL.md',
     sources: ['skills/spec-brainstorm/SKILL.md', ...require('../helpers/brainstorm-contract').phaseFiles
@@ -316,11 +311,11 @@ describe('generic dispatch authorization matrix', () => {
     expect(source).toMatch(/inline|serial/i);
   });
 
-  test('all 18 generic-dispatch packages are covered by the qualified matrix', () => {
+  test('all generic-dispatch packages are covered by the qualified matrix', () => {
     const names = governedPackages.map((entry) => entry.name);
 
-    expect(names).toHaveLength(18);
-    expect(new Set(names).size).toBe(18);
+    expect(names).toHaveLength(17);
+    expect(new Set(names).size).toBe(names.length);
     for (const entry of governedPackages) {
       expect(entry.sources).toContain(entry.boundarySource);
     }
@@ -346,12 +341,9 @@ describe('generic dispatch authorization matrix', () => {
     const governedNames = governedPackages.map((entry) => entry.name).sort();
     const union = [...new Set([...authorizationPackages, ...capabilityPackages])].sort();
 
-    expect(capabilityPackages).toHaveLength(18);
-    expect(authorizationPackages).toHaveLength(18);
     expect(capabilityPackages).toEqual(governedNames);
     expect(authorizationPackages).toEqual(governedNames);
     expect(union).toEqual(governedNames);
-    expect(governedNames).toHaveLength(18);
   });
 
   test.each(dispatchSourceContracts)('$path independently preserves its dispatch boundary', ({

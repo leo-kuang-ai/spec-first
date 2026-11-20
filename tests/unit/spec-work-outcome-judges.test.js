@@ -43,19 +43,23 @@ describe('Work outcome judge calibration', () => {
         { role: 'tool_result', tool_result: { call_id: id, status: 'success', content: result.stdout } });
       return { command, result };
     };
+    fs.appendFileSync(path.join(workspace, '.git/info/exclude'), '\n/.spec-first/workflows/\n');
+    const { computeWorkingTreeFingerprint } = require('../../skills/spec-work/scripts/working-tree-fingerprint.cjs');
+    const checkedTree = computeWorkingTreeFingerprint(workspace).fingerprint;
     const checked = run(['-e', "require('node:assert/strict').ok(require('node:fs').readFileSync('README.md','utf8').includes('Known limitations')); console.log('README verified');"]);
+    expect(computeWorkingTreeFingerprint(workspace).fingerprint).toBe(checkedTree);
     const slug = path.basename(workspace).toLowerCase();
     const runRoot = `.spec-first/workflows/spec-work/${slug}/calibration`;
     fs.mkdirSync(path.join(workspace, runRoot, 'logs'), { recursive: true });
     fs.writeFileSync(path.join(workspace, runRoot, 'logs/check.log'), checked.result.stdout);
-    const payload = { profile: { source: 'explicit', name: 'README', path: null }, checks: [{
+    const payload = { checked_worktree_fingerprint: checkedTree, profile: { source: 'explicit', name: 'README', path: null }, checks: [{
       id: 'readme', service: 'node', command: checked.command, status: 'passed', exit_code: 0, ran: true,
       required_tools: ['node'], missing_tools: [], log_path: `${runRoot}/logs/check.log`, reason_code: 'executed', redaction_status: 'none-required',
     }] };
     fs.writeFileSync(path.join(workspace, runRoot, 'input.json'), JSON.stringify(payload));
     const recorded = run([cli, 'internal', 'verification-run-summary', 'record', '--input', `${runRoot}/input.json`, '--run-id', 'calibration', '--target-repo', workspace, '--json']);
     const ref = JSON.parse(recorded.result.stdout).run_summary_ref;
-    fs.writeFileSync(path.join(workspace, runRoot, 'claims.json'), JSON.stringify({ run_summary_ref: ref,
+    fs.writeFileSync(path.join(workspace, runRoot, 'claims.json'), JSON.stringify({ run_summary_ref: ref, validation_scope: 'current-worktree',
       claims: [{ claim_type: 'validation', asserted_status: 'passed', evidence_refs: ['verification-run-summary:readme'] }] }));
     const closed = run([cli, 'internal', 'honest-closeout', 'validate', '--input', `${runRoot}/claims.json`, '--target-repo', workspace, '--json']);
     expect(JSON.parse(closed.result.stdout).overall).toBe('verified');

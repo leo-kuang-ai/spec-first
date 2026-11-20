@@ -139,6 +139,17 @@ describe('规划返回判据的正反例校准', () => {
     fs.writeFileSync(path.join(workspace, 'docs/plans/month-filter-plan.md'), planText.replace('implementation-ready', 'requirements-only'));
     expect(judge().status).toBe(1);
   });
+  test('传统评审目录不能冒用 v1 元数据通过正式计划交接', () => {
+    expect(judge().status).toBe(0);
+    const headings = ['背景、目标与范围', '现状与问题分析', '总体设计与方案选型', '详细设计', '测试与验收', '实施与上线'];
+    let index = 0;
+    const changed = planText.replace(/^## .+$/gm, () => `## ${headings[index++]}`);
+    expect(index).toBe(headings.length);
+    fs.writeFileSync(path.join(workspace, 'docs/plans/month-filter-plan.md'), `${changed}\n## 影响范围与兼容性\n`);
+    const result = judge();
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('缺少计划结构：Goal Capsule');
+  });
   test('阻塞包不能冒充已实施或返回已有 caller', () => {
     const value = packet('blocked');
     value.implementation_started = true;

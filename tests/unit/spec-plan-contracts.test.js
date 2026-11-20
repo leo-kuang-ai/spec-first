@@ -35,6 +35,14 @@ function sectionBetween(source, start, end) {
 }
 
 describe('spec-plan current contracts', () => {
+  test('评审后的实施判定覆盖两种格式和两种执行入口', () => {
+    const checks = sectionBetween(handoff, '## 5.3.9 Final Checks', '## 5.4 Post-Generation');
+    expect(checks).toContain('Markdown 与 HTML');
+    expect(checks).toContain('暂停 `spec-work` 和原生 goal');
+    expect(checks).toContain('requirements-only');
+    expect(checks).toContain('非阻塞建议不影响实施资格');
+  });
+
   test('continues historical plans through an evidence-scoped successor without resetting history', () => {
     const resume = sectionBetween(skill, '#### 0.1 Resume', '#### 0.2');
     expect(resume).toContain('current user explicitly requests completion');

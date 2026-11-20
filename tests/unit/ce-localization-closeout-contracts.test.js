@@ -198,14 +198,8 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('requires a source-bound semantic delta before refreshing a stale review receipt', () => {
-    const deterministic = producer.buildArtifacts();
-    const closeout = producer.loadCloseoutArtifacts();
-    const staleReview = closeout.reviews.round3Openai;
-    const currentDelta = reviewDelta(
-      deterministic,
-      closeoutWriter.collectReviewGaps(staleReview, deterministic),
-    );
-    const review = closeoutWriter.mergeReviewDelta(staleReview, deterministic, currentDelta);
+    const deterministic = recordedDeterministic();
+    const review = producer.loadCloseoutArtifacts().reviews.round3Openai;
     const skillReview = review.skill_reviews.find((entry) => entry.skill_id === 'spec-compound');
     const receipt = skillReview.source_read_receipts.find((entry) => entry.path === 'skills/spec-compound/SKILL.md');
     const fact = deterministic.coverage.package_files.find((entry) => entry.path === receipt.path);
@@ -335,14 +329,8 @@ describe('CE localization closeout artifacts', () => {
   });
 
   test('does not refresh an unreviewed Skill that shares the same source path', () => {
-    const deterministic = producer.buildArtifacts();
-    const closeout = producer.loadCloseoutArtifacts();
-    const staleReview = closeout.reviews.round3Openai;
-    const currentDelta = reviewDelta(
-      deterministic,
-      closeoutWriter.collectReviewGaps(staleReview, deterministic),
-    );
-    const review = closeoutWriter.mergeReviewDelta(staleReview, deterministic, currentDelta);
+    const deterministic = recordedDeterministic();
+    const review = producer.loadCloseoutArtifacts().reviews.round3Openai;
     const sharedPath = 'tests/unit/compound-promotion-contracts.test.js';
     const reviewedSkillId = 'spec-compound';
     const unreviewedSkillId = 'spec-compound-refresh';
@@ -366,6 +354,16 @@ describe('CE localization closeout artifacts', () => {
       .toEqual({ valid: true, errors: [] });
     expect(() => closeoutWriter.mergeReviewDelta(review, deterministic, delta))
       .toThrow(`${unreviewedSkillId}:${sharedPath}`);
+  });
+
+  test('整个 Skill 退役时必须重新完整审查', () => {
+    const deterministic = recordedDeterministic();
+    const review = producer.loadCloseoutArtifacts().reviews.round3Openai;
+    deterministic.inventory.skills = deterministic.inventory.skills.filter(
+      (entry) => entry.skill_id !== 'spec-compound',
+    );
+    expect(() => closeoutWriter.collectReviewGaps(review, deterministic))
+      .toThrow('run a full current-source lane review');
   });
 
   test('allows one Skill/path relation to stay current while another is explicitly retired', () => {

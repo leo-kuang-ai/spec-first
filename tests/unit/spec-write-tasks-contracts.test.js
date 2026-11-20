@@ -21,6 +21,11 @@ const qualityGuide = fs.readFileSync(
 );
 
 describe('spec-write-tasks current contracts', () => {
+  test('示例卡片与结构化任务的执行字段一致', () => {
+    const contract = JSON.parse(schema.match(/^```json\n([\s\S]*?)\n```/m)[1]);
+    const card = require('js-yaml').safeLoad(schema.split('### Recommended Human-Readable Task Card Example')[1].match(/```yaml\n([\s\S]*?)\n```/)[1]);
+    expect(card).toEqual(contract.tasks.find(task => task.task_id === card.task_id));
+  });
   test('keeps the plan canonical and task packs derived', () => {
     expect(skill).toContain('Keep the plan as single source of truth');
     expect(skill).toContain('Task Pack Contract');

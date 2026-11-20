@@ -16,19 +16,6 @@ function section(source, heading) {
 }
 
 describe('Skill-flow 剩余 P2 关闭合同', () => {
-  test('SF-14 将 app-audit code-review 字段限定为休眠兼容而非 active edge', () => {
-    const skill = read('skills/spec-app-consistency-audit/SKILL.md');
-    const modeContract = read('skills/spec-app-consistency-audit/references/mode-output-contract.md');
-    const mergeScript = read('skills/spec-app-consistency-audit/scripts/merge-contracts.js');
-    const consumers = section(skill, '### Downstream Consumers');
-
-    expect(consumers).not.toBe('');
-    expect(consumers).not.toContain('`spec-code-review`');
-    expect(skill).toContain('休眠兼容字段');
-    expect(modeContract).toContain('当前没有受治理的');
-    expect(mergeScript).toContain("consumers: ['report-writer']");
-  });
-
   test('SF-15 只列出真正读取 optimization artifact 的 consumer', () => {
     const skill = read('skills/spec-optimize/SKILL.md');
 

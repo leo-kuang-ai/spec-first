@@ -19,7 +19,7 @@ This skill does not implement code. It explores, clarifies, and documents decisi
 ## Workflow Contract Summary
 
 - **Inputs:** unresolved product ideas, users, constraints, and traceable repository or external evidence.
-- **Outputs:** a requirements-only unified plan with a Product Contract, scope, success criteria, open questions, and evidence limitations.
+- **Outputs:** 小而明确的讨论可在聊天中交付产品决定、理由和仍未确定的事项，不要求文件或稳定编号。需要持久交接时才交付 requirements-only unified plan，包含 Product Contract、范围、成功标准、未决问题和证据限制。
 - **Hard exits:** unresolved product decisions, target repository or document ownership, unsupported claims, or work owned by planning, implementation, debugging, or review.
 - **Authority:** the current user confirms product meaning; the LLM explores and synthesizes; scripts and providers supply advisory facts. This workflow does not authorize implementation, commits, or landing.
 - **Consumers:** `spec-plan`, `spec-doc-review`, product owners, and downstream requirements reviewers.

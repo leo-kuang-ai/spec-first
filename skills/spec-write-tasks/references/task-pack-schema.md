@@ -108,7 +108,7 @@ Traceability Matrix makes requirement / source unit / task / validation coverage
 ```md
 | Source | Requirement / Acceptance | Task(s) | Validation |
 | --- | --- | --- | --- |
-| U1 | R1, AE1 | T001, T002 | unit tests + smoke path |
+| U1 | R1 | T001 | 验证当前任务包可用、过期任务包被拒绝 |
 ```
 
 Rules:
@@ -154,16 +154,15 @@ Executable task packs must include exactly one fenced JSON block under `## Task 
       "task_id": "T001",
       "source_unit": "U1",
       "requirement_refs": ["R1"],
-      "goal": "Validate task pack identity, freshness, and structure.",
+      "goal": "校验任务包的来源、版本和结构。",
       "dependencies": [],
-      "files": ["src/cli/task-pack.js"],
-      "expected_side_effects": ["package-lock.json"],
-      "test_focus": "Valid and stale task pack validation.",
-      "done_signal": "Validator tests pass.",
+      "files": ["src/cli/task-pack.js", "tests/unit/task-pack-command.test.js"],
+      "test_focus": "分别验证当前任务包和源方案已变更的旧任务包。",
+      "done_signal": "当前任务包通过校验；旧任务包被拒绝执行。",
       "wave": 1,
       "review_gate": "required",
-      "review_focus": "Review task-pack validator compatibility and source-plan boundary.",
-      "stop_if": "Validation requires judging task splitting quality or changing source-plan scope."
+      "review_focus": "检查新校验是否仍接受合法任务包。",
+      "stop_if": "需要改变源方案范围或由校验器判断任务拆分质量时停止。"
     }
   ]
 }
@@ -213,31 +212,23 @@ These fields should be added when useful for context compression, review, or wor
 
 ### Recommended Human-Readable Task Card Example
 
-```md
-- T001
-  source_unit: U1
-  goal: Establish the core data structure and boundary contract
-  dependencies: []
-  files:
-    - src/cli/task-pack.js
-    - tests/unit/task-pack-command.test.js
-  expected_side_effects:
-    - package-lock.json
-  requirement_refs:
-    - R1
-  context_refs:
-    - docs/plans/example-plan.md#U2-Task-pack-source-plan-focused-read
-    - skills/spec-work/SKILL.md#Phase-1-Quick-Start
-    - tests/unit/spec-work-contracts.test.js
-  entry_hint: Start with the plan's Requirements and Scope Boundaries
-  test_focus: Minimal happy path for core behavior
-  done_signal: Relevant tests pass and the boundary is stable
-  parallelizable: false
-  risk_note: Core structure drift would affect later tasks
-  review_gate: required
-  review_focus: Check source-plan authority, validator compatibility, and scope expansion risks
-  stop_if: A new public entrypoint, config key, or durable state file is needed but absent from the plan
-  wave: 1
+写卡片时从对应 JSON 任务提取范围、验收、评审与停止条件。交接前对照两种视图；任何差异若会改变执行者的行动，先修正卡片再交接。CLI 不校验自由文本。
+
+```yaml
+task_id: T001
+source_unit: U1
+requirement_refs: [R1]
+goal: 校验任务包的来源、版本和结构。
+dependencies: []
+files:
+  - src/cli/task-pack.js
+  - tests/unit/task-pack-command.test.js
+test_focus: 分别验证当前任务包和源方案已变更的旧任务包。
+done_signal: 当前任务包通过校验；旧任务包被拒绝执行。
+review_gate: required
+review_focus: 检查新校验是否仍接受合法任务包。
+stop_if: 需要改变源方案范围或由校验器判断任务拆分质量时停止。
+wave: 1
 ```
 
 ## Orientation Evidence

@@ -83,8 +83,9 @@ async function runUpdate(argv, deps = {}) {
   }
 
   // `--json` / `--claude` / `--codex` 等旧 check-only flag 已移除,视为用法错误。
-  if (args.length > 0) {
-    console.error(`Usage: spec-first update [-h|--help]`);
+  const dryRun = args.length === 1 && args[0] === '--dry-run';
+  if (args.length > 0 && !dryRun) {
+    console.error(`Usage: spec-first update [--dry-run] [-h|--help]`);
     return 2;
   }
 
@@ -100,6 +101,18 @@ async function runUpdate(argv, deps = {}) {
 
   // 来源不足时不安装第二份包，也不让旧 CLI 自动刷新项目。
   const origin = (deps.detectInstallOrigin || detectInstallOrigin)();
+  if (dryRun) {
+    console.log(`更新预览（不安装、不刷新）\n安装来源：${origin.origin} (${origin.reason_code})\n当前 CLI：${process.argv[1]} (v${pkg.version})\n工作目录：${cwd}`);
+    if (origin.origin === 'npm-global') {
+      const targetVersion = (deps.lookupTargetVersion || lookupTargetVersion)(cwd);
+      console.log(`npm latest：${targetVersion || '未知（查询失败）'}`);
+      const refresh = resolveRuntimeRefresh(cwd);
+      console.log(`项目目录：${refresh?.cwd || cwd}`);
+      console.log(refresh?.args ? `拟执行：${formatSpecFirstCommand(refresh.args)}` : resolveRefreshSkippedMessage(messages, refresh || {}));
+      if (!refresh?.args) printRuntimeRefreshFallback(refresh || {});
+      return 0;
+    }
+  }
   if (origin.origin !== 'npm-global') {
     console.log(`包升级：已跳过。安装来源：${origin.origin} (${origin.reason_code})。`);
     if (origin.origin === 'claude-plugin') {
@@ -144,7 +157,7 @@ async function runUpdate(argv, deps = {}) {
   const installedCli = resolveInstalledCli();
   const installedVersion = readInstalledVersion(installedCli && installedCli.cliPath);
   console.log(installedVersion
-    ? messages.upgradedTo(PACKAGE_NAME, installedVersion)
+    ? `${messages.upgradedTo(PACKAGE_NAME, installedVersion)} (${pkg.version} → ${installedVersion})`
     : messages.upgraded(PACKAGE_NAME));
   const refresh = resolveRuntimeRefresh(cwd);
   if (!refresh || !Array.isArray(refresh.args)) {
@@ -175,7 +188,7 @@ async function runUpdate(argv, deps = {}) {
       const status = refreshResult && Number.isInteger(refreshResult.status) ? refreshResult.status : 1;
       console.error('');
       console.error(messages.refreshDegradedExit(status));
-      printRuntimeRefreshFallback(refresh);
+      console.error(`包安装步骤已完成，无需重新安装。仅重试项目配置：\n  工作目录：${refresh.cwd || cwd}\n  Node 入口：${installedCli.cliPath}\n  参数：${refresh.args.join(' ')}`);
       return 1;
     }
     console.log(messages.refreshCompleted);
@@ -211,6 +224,17 @@ function readInstalledVersion(cliPath, options = {}) {
 // 返回 { status, errorCode },便于测试注入替身。
 // Node >=20.12 (CVE-2024-27980) 拒绝 shell:false 下 spawn `.cmd`,直接 spawn `npm.cmd` 会 EINVAL;
 // 复用仓库既有的 npm CLI JavaScript resolver,统一走 `node npm-cli.js`。
+function lookupTargetVersion(cwd) {
+  try {
+    const result = runNpm(['view', '--global', `${PACKAGE_NAME}@latest`, 'version', '--json', '--fetch-retries=0'], { cwd, encoding: 'utf8', timeout: 4000 });
+    if (result.status !== 0 || result.error || result.signal) return '';
+    const version = JSON.parse(result.stdout);
+    return typeof version === 'string' && /^\d+\.\d+\.\d+(?:[-+][\w.+-]+)?$/.test(version) ? version : '';
+  } catch {
+    return '';
+  }
+}
+
 function defaultRunInstall() {
   try {
     const result = runNpm(['install', '-g', `${PACKAGE_NAME}@latest`], { stdio: 'inherit' });
@@ -489,6 +513,7 @@ function printHelp() {
     '',
     '📘 Usage:',
     '  spec-first update',
+    '  spec-first update --dry-run   预览安装来源、目标版本与项目刷新范围，不执行更新',
     '',
     '⚙️  Options:',
     '  -h, --help      Show help',

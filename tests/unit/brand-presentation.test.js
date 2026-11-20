@@ -1,9 +1,5 @@
 'use strict';
 
-// 品牌展示契约：首次安装（init/quickstart）与后续更新（update）入口
-// 都必须呈现 spec-first logo。形态语义：首次安装 fullArt，刷新 wordmark，
-// update fullArt；quickstart 以 wordmark 让位给转发目标 init 的主 logo。
-
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -69,7 +65,7 @@ describe('brand presentation contract', () => {
     }
   });
 
-  test('init -y refresh renders the compact wordmark', async () => {
+  test('重复 init 展示与首次安装相同的完整标识', async () => {
     const { repo } = makeRepo();
     const originalCwd = process.cwd();
     const first = withCapturedLogs();
@@ -88,8 +84,8 @@ describe('brand presentation contract', () => {
         second.restore();
       }
       const output = refreshLines.join('\n');
-      expect(output).toContain(WORDMARK_PREFIX);
-      expect(output).not.toContain(FULLART_MARK);
+      expect(output).toContain(FULLART_MARK);
+      expect(refreshLines[0]).toBe(first.lines[0]);
     } finally {
       first.restore();
       process.chdir(originalCwd);

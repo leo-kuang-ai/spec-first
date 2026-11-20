@@ -400,7 +400,8 @@ checkFixture({
   }
 }, {"README.md":["Known rough edges","Known limitations"]});
 const envelope = finalObject();
-checkCloseout(envelope, { allowTempClaims: true });
+const closeout = checkCloseout(envelope, { allowTempClaims: true });
+assert.equal(outputObject(closeout).validation_scope, 'current-worktree', 'Historical validation cannot close the current tree');
 
 // fresh-run 恢复纪律（shipping-workflow.md :58）：无 durable run artifact 存在时
 // state-write 结构性非法（transcript 断言）；verification-run-summary record 只写

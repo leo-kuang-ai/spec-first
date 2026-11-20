@@ -6,6 +6,14 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const CodexAdapter = require('../../src/cli/adapters/codex');
+const { isPathWithin } = require('../../src/cli/commands/init-paths');
+
+test('工作区允许双点开头的普通目录名，但不允许父目录或兄弟目录', () => {
+  const root = path.join(os.tmpdir(), 'workspace');
+  expect(isPathWithin(path.join(root, '..client', 'src'), root)).toBe(true);
+  expect(isPathWithin(path.dirname(root), root)).toBe(false);
+  expect(isPathWithin(path.join(root, '..', 'sibling'), root)).toBe(false);
+});
 const { buildInitPlan } = require('../../src/cli/commands/init-plan');
 const {
   applyWorkspaceInitPlan,

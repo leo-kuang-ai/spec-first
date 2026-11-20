@@ -119,14 +119,14 @@ Set `BASE:` to `pr:<number-or-url>` (logical marker — not a git SHA). Set `UNT
 
 1. `git rev-parse --abbrev-ref HEAD` equals `headRefName`.
 2. The PR is **not** cross-repository (`isCrossRepository` is false).
-3. The PR head commit is contained in the local checkout: `git merge-base --is-ancestor <headRefOid> HEAD` exits 0. This confirms the working tree actually carries the PR head (allowing unpushed local fixes layered on top) rather than an unrelated same-named branch.
+3. `git rev-parse HEAD` 与本次取得的 `headRefOid` 完全相同，`git status --porcelain=v1 --untracked-files=all` 成功且输出为空，且本地可以解析本次取得的 `baseRefOid`。仅有祖先关系、索引或工作树有改动、身份不可核实，均走 `pr-remote`。本地未推送的修复可另列说明，不能关闭远端 finding。
 
 - **`local-aligned`** — all three checks pass. Local Read/Grep/git blame against workspace files are valid for PR changed paths.
 - **`pr-remote`** — any check fails. The working tree is **not** the PR head; workspace file contents for changed paths may be stale or unrelated.
 
 **Diff by scope mode** (do not mix remote and local diffs — contradictory hunks cause false positives):
 
-- **`local-aligned`:** Resolve `<resolved-base-ref>` from `baseRefName` (fetch if needed). Compute `BASE=$(git merge-base HEAD <resolved-base-ref>)`, then set `FILES:` from `git diff --name-only $BASE` and `DIFF:` from `git diff -U10 $BASE` (includes committed, staged, and unstaged changes on the PR branch). Do **not** call `gh pr diff` or append remote hunks — when unpushed fixes exist, the local tree is canonical. Note in Coverage: `scope: local-aligned (PR; local tree diff)`.
+- **`local-aligned`:** 以 `git merge-base <baseRefOid> <headRefOid>` 为 `BASE`；文件清单与补丁均比较 `BASE` 到 `headRefOid` 两个不可变提交，不使用移动分支名或工作树作为差异终点。无法求得共同祖先时走 `pr-remote`。两种 PR 模式的报告都标明实际审查的 base/head OID。开始验证或本地修复前复核本地对齐；对齐已失效则停止依赖工作树的动作。出具当前 PR 结论前复核远端两端身份，发生变化则重新取证；未经推送的本地修复不改变原 PR 结论。
 - **`pr-remote`:** Set `FILES:` from the PR `files` array. Set `DIFF:` from `gh pr diff <number-or-url> --color=never`. If `gh pr diff` fails, stop with an actionable error — do not fall back to checkout.
 
 When **`pr-remote`**, before Stage 4:
@@ -249,5 +249,7 @@ Inline fallback output contract:
 2. Normalize every surviving issue directly into the final finding fields, assign stable `#` values in Stage 5 ordering, set `reviewers: ["inline-fallback"]`, and derive `actionable_findings` from the normal routing fields. Do not emit a preliminary fast-pass block or claim validation/cross-reviewer agreement.
 3. Set `reviewers: ["inline-fallback"]`, `coverage.dispatch_reason_code` to the concrete fallback reason, and record independent/validator/cross-model coverage as not run. When no targeted command ran, use the Stage 5d `no-targeted-command-executed` evidence shape.
 4. Return `status: degraded` and `verdict: Not ready` even when no issue is found; single-model bounded coverage cannot close merge readiness. In task mode also set `required_gate_eligible: false`.
+
+**已授权的串行修复交接。** 先按 Stage 5e 冻结并复核只读报告，保留其 `degraded` 和未执行独立验证的事实。仅在普通模式、用户明确要求本地修复、当前范围是可核实的本地树、且未发现范围漂移时，交回已有执行 caller，或在同一会话实际进入 `spec-debug` 继续已授权的定位、局部修复与验证。交接须携带已审版本、范围、finding、直接证据与限制；执行者先复核当前文件和 dirty overlap。只交接可用直接证据独立核实的机械 P2/P3；需独立验证、涉及权限或公共契约、证据不足的项仍具名阻塞。`mode:agent`、只读请求和远端范围不触发修复。修复发生在审查之后，不倒改报告、不声称独立验证，不自动提交或发布。无法进入执行 owner 时保留报告并说明修复尚未开始。
 
 The explicit Quick Review Short-Circuit is separate: when the user asked for a quick/light review and the harness has a built-in report-only reviewer, use that path as requested rather than labelling it a failed multi-agent run.

@@ -62,7 +62,7 @@ bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/sc
 
 Defaults:
 - `from-branch` defaults to origin's default branch (or `main` if that cannot be resolved)
-- The new branch is created at `origin/<from-branch>` (or the local ref if the remote is unavailable)
+- 新分支以本次获取的远端分支提交为起点；获取失败时只允许同名本地 `refs/heads/` 分支。仅有旧的远端缓存不能创建工作树。脚本报告基线并核对新工作树的 HEAD。
 - `.env*` files are not copied unless `--copy-env` is passed
 
 Examples:

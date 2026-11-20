@@ -71,6 +71,7 @@ This reference owns the local verification stages, not cross-harness model routi
      post-fix tree;
    - the returned `verified_worktree_fingerprint.fingerprint` exactly equals
      `pre_final_verification_fingerprint.fingerprint`;
+   - 读取该新摘要，确认 `checked_worktree_fingerprint` 也等于上述指纹；旧摘要未绑定或仅核对历史记录，不能为当前工作树放行；
    - a second helper invocation immediately after the return produces the same
      fingerprint. Any mutation during verification, stale evidence reuse,
      helper failure, missing field, or mismatch is `final-verification-stale`

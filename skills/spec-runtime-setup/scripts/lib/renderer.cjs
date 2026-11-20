@@ -2,7 +2,7 @@
 
 const { renderCommand } = require('./command-display.cjs');
 
-const { providerDisplayFacts } = require('./provider-display.cjs');
+const { providerDisplayFacts, providerHeadline } = require('./provider-display.cjs');
 
 const REVIEW_RISK_FLAGS = new Set([
   'unpinned-npx',
@@ -243,7 +243,7 @@ function renderHumanSummary(
   lines.push('', 'Provider 工具');
   for (const provider of toolFacts.provider_readiness || []) {
     const display = providerDisplayFacts(provider);
-    lines.push(`- ${provider.provider || provider.id}: ${display.currentness_status} (${display.reason_code})`);
+    lines.push(providerHeadline(provider, display));
     lines.push(`  readiness_scope: ${display.readiness_scope}; probe_status: ${display.probe_status}`);
     const steadyState = provider.steady_state || {};
     if (steadyState.hook_status) {

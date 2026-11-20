@@ -744,7 +744,7 @@ function printCleanSummary(platform, cleanPlan, { mode, messages = CLEAN_MESSAGE
   for (const operation of cleanPlan.runtimeCleanup.operations.filter((entry) => entry.kind === 'update_file')) {
     console.log(`  - ${operation.path}`);
   }
-  for (const diagnostic of cleanPlan.runtimeCleanup.diagnostics || []) {
+  for (const diagnostic of [...(cleanPlan.managedPlan.diagnostics || []), ...(cleanPlan.runtimeCleanup.diagnostics || [])]) {
     console.log(`[${diagnostic.code}] ${diagnostic.message}`);
   }
   if (dryRun) {

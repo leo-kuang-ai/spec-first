@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { writeFileAtomic } = require('./atomic-write');
+const { isRetiredAsset, matchesRetiredProjection, retiredSkills } = require('./retired-skills');
 
 const REQUIRED_MANAGED_STATE_ARRAY_FIELDS = [
   'commands',
@@ -142,6 +143,7 @@ function normalizeState(raw) {
   return {
     manifestVersion: typeof safe.manifestVersion === 'string' ? safe.manifestVersion : '',
     platform: typeof safe.platform === 'string' ? safe.platform : '',
+    ...(safe.sharedSkillRetirementV1 === true ? { sharedSkillRetirementV1: true } : {}),
     commands: normalizeStringArray(safe.commands),
     skills: normalizeStringArray(safe.skills),
     workflowSkills: normalizeStringArray(safe.workflowSkills),
@@ -333,8 +335,9 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
     );
   }
 
-  if (!preserveSharedSkills) {
+  {
     for (const skillName of state.skills) {
+      if (preserveSharedSkills && !isRetiredAsset(skillName)) continue;
       operations.push(
         buildOperation(
           'remove_dir',
@@ -346,6 +349,7 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
     }
 
     for (const skillName of state.workflowSkills) {
+      if (preserveSharedSkills && !isRetiredAsset(skillName)) continue;
       operations.push(
         buildOperation(
           'remove_dir',
@@ -380,8 +384,7 @@ function planManagedAssetRemoval(projectRoot, managedState, adapter) {
   }
 
   return {
-    operations,
-    summary: summarizeOperations(operations),
+    ...guardRetiredRemovals(projectRoot, adapter, operations),
     skippedSharedSkills: preserveSharedSkills,
   };
 }
@@ -393,7 +396,7 @@ function removeManagedAssets(projectRoot, managedState, adapter) {
 // 另一受支持宿主的受管 state 仍声明同一 skillsRoot 投影时为 true（如 Codex 与
 // ZCode 共同消费 `.agents/skills/`）。惰性 require：adapters 依赖本模块，顶层
 // import 会成环。
-function hasSharedSkillsRootConsumer(projectRoot, adapter) {
+function hasSharedSkillsRootConsumer(projectRoot, adapter, skillName, selected = []) {
   const { getSupportedPlatforms, getAdapter } = require('./adapters');
   return getSupportedPlatforms().some((platform) => {
     if (platform === adapter.id) {
@@ -411,7 +414,8 @@ function hasSharedSkillsRootConsumer(projectRoot, adapter) {
     try {
       const candidateState = readState(projectRoot, candidate);
       if (candidateState && candidateState.platform === candidate.id) {
-        return true;
+        if (skillName && selected.includes(candidate.id)) return false;
+        return !skillName || candidateState.skills.includes(skillName) || candidateState.workflowSkills.includes(skillName);
       }
       // state 缺失但受管 runtime 面仍在（如手工删了 state.json）：按不确定处理，
       // 保留共享投影——与 AGENTS.md 消费者判定的 uncertain 口径一致。
@@ -500,10 +504,41 @@ function planObsoleteManagedAssetRemoval(projectRoot, previousState, nextState, 
     );
   }
 
-  return {
-    operations,
-    summary: summarizeOperations(operations),
-  };
+  return guardRetiredRemovals(projectRoot, adapter, operations);
+}
+
+function guardRetiredRemovals(projectRoot, adapter, candidates) {
+  const operations = [];
+  const diagnostics = [];
+  for (const operation of candidates) {
+    const name = path.posix.basename(operation.path);
+    if (isRetiredAsset(name)) {
+      if (path.posix.dirname(operation.path) === adapter.skillsRoot && hasSharedSkillsRootConsumer(projectRoot, adapter, name)) continue;
+      if (!matchesRetiredProjection(projectRoot, operation.path)) {
+        if (fs.lstatSync(path.join(projectRoot, operation.path), { throwIfNoEntry: false })) {
+          diagnostics.push({ level: 'warn', code: 'retired_asset_preserved', message: `保留无法确认为原版投影的退役资产：${operation.path}` });
+        }
+        continue;
+      }
+      operation.verifyRetiredProjection = true;
+    }
+    operations.push(operation);
+  }
+  return { operations, diagnostics, summary: summarizeOperations(operations) };
+}
+
+function planSharedSkillRetirement(projectRoot, adapter, previous, selected) {
+  const operations = [];
+  if (adapter.skillsRoot !== '.agents/skills' || previous?.platform !== adapter.id) return { operations };
+  for (const name of retiredSkills) {
+    const tracked = previous.skills.includes(name) || previous.workflowSkills.includes(name);
+    if (!tracked && previous.sharedSkillRetirementV1) continue;
+    const relative = `${adapter.skillsRoot}/${name}`;
+    if (!hasSharedSkillsRootConsumer(projectRoot, adapter, name, selected) && matchesRetiredProjection(projectRoot, relative)) {
+      operations.push(buildRelativeOperation('remove_dir', relative, 'retired_shared_skill', { verifyRetiredProjection: true }));
+    }
+  }
+  return { operations };
 }
 
 function removeObsoleteManagedAssets(projectRoot, previousState, nextState, adapter) {
@@ -560,7 +595,12 @@ function planRetiredCommandNamespaceRemoval(
     if (!fs.existsSync(absolutePath) || !fs.lstatSync(absolutePath).isFile()) {
       continue;
     }
-    operations.push(buildOperation('remove_file', absolutePath, projectRoot, reason));
+    const operation = buildOperation('remove_file', absolutePath, projectRoot, reason);
+    if (isRetiredAsset(filename)) {
+      if (!matchesRetiredProjection(projectRoot, operation.path)) continue;
+      operation.verifyRetiredProjection = true;
+    }
+    operations.push(operation);
     removableEntries.add(filename);
   }
 
@@ -623,6 +663,10 @@ function applyOperationPlan(projectRoot, plan) {
   const projectRootReal = fs.realpathSync.native(path.resolve(projectRoot));
   for (const operation of plan.operations) {
     const targetPath = resolveOperationTarget(projectRoot, operation);
+    if (operation.verifyRetiredProjection && !matchesRetiredProjection(projectRoot, operation.path)) {
+      if (!fs.lstatSync(targetPath, { throwIfNoEntry: false })) continue;
+      throw new Error(`退役资产已变化，停止清理：${operation.path}`);
+    }
     assertOperationTargetContained(projectRootReal, targetPath, operation);
 
     if (operation.kind === 'ensure_dir') {
@@ -778,6 +822,7 @@ module.exports = {
   planObsoleteManagedAssetRemoval,
   planRetiredCommandNamespaceRemoval,
   planRetiredRuntimeAssetPrune,
+  planSharedSkillRetirement,
   readStateFileRaw,
   readState,
   removeManagedAssets,

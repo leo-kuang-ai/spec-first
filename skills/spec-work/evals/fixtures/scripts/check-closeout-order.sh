@@ -400,6 +400,7 @@ checkFixture({
   }
 }, {"README.md":["Known rough edges","Known limitations"]});
 const envelope = finalObject();
-checkCloseout(envelope);
+const closeout = checkCloseout(envelope, { allowTempClaims: false });
+assert.equal(outputObject(closeout).validation_scope, 'current-worktree', 'Historical validation cannot close the current tree');
 console.log('PASS: fixture state and required outcome evidence verified; semantic quality is not scored.');
 EVAL_JUDGE_NODE

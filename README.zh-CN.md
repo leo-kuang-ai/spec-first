@@ -120,12 +120,9 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 | 制定产品方向与路线图 | `spec-strategy` | 创建或更新 `STRATEGY.md` |
 | 判断是否采纳外部技术 | `spec-pov` | 基于当前项目给出采用判断 |
 | 验证尚未确定的交互或产品行为 | `spec-prototype` | 可运行的临时原型，需人体验，不代表生产实现 |
-| 建立项目架构知识与约束 | `spec-project-rules` | 从源码维护架构知识库 |
-| 提取既有编码约定 | `spec-rule-miner` | 挖掘代码证据，不代替架构规则维护 |
 | 简化近期代码 | `spec-simplify-code` | 保持行为；真实缺陷交给 `spec-debug` |
 | 浏览器内打磨 UI | `spec-polish` | 启动开发服务并检查实际页面 |
 | 验证分支或 PR 的用户流程 | `spec-dogfood` | 限于变更影响面，保留浏览器验证报告 |
-| 检查移动 App PRD/Figma/源码一致性 | `spec-app-consistency-audit` | 静态跨来源审查，不代替真机或模拟器验证 |
 | 构建并验证 iOS App | `spec-test-xcode` | 用户明确调用，需 XcodeBuildMCP 与模拟器 |
 | 按指标迭代优化 | `spec-optimize` | 先定义可测目标，再按证据评估 |
 | 按可检查目标持续迭代 | `autoresearch` | 有界迭代、验证与保留/丢弃，不用于一次性排错 |

@@ -76,7 +76,7 @@ Committed: `fix(review): cover empty-format branch + tighten export perms` (`com
 
 | # | File | Issue | Reviewer |
 |---|------|-------|----------|
-| 1 | `orders_controller.rb:12` | Broad rescue masking failed permission check | correctness |
+| H1 | `orders_controller.rb:12` | Broad rescue masking failed permission check | correctness |
 
 ### Learnings & Past Solutions
 
@@ -101,11 +101,11 @@ Committed: `fix(review): cover empty-format branch + tighten export perms` (`com
 
 ---
 
-> **Verdict:** Ready with fixes
+> **Verdict:** Not ready
 >
-> **Reasoning:** 1 critical auth bypass must be fixed. The memory/pagination issues (P1) should be addressed for production safety.
+> **当前不能合并。** P0 #1 `orders_controller.rb:42` 缺少归属检查。先修复，再验证能导出自己的订单、不能导出其他账户的订单。
 >
-> **Fix order:** P0 auth bypass -> P1 memory/pagination -> P2 error handling if straightforward
+> **下一项决定：** P1 #3 `export_service.rb:91` 先确定分页合同，再核对 #2 的内存上限。
 ```
 
 ## Anti-patterns
@@ -145,7 +145,7 @@ This fails because of the **box-drawing `────` separators between items*
 - **Triage Groups section (when groups exist)** -- pipe table `| Group | Findings | Context | Preferred Resolution | Why |` rendered after Applied and before the severity tables. The `Findings` cell lists stable `#`s (e.g. `#2, #3`); every referenced `#` must appear in a severity table below. Groups are a triage lens over the findings -- they never replace the severity tables, merge findings, or renumber them. Omit when `grouping:off` is active or no groups survived Stage 5b/5c pruning.
 - **Applied section (explicit apply only)** -- render only when default mode resolved `mutation_policy: apply-fixes` and Stage 5c actually applied fixes. List them first, before the severity tables, as `# | File | Fix | Reviewer`, followed by validation and the separate commit authorization/status. Without `commit_authorization`, say `verified, left uncommitted`; a clean tree alone never licenses a commit. A fix spanning multiple files is one row with one stable `#`. Flag green-but-unverifiable edits (auth/contract/concurrency) inline. Omit for ordinary report-only review, `mode:agent`, degraded inline fallback, and no applied fixes.
 - **Actionable Findings section** -- include when the actionable queue is non-empty (findings for the caller to handle)
-- **Pre-existing section** -- separate table, no confidence column (these are informational)
+- **Pre-existing section** -- separate table, no confidence column (these are informational). 历史问题使用独立展示编号，如 `H1`；行动表和分组仍沿用本次发现的原始 `#`，不改变 JSON 标识。
 - **Learnings & Past Solutions section** -- results from the `learnings-researcher` local prompt asset, with links to docs/solutions/ files
 - **Agent-Native Gaps section** -- results from the `agent-native-reviewer` local prompt asset. Omit if no gaps found.
 - **Deployment Notes section** -- key checklist items from the `deployment-verification-agent` local prompt asset. Omit if the prompt did not run. Schema drift surfaces as `data-migration` findings — no separate section.

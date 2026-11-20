@@ -541,21 +541,25 @@ create_worktree() {
   default_branch=$(get_default_branch)
   from_branch="${from_branch:-$default_branch}"
 
-  # Fetch from-branch without touching the main checkout.
-  if ! git fetch origin "$from_branch" --quiet; then
-    echo "Warning: could not fetch origin/$from_branch; using local ref" >&2
-  fi
-
-  # Prefer origin/<from> if available, else fall back to local ref.
-  local base_ref="origin/$from_branch"
-  if ! git rev-parse --verify "$base_ref" &>/dev/null; then
-    base_ref="$from_branch"
+  git check-ref-format "refs/heads/$from_branch" || return 1
+  local base_ref base_oid
+  if git fetch --quiet origin "refs/heads/$from_branch"; then
+    base_ref="refs/remotes/origin/$from_branch"
+    base_oid=$(git rev-parse --verify 'FETCH_HEAD^{commit}') || return 1
+    # 自定义 fetch 映射可能不更新跟踪分支；只在其确实指向本次提交时沿用跟踪行为。
+    if [[ $(git rev-parse --verify "$base_ref^{commit}" 2>/dev/null) != "$base_oid" ]]; then
+      base_ref="$base_oid"
+    fi
+  else
+    base_ref="refs/heads/$from_branch"
+    echo "Warning: could not fetch origin/$from_branch; trying $base_ref" >&2
+    base_oid=$(git rev-parse --verify "$base_ref^{commit}" 2>/dev/null) || base_oid=''
   fi
 
   # Empty/unborn repository: no ref resolves to a commit. Fail with a structured
   # reason instead of surfacing an opaque `git worktree add` error or inviting a
   # raw-wrapper fallback (eval it-1, 2026-09-21).
-  if ! git rev-parse --verify "$base_ref^{commit}" &>/dev/null; then
+  if [[ -z "$base_oid" ]]; then
     echo "Error: base ref '$base_ref' does not resolve to a commit (empty or unborn repository); make an initial commit before creating a worktree." >&2
     echo "reason_code=base-ref-unresolvable base_ref=$base_ref" >&2
     return 1
@@ -567,13 +571,17 @@ create_worktree() {
     exit 1
   fi
 
-  echo "Creating worktree $branch_name from $from_branch"
+  echo "Creating worktree $branch_name from $base_ref ($base_oid)"
 
   mkdir -p "$WORKTREE_DIR"
   assert_worktree_path "$worktree_path" || return 1
   ensure_gitignore
 
   git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
+  if [[ $(git -C "$worktree_path" rev-parse HEAD) != "$base_oid" ]]; then
+    echo "reason_code=worktree-base-drift path=$worktree_path expected=$base_oid" >&2
+    return 1
+  fi
 
   echo "Environment files:"
   if [[ "$copy_env" == "true" ]]; then

@@ -126,7 +126,7 @@ flowchart TD
 
   B --> C{"Phase 0<br/>Classify Intent And Input Mode"}
   C -->|no-input| C1["询问 target increment 或 PRD path<br/>暂停运行"]
-  C -->|wrong-stage| C2["Route out<br/>brainstorm / app-consistency-audit / plan / work / debug"]
+  C -->|wrong-stage| C2["Route out<br/>brainstorm / plan / work / debug"]
   C -->|implementation-ready 或低风险小修| C3{"durable WHAT record 有价值吗?"}
   C3 -->|否| C4["bypass<br/>不写 clarified-requirements artifact<br/>记录 reason / handoff target<br/>说明 downstream 不会 invent WHAT"]
   C3 -->|是| D
@@ -358,7 +358,7 @@ URL parse -> tool discovery -> auth/access probe -> fetch or degraded reason
   -> design-WHAT extraction -> code/owner reconciliation -> clarification write targets / Planning Recheck
 ```
 
-设计源证据默认是 `source-candidate` / `provider_untrusted`，直到经过代码、文档或 owner 决策校准。工具不可用、未授权、无访问权限或 headless 无法抓取时，不阻断需求澄清；它会 loud degrade 到截图、导出 context、本地 `figma-context:<path>`、reference-claim 或 owner 描述。`spec-prd` 只提取会影响 WHAT/WHY、entry、state、copy、empty/error/loading、permission、i18n、accessibility 和 acceptance 的事实；PRD/Figma/source 一致性审计仍应 route 到 `spec-app-consistency-audit`。
+设计源证据默认是 `source-candidate` / `provider_untrusted`，直到经过代码、文档或 owner 决策校准。工具不可用、未授权、无访问权限或 headless 无法抓取时，不阻断需求澄清；它会 loud degrade 到截图、导出 context、本地 `figma-context:<path>`、reference-claim 或 owner 描述。`spec-prd` 只提取会影响 WHAT/WHY、entry、state、copy、empty/error/loading、permission、i18n、accessibility 和 acceptance 的事实，不据此宣称实现与设计一致。
 
 如果 Figma 或其它 design-source 会影响页面结构、二级页/详情页入口、模块状态、错误/空/加载态、交互触发、验收或范围，`spec-prd` 必须先建立 `design_source_inventory` 分母，再记录 `design_sources_read`、`design_sources_unread` 和 `design_source_coverage`。每个条目应说明 `source_or_node`、`read_status`、影响的 clarification write target、未读原因、evidence level 和 readiness consequence。未读节点仍会改变 WHAT 或 acceptance 时，readiness 不得返回 `ready-for-planning`；这些问题不能只作为 non-blocking `Planning Recheck` 后移给 `spec-plan`。
 

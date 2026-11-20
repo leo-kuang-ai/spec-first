@@ -8,6 +8,7 @@ const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { resolveNpmCliPath } = require('../../scripts/lib/npm-cli.cjs');
 const pkg = require('../../package.json');
+const { assertInstalledRuntime } = require('../fixtures/assert-installed-runtime.cjs');
 
 const repoRoot = path.resolve(__dirname, '../..');
 
@@ -22,6 +23,8 @@ test('真实隔离 prefix 的升级、本地副本、开发链接和 PATH 启动
     ...process.env,
     HOME: home,
     USERPROFILE: home,
+    CODEX_HOME: path.join(home, '.codex'),
+    CLAUDE_CONFIG_DIR: path.join(home, '.claude'),
     npm_config_prefix: prefix,
     npm_config_cache: path.join(root, 'cache'),
     npm_config_userconfig: path.join(root, 'npmrc'),
@@ -56,6 +59,10 @@ test('真实隔离 prefix 的升级、本地副本、开发链接和 PATH 启动
     const tarball = fs.readFileSync(path.join(root, 'pack', filename));
     let registry;
     server = http.createServer((req, res) => {
+      if (req.url.startsWith('/project/')) {
+        res.setHeader('content-type', 'application/json');
+        return res.end(JSON.stringify({ name: pkg.name, 'dist-tags': { latest: '0.0.1' }, versions: { '0.0.1': { name: pkg.name, version: '0.0.1' } } }));
+      }
       if (req.url.startsWith('/archive.tgz')) {
         res.setHeader('content-type', 'application/octet-stream');
         return res.end(tarball);
@@ -69,7 +76,12 @@ test('真实隔离 prefix 的升级、本地副本、开发链接和 PATH 启动
     });
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
     registry = `http://127.0.0.1:${server.address().port}`;
-    env.npm_config_registry = registry;
+    delete env.npm_config_registry;
+    delete env.NPM_CONFIG_REGISTRY;
+    fs.writeFileSync(env.npm_config_userconfig, `registry=${registry}/\n`);
+    fs.writeFileSync(path.join(project, 'package.json'), '{}');
+    fs.writeFileSync(path.join(project, '.npmrc'), `registry=${registry}/project/\n`);
+    expect((await run([npmCli, 'view', `${pkg.name}@latest`, 'version'])).stdout.trim()).toBe('0.0.1');
     await run([npmCli, 'install', '-g', path.join(root, 'pack', filename)]);
     const globalRoot = (await run([npmCli, 'root', '-g'])).stdout.trim();
     const packageRoot = path.join(globalRoot, pkg.name);
@@ -93,11 +105,29 @@ if ((process.argv[1] || '').endsWith('spec-first.js')) {
 }
 `);
     const observation = { NODE_OPTIONS: `--require=${preload}` };
+    const preview = await run([entry, 'update', '--dry-run'], observation);
+    expect(preview.stdout).toContain(`npm latest：${pkg.version}`);
+    expect(fs.readFileSync(trace, 'utf8').trim().split('\n').map(JSON.parse).some((row) => row.args?.includes('install'))).toBe(false);
     const globalRun = await run([entry, 'update'], observation);
     let rows = fs.readFileSync(trace, 'utf8').trim().split('\n').map(JSON.parse);
     expect(rows.some((row) => row.evidence && row.evidence.origin === 'npm-global')).toBe(true);
     expect(rows.some((row) => row.args && row.args.slice(1).join(' ') === 'install -g spec-first@latest')).toBe(true);
     expect(globalRun.stdout).toMatch(/升级|upgraded/);
+    fs.writeFileSync(path.join(project, 'AGENTS.md'), '# 用户说明\n');
+    const initArgs = [entry, 'init', '--codex', '--cursor', '-y', '-u', 'tester', '--lang', 'zh'];
+    await run(initArgs, observation);
+    const instructions = fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8');
+    expect(instructions).toContain('# 用户说明');
+    await run(initArgs, observation);
+    expect(fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8')).toBe(instructions);
+    for (const host of ['codex', 'cursor']) {
+      const report = await run([entry, 'doctor', `--${host}`, '--json'], observation);
+      assertInstalledRuntime(JSON.parse(report.stdout), host);
+    }
+    fs.appendFileSync(path.join(project, '.agents/skills/spec-debug/SKILL.md'), '\n测试漂移\n');
+    const drifted = await run([entry, 'doctor', '--codex', '--json'], observation);
+    expect(JSON.parse(drifted.stdout)).toMatchObject({ platforms: ['codex'], runtime_asset_health: 'warn' });
+    expect(() => assertInstalledRuntime(JSON.parse(drifted.stdout), 'codex')).toThrow('.agents/skills');
     const local = path.join(root, 'local');
     fs.cpSync(packageRoot, local, { recursive: true });
     const localEntry = path.join(local, 'bin/spec-first.js');

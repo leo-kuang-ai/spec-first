@@ -32,6 +32,22 @@ function createRepo() {
   return root;
 }
 
+test('暂存内容改变而工作文件与 MM 状态不变时仍会使指纹失效', () => {
+  const root = createRepo();
+  const file = path.join(root, 'tracked.txt');
+  const snapshot = (staged) => {
+    fs.writeFileSync(file, staged);
+    runGit(root, ['add', 'tracked.txt']);
+    fs.writeFileSync(file, 'working copy\n');
+    expect(runGit(root, ['status', '--porcelain'])).toBe('MM tracked.txt');
+    return computeWorkingTreeFingerprint(root).fingerprint;
+  };
+
+  const first = snapshot('index A\n');
+  expect(snapshot('index B\n')).not.toBe(first);
+  expect(snapshot('index A\n')).toBe(first);
+});
+
 test('fingerprint changes for tracked and untracked content and is stable when bytes are restored', () => {
   const root = createRepo();
   const clean = computeWorkingTreeFingerprint(root);

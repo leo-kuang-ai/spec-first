@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const { validateAgainstSchema } = require('../../contracts/schema-validator');
 const { readVerificationRunSummary, aggregateRunSummaryStatus } = require('./verification-run-summary');
+const { computeWorkingTreeFingerprint } = require('../../../skills/spec-work/scripts/working-tree-fingerprint.cjs');
 const {
   resolveTargetRepoRoot,
   validateOutputContainment,
@@ -13,7 +14,7 @@ const {
 
 const HONEST_CLOSEOUT_SCHEMA_VERSION = 'honest-closeout.v1';
 const HONEST_CLOSEOUT_SCHEMA_PATH = path.join(__dirname, '..', '..', '..', 'docs', 'contracts', 'workflows', 'honest-closeout.schema.json');
-const ALLOWED_INPUT_FIELDS = new Set(['run_summary_ref', 'claims']);
+const ALLOWED_INPUT_FIELDS = new Set(['run_summary_ref', 'claims', 'validation_scope']);
 const ALLOWED_CLAIM_FIELDS = new Set(['claim_type', 'asserted_status', 'evidence_refs']);
 const CLAIM_TYPES = new Set(['validation', 'impact_surface', 'review', 'knowledge_promotion']);
 
@@ -36,6 +37,7 @@ function runCli(argv) {
         'validation 引用 verification-run-summary:<check-id>；其他 claim 使用目标仓库内的普通文件证据。',
         '示例只声明 not-run，不能证明验证通过；asserted_status 必须匹配实际证据。',
         '命令退出码 0 仅表示完成校验，必须读取 overall、overall_reason_code 与每项 verdict。',
+        '声明当前代码通过时使用 validation_scope: current-worktree；recorded-run 只核对历史记录。',
       ],
       input_example: {
         run_summary_ref: '.spec-first/workflows/spec-debug/<workspace-slug>/<run-id>/verification-run-summary.json',
@@ -146,12 +148,29 @@ function validateHonestCloseout({ targetRepo, payload }) {
     return buildOutput([], 'degraded', 'missing-structured-claims');
   }
 
+  const fingerprint = runSummary && runSummary.checked_worktree_fingerprint;
+  const scope = payload.validation_scope || (fingerprint ? 'current-worktree' : 'recorded-run');
+  const hasValidation = payload.claims.some(claim => claim.claim_type === 'validation');
+  const worktreeLimitation = hasValidation && scope === 'current-worktree'
+    ? checkWorktreeBinding(target.root, fingerprint) : null;
   const claims = payload.claims.map((claim) => evaluateClaim(claim, {
     targetRepoRoot: target.root,
     runSummary,
     runSummaryReason,
+    worktreeLimitation,
   }));
-  return buildOutput(claims, overallFromClaims(claims), overallReasonFromClaims(claims));
+  const output = buildOutput(claims, overallFromClaims(claims), overallReasonFromClaims(claims));
+  if (hasValidation) output.validation_scope = scope;
+  return output;
+}
+
+function checkWorktreeBinding(targetRepo, fingerprint) {
+  if (!fingerprint) return 'verification-worktree-unbound';
+  try {
+    return computeWorkingTreeFingerprint(targetRepo).fingerprint === fingerprint ? null : 'verification-worktree-changed';
+  } catch {
+    return 'verification-worktree-unavailable';
+  }
 }
 
 function validateInput(payload) {
@@ -160,6 +179,12 @@ function validateInput(payload) {
     return { errors: ['payload must be a JSON object'], reasonCode: 'payload-invalid' };
   }
   validateObjectFields(payload, 'payload', ALLOWED_INPUT_FIELDS, errors);
+  if (payload.validation_scope !== undefined && !['recorded-run', 'current-worktree'].includes(payload.validation_scope)) {
+    errors.push('validation_scope must be recorded-run or current-worktree');
+  }
+  if (payload.validation_scope === 'current-worktree' && Array.isArray(payload.claims) && !payload.claims.some(claim => claim?.claim_type === 'validation')) {
+    errors.push('current-worktree requires a validation claim');
+  }
   if (payload.run_summary_ref !== null && payload.run_summary_ref !== undefined && typeof payload.run_summary_ref !== 'string') {
     errors.push('run_summary_ref must be a string or null');
   }
@@ -241,6 +266,7 @@ function evaluateValidationClaim(claim, context) {
       return withVerdict(claim, 'degraded', 'run-summary-checks-uncovered');
     }
     if (checks.every((check) => check.status === 'passed' && check.ran === true && check.exit_code === 0)) {
+      if (context.worktreeLimitation) return withVerdict(claim, 'degraded', context.worktreeLimitation);
       return withVerdict(claim, 'consistent', 'validation-evidence-consistent');
     }
     return withVerdict(claim, 'unsupported', 'evidence-status-mismatch');

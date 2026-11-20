@@ -113,6 +113,7 @@ function createReadOnlyAuditRunner() {
 }
 
 function fakeRunner(command, args, options = {}) {
+  if (command === 'codegraph' && args[0] === 'query') return { exit_code: 0, stdout: '[]' };
   const packed = require('../fixtures/mcp-setup/npm-archives/runner.cjs').materializeNpmPack(command, args);
   if (packed) return packed;
   const cwd = options.cwd || process.cwd();
@@ -405,6 +406,25 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       }),
     ]));
     expect(snapshot(homeDir)).toEqual(before);
+
+    const projected = path.join(target, '.agents', 'skills', 'spec-runtime-setup');
+    fs.cpSync(skillRoot, projected, { recursive: true });
+    const probeHome = path.join(target, 'probe-home');
+    fs.cpSync(homeDir, probeHome, { recursive: true });
+    const probeConfig = path.join(probeHome, '.codex', 'config.toml');
+    for (const flags of [[], ['--json']]) {
+      const preview = spawnSync(process.execPath, [path.join(projected, 'scripts/setup.cjs'), '--plan', '--only', 'graphify', ...flags], {
+        cwd: target,
+        env: { ...process.env, HOME: probeHome, USERPROFILE: probeHome, CODEX_HOME: path.dirname(probeConfig), MCP_SETUP_HOST: 'codex' },
+        encoding: 'utf8',
+      });
+      expect(JSON.parse(preview.stdout).reason_code).toBe('host-config-conflict');
+      expect(preview.status).toBe(2);
+      if (flags.length === 0) expect(preview.stderr).toContain('宿主配置冲突：context7（字段：command, args）');
+      else expect(preview.stderr).not.toContain('宿主配置冲突');
+      expect(preview.stderr).not.toContain('user-owned');
+      expect(fs.readFileSync(probeConfig)).toEqual(fs.readFileSync(configPath));
+    }
 
     const repairPlan = runSetup({
       argv: ['--plan', '--only', 'graphify', '--repair-host-config'],

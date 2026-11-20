@@ -18,7 +18,7 @@ const RUN_SUMMARY_SCHEMA_PATH = path.join(__dirname, '..', '..', '..', 'docs', '
 const DEFAULT_WORKFLOW = 'spec-work';
 const ALLOWED_WORKFLOWS = new Set(['spec-work', 'spec-debug', 'spec-code-review']);
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$/;
-const ALLOWED_INPUT_FIELDS = new Set(['profile', 'checks']);
+const ALLOWED_INPUT_FIELDS = new Set(['profile', 'checks', 'checked_worktree_fingerprint']);
 const ALLOWED_PROFILE_FIELDS = new Set(['source', 'name', 'path']);
 const ALLOWED_CHECK_FIELDS = new Set([
   'id',
@@ -64,7 +64,7 @@ function runCli(argv) {
         '示例为尚未执行的检查，不是验证证据。按实际命令结果填写，不得直接改为 passed。',
         'reason_code 为具体原因字符串，不是固定枚举；schedulable 与 missing_dependency 仅用于 not-run。检查实际执行后应同步改为实际原因（例如 executed），不能沿用示例的 schedulable。',
         '已执行检查必须包含真实退出码与脱敏日志；log_path 为仓库相对路径，位于 .spec-first/workflows/<workflow>/<workspace-slug>/<run-id>/logs/。',
-        '输入只包含 profile 和 checks；schema_version、generated_at 和输出路径由 writer 生成。',
+        '输入包含 profile、checks；可选 checked_worktree_fingerprint 只能取自实际检查期间的工作树。schema_version、generated_at 和输出路径由 writer 生成。',
       ],
       input_example: {
         profile: { source: 'local', name: 'example', path: null },
@@ -221,6 +221,7 @@ function writeVerificationRunSummary({ inputPath, runId, targetRepo, workflow = 
     generated_at: new Date().toISOString(),
     profile: payload.profile,
     checks: payload.checks,
+    ...(payload.checked_worktree_fingerprint !== undefined && { checked_worktree_fingerprint: payload.checked_worktree_fingerprint }),
   };
   const schemaValidation = validateRunSummary(summary);
   if (schemaValidation.errors.length > 0) {

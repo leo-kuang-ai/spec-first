@@ -45,7 +45,7 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are advisor
 ## Quality And Delivery Side Paths
 
 - Measurable experiment -> `spec-optimize`; branch or PR browser QA -> `spec-dogfood`.
-- Running UI polish -> `spec-polish`; app PRD/Figma/source consistency -> `spec-app-consistency-audit`.
+- Running UI polish -> `spec-polish`.
 - An unresolved product behavior or feel question that needs a human-experienced throwaway artifact -> `spec-prototype`.
 
 ## Standalone Skills
@@ -54,8 +54,6 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are advisor
 - Explicitly create cross-session continuity, or find/resume a user-selected handoff source -> `spec-handoff`; ordinary current-session continuation and workflow-internal returns stay with their current owner.
 - Set product direction, roadmap, or metrics -> `spec-strategy`.
 - Simplify recent changes without changing behavior -> `spec-simplify-code`; real bugs still use `spec-debug`.
-- Mine project conventions from code evidence -> `spec-rule-miner`.
-- Build or incrementally maintain the multi-end monorepo architecture knowledge base (end ownership, dependency direction, reuse contracts) -> `spec-project-rules`.
 - Product signals -> `spec-product-pulse`; feedback-source sweep -> `spec-sweep`; Riffrec/audio/video analysis -> `spec-riffrec-feedback-analysis`.
 - 用户明确要求处理 GitHub PR review feedback -> `spec-resolve-pr-feedback`；它只按当前请求中分别明确的本地修复、commit、push、回复与 thread resolve 授权执行副作用。
 - 用户明确要求在 iOS Simulator 上构建、运行或验证 App -> `spec-test-xcode`；它是用户主动入口，并要求当前宿主已连接 XcodeBuildMCP。

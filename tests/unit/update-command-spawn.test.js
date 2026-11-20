@@ -498,12 +498,13 @@ describe('spec-first update exits 0 and spawns no init when there is nothing to 
     expect(stderr).toContain('--claude');
   });
 
-  test('child-only runtime prints per-child refresh commands and never --all-repos', async () => {
+  test.each([[], ['--dry-run']].map((argv) => ({ argv })))('child-only runtime prints per-child refresh commands and never --all-repos: $argv', async ({ argv }) => {
     const { update } = loadUpdateWithSpawnSpy();
     const output = captureOutput();
     let exitCode;
     try {
-      exitCode = await update.runUpdate([], {
+      exitCode = await update.runUpdate(argv, {
+        lookupTargetVersion: () => '1.0.0',
         detectInstallOrigin: () => ({ origin: 'npm-global', reason_code: 'fixture' }),
         runInstall: () => ({ status: 0, errorCode: null }),
         resolveInstalledCliPath: () => ({ ok: true, cliPath: '/global/spec-first/bin/spec-first.js' }),

@@ -512,7 +512,7 @@ describe('plugin module facade and governance', () => {
       ))).toBe(false);
       expect(fs.existsSync(path.join(
         projectRoot,
-        '.cursor/skills/spec-app-consistency-audit/README.md',
+        '.cursor/skills/spec-optimize/README.md',
       ))).toBe(false);
       expect(fs.existsSync(path.join(
         projectRoot,
@@ -702,13 +702,6 @@ describe('plugin module facade and governance', () => {
             : Buffer.from(operation.contents, 'utf8');
           expect(projected).toEqual(source);
         }
-
-        const auditLock = plan.operations.find((candidate) =>
-          candidate.path.endsWith('/spec-app-consistency-audit/references/ecc-source-lock.json')
-        );
-        expect(auditLock.contents).toContain(
-          `\"target_root\": \"${adapter.workflowsRoot}/spec-app-consistency-audit/prompts\"`,
-        );
 
         plugin.syncBundledAssets(projectRoot, adapter);
 

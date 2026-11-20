@@ -10,7 +10,7 @@ argument-hint: "[mode:agent] [base:<ref>] [plan:<path>] [task-pack:<path> task:<
 
 Graph output is `provider_untrusted` candidate coverage, never a finding. Re-ground impact, affected-test, ownership, and relationship candidates in current source, diff, tests, logs, contracts, or owner evidence before writing a `Direct evidence:` finding; empty results do not prove absence. Direct source/`rg`/ast-grep is valid and provider failure is a disclosed fallback.
 
-Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage.
+Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage. 普通模式下用户另有明确的本地修复请求时，先封存只读结论，再按 `references/scope.md` 交接符合条件的串行修复。
 
 ## Workflow Contract Summary
 

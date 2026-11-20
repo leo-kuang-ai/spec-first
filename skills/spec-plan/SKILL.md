@@ -20,6 +20,8 @@ Note: Use the current date from the active host context. Use this when weighting
 
 ## Output Contract
 
+用户明确要「给研发评审的传统技术方案」或要把指定方案按传统目录改成**人读评审稿**时，使用[技术评审稿模板](references/technical-design-review.md)。这是按用途选择的人读出口，不是把所有技术方案改成另一套执行协议。需要直接交接实施、原地深化、由流水线调用或同时要求评审与实施时，执行计划仍走下述 Durable 合同；不得把评审稿的路径交给执行者。
+
 派发或基于仓库调研前，先判定单人低风险请求的输出分档。**Direct** 适用于无需用户决策、可一次说明并核对依据的规划，交付简短聊天结论；**Chat brief** 最多含一个决策且无风险面，交付简案。多轮、不明确、用户要求计划文件、pipeline/headless、续接已有计划或涉及认证、支付、迁移、外部契约时，默认 **Durable**；不确定也选 Durable。选 Direct 或 Chat brief 时须读取 `references/output-contracts.md`。分档仅决定计划产物形态，Direct 的“校核”不是运行实现代码、服务或测试，也不改变 `spec-plan` 的规划产出者身份；用户同轮授权实施时，产出后必须实际进入 `spec-work` 或返回已存在的执行 caller；Durable 计划另可按 Phase 5.4 交给用户明确选择、宿主实际支持的原生 goal，不能仅给出可选菜单。没有调用 primitive 时，仅发现其他宿主的 `.agents/skills/` 等生成镜像不算加载了执行 owner 的源码，也不算进入执行 owner。无可用执行路径时即使是单文件低风险任务也只能交付规划并报告交接阻塞，不得在 Direct/Chat brief 分支自行编辑源码。
 
 ## Workflow Contract Summary

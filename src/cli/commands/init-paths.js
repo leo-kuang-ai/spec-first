@@ -15,7 +15,7 @@ function canonicalizeExistingPath(targetPath) {
 
 function isPathWithin(childPath, parentPath) {
   const relative = path.relative(parentPath, childPath);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+  return relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
 }
 
 function toWorkspaceRelativePath(childPath, workspaceRoot) {

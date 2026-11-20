@@ -88,7 +88,7 @@ The Product Expert Lens consumes design-source evidence only as advisory input:
 
 - design claims are `source-candidate` / `provider_untrusted` until reconciled with code/source or owner decision
 - design facts can raise gaps for entry, state, copy, empty/error/loading, permission, i18n, accessibility, and acceptance examples
-- PRD/design-source/source consistency audit remains a route-out to `spec-app-consistency-audit`
+- PRD、设计和源码的一致性审查不属于需求编写范围。
 - unavailable tools degrade loudly to screenshot, exported context, local exported files, reference-claim, or owner description
 
 Do not copy the detailed design-source protocol into this hot-path file.

@@ -14,7 +14,6 @@
 
 - `using-spec-first`：入口路由治理（standalone；只选下一步，不写 artifact）
 - `spec-runtime-setup`：required harness runtime、MCP servers 和 helper tools 的安装与验证入口
-- `spec-app-consistency-audit`：移动 App 的 PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查入口
 - `spec-write-skill`：创建 / 修改 / 迁移项目拥有的 Agent Skill package，或只读 readiness 校验
 - `spec-dogfood` / `spec-polish`：分支/PR 浏览器 QA 与 UI polish
 - `spec-compound` / `spec-compound-refresh`：工作完成后的稳定知识捕获与 learnings 刷新
@@ -57,7 +56,7 @@ Plan lifecycle audit 的边界：
 
 - 一个前置的 `spec-ideate` 候选发散入口
 - 跨宿主统一的 `spec-*` workflow 入口
-- 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、skill 包治理入口 `spec-write-skill`，以及知识沉淀入口 `spec-compound`（完整清单见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)）
+- Skill 包治理入口 `spec-write-skill`，以及知识沉淀入口 `spec-compound`（完整清单见 [公开入口与 Skill 目录](./24-公开入口与Skill目录.md)）
 - 一条 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 的标准闭环
 - 项目级 `.claude/commands/spec-*.md`
 - 项目级 `.claude/skills`、`.claude/spec-first/workflows` 与 `.claude/agents`
@@ -82,11 +81,11 @@ using-spec-first（入口路由，可选）
   -> plan
   -> write-tasks（可选）
   -> work / debug / optimize / polish / dogfood
-  -> code-review / app-consistency-audit
+  -> code-review
   -> compound / compound-refresh
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
 旁路（按意图直接进入，非主链路状态）：
-  write-skill | explain | pov | strategy | rule-miner | project-rules | simplify-code
+  write-skill | explain | pov | strategy | simplify-code
   | product-pulse | sweep | riffrec-feedback-analysis | promote | lfg（仅显式）
 ```
 
@@ -103,22 +102,6 @@ using-spec-first（入口路由，可选）
 3. 多仓工作区
 
 核心边界是：`.spec-first` 的权威事实属于 **selected Git repo root**。单仓多模块不在每个 module 下拆多套 `.spec-first`；多仓工作区的父目录只拥有 advisory workspace summaries，不拥有 child repo 的 `.spec-first/config/*` 或当前源码事实。详见 [三种开发模式](./08-三种开发模式.md)。
-
-## App 一致性审查
-
-移动 App 的产品、设计和代码在进入模拟器、真机或打包验证前，可以使用专项入口做静态一致性审查：
-
-```text
-spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
-```
-
-它适合检查 PRD、materialized Figma context、本地源码、页面路由、KMP / Clean Architecture、组件复用、埋点、i18n 和行业规则之间是否一致。审查产物写入 `.spec-first/app-audit/runs/<run-id>/`，默认是 runtime/control-plane evidence，不作为长期手工维护文档提交。
-
-边界：
-
-- `figma-context:<path>` 是可抽取 evidence；`figma-ref:<id-or-url>` 只是 reference。
-- Figma MCP 是宿主可选能力，只在默认交互模式下用于 materialize 本地 JSON；它不是 `spec-runtime-setup` 的 required baseline。
-- 缺 PRD、Figma 或直接源码证据时应降级披露能力范围，不把缺失输入直接当作整个审查失败。
 
 ![Spec-First 五阶段工作流](../assets/svg/spec-first-workflow.svg)
 

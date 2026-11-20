@@ -49,11 +49,8 @@ const CLOSEOUT_PATHS = Object.freeze({
   report: path.join(CLOSEOUT_ROOT, 'reports/2026-08-20-ce-localization-full-skill-review.md'),
 });
 const LOCAL_ONLY_SKILL_IDS = Object.freeze([
-  'spec-app-consistency-audit',
   'spec-polish',
   'spec-prd',
-  'spec-project-rules',
-  'spec-rule-miner',
   'spec-write-tasks',
   'using-spec-first',
 ]);
@@ -1256,8 +1253,11 @@ function validateCloseoutArtifacts(closeout, deterministic) {
     if (!observedUpstreamIds.has(record.audit_id)) errors.push(`ledger: missing CE record ${record.audit_id}`);
   }
   const localSkills = localEntries.map((entry) => entry.canonical_owner).sort();
-  if (stableJson(localSkills) !== stableJson([...LOCAL_ONLY_SKILL_IDS].sort())) {
-    errors.push('ledger: local-only entries do not match the six reviewed local-only Skills');
+  const expectedLocalSkills = expectedSnapshot.inventory_hash === 'ed135a864893cde2a444577b62acd29af6d021dd3d34ef5d2c942caa767f4d1e'
+    ? [...LOCAL_ONLY_SKILL_IDS, 'spec-app-consistency-audit', 'spec-project-rules', 'spec-rule-miner']
+    : [...LOCAL_ONLY_SKILL_IDS];
+  if (stableJson(localSkills) !== stableJson(expectedLocalSkills.sort())) {
+    errors.push('ledger: local-only entries do not match the reviewed inventory');
   }
   for (const entry of closeout.ledger.entries || []) {
     if (entry.target_repo_head !== expectedSnapshot.head

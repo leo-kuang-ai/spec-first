@@ -35,6 +35,45 @@ function initRepo() {
 }
 
 describe('spec-worktree existing-ref isolation contracts', () => {
+  test('成功获取时使用远端提交而非较新的本地分支', () => {
+    const dir = initRepo();
+    const remote = initRepo();
+    try {
+      run('git', ['commit', '--allow-empty', '-qm', 'local only'], { cwd: dir });
+      run('git', ['remote', 'add', 'origin', remote], { cwd: dir });
+      const expected = run('git', ['rev-parse', 'HEAD'], { cwd: remote }).trim();
+      expect(run('git', ['rev-parse', 'HEAD'], { cwd: dir }).trim()).not.toBe(expected);
+      const output = run('bash', [scriptPath, 'create', 'result', 'main'], { cwd: dir });
+      expect(output).toContain(expected);
+      expect(run('git', ['rev-parse', 'HEAD'], { cwd: path.join(dir, '.worktrees/result') }).trim()).toBe(expected);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+      fs.rmSync(remote, { recursive: true, force: true });
+    }
+  });
+
+  test.each([true, false])('获取失败不使用旧缓存：本地基线存在=%s', (hasLocal) => {
+    const dir = initRepo();
+    const git = (...args) => run('git', args, { cwd: dir }).trim();
+    try {
+      git('update-ref', 'refs/remotes/origin/base', 'HEAD');
+      git('commit', '--allow-empty', '-qm', 'local advance');
+      if (hasLocal) git('branch', 'base');
+      const target = path.join(dir, '.worktrees/result');
+      const create = () => run('bash', [scriptPath, 'create', 'result', 'base'], { cwd: dir });
+      if (hasLocal) {
+        create();
+        expect(run('git', ['rev-parse', 'HEAD'], { cwd: target }).trim()).toBe(git('rev-parse', 'refs/heads/base'));
+      } else {
+        expect(create).toThrow(/base-ref-unresolvable/);
+        expect(fs.existsSync(path.join(dir, '.worktrees'))).toBe(false);
+        expect(git('branch', '--list', 'result')).toBe('');
+      }
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   test.each(['create', 'isolate'])('%s rejects symlinked worktree containers and preserves the original checkout and outside files', (mode) => {
     const dir = initRepo();
     const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-worktree-outside-'));

@@ -120,12 +120,9 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 | 制定产品方向与路线图 | `spec-strategy` | 创建或更新 `STRATEGY.md` |
 | 判断是否采纳外部技术 | `spec-pov` | 基于当前项目给出采用判断 |
 | 验证尚未确定的交互或产品行为 | `spec-prototype` | 可运行的临时原型，需人体验，不代表生产实现 |
-| 建立项目架构知识与约束 | `spec-project-rules` | 从源码维护架构知识库 |
-| 提取既有编码约定 | `spec-rule-miner` | 挖掘代码证据，不代替架构规则维护 |
 | 简化近期代码 | `spec-simplify-code` | 保持行为；真实缺陷交给 `spec-debug` |
 | 浏览器内打磨 UI | `spec-polish` | 启动开发服务并检查实际页面 |
 | 验证分支或 PR 的用户流程 | `spec-dogfood` | 限于变更影响面，保留浏览器验证报告 |
-| 检查移动 App PRD/Figma/源码一致性 | `spec-app-consistency-audit` | 静态跨来源审查，不代替真机或模拟器验证 |
 | 构建并验证 iOS App | `spec-test-xcode` | 用户明确调用，需 XcodeBuildMCP 与模拟器 |
 | 按指标迭代优化 | `spec-optimize` | 先定义可测目标，再按证据评估 |
 | 按可检查目标持续迭代 | `autoresearch` | 有界迭代、验证与保留/丢弃，不用于一次性排错 |
@@ -247,6 +244,7 @@ docs/
 spec-first quickstart  # 检查前置条件并进入 init
 spec-first doctor      # 检查环境和 runtime 健康状态
 spec-first init        # 生成所选宿主的 runtime assets
+spec-first update --dry-run  # 按全局 npm 配置查询目标版本，预览宿主刷新范围；跳过刷新时列出后续命令，不修改项目
 spec-first update      # 升级 CLI 并刷新 runtime assets
 spec-first clean       # 移除所选 generated runtime assets
 spec-first plans audit --status completed --json
@@ -266,6 +264,8 @@ npm run test:integration
 npm run test:release
 npm run build
 ```
+
+在仓库根目录运行 `npm pack` 会生成 `.tgz` 并打印文件名；`npm run build` 只预览，不生成文件。仓库内的 npm 命令默认保留警告和错误，省略通知级日志。审查打包内容时用 `npm pack --dry-run --loglevel=notice` 查看文件清单、包大小和校验摘要；脚本可用 `npm pack --dry-run --json` 读取完整数据。
 
 源码变更应发生在 canonical source surfaces。只有 runtime source 变化时，才通过 `spec-first init` 重新生成 runtime copies。更多信息见[贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)、[版本记录](CHANGELOG.md)和 [GitHub Issues](https://github.com/leo-kuang-ai/spec-first/issues)。
 

@@ -1,0 +1,107 @@
+{
+  "source": "6708eee41",
+  "additionalSources": {
+    "projections": "2c2bdfb75",
+    "legacyClaudeQoder": "940d08144",
+    "legacyOpenCode": "d807db7fe",
+    "legacyCommandTemplate": "6708eee41"
+  },
+  "paths": {
+    ".claude/skills/spec-project-rules": [
+      "359585a5398a421db6500156187b073a601bb99b4d132feb46e8e2af69929263",
+      "52c932c7390d7d2030eb04915aebdf166fedb781694add515d973b0571a59d02"
+    ],
+    ".claude/skills/spec-rule-miner": [
+      "7f58e1a6290085351442985d31792d28b8da03492b8d4f65d5bed45ec02ccbc5",
+      "546b9ce981bf315fbe5786db3f66c6534a3d8bd3148cb63d9676aae0035ff108"
+    ],
+    ".claude/spec-first/workflows/spec-app-consistency-audit": [
+      "b8a0fdd3b10494343ad8c7a01cd2f58fed236a01127e761367cfbe7c8100a591",
+      "1174e13ffc940f94345707e260d0cf9c38b2a355d5f92aa04e9c535882ee65c7"
+    ],
+    ".claude/commands/spec-app-consistency-audit.md": [
+      "d95cb3a8e463b8e144ed9b1b46fc6a52deb3177d63dc8d3d8a9043e63c9e0a64",
+      "1311bd4a859e4d76edad78909b786cee6e2eff96a2d56c8d6b5e2afe5b8c83ce"
+    ],
+    ".agents/skills/spec-project-rules": [
+      "359585a5398a421db6500156187b073a601bb99b4d132feb46e8e2af69929263",
+      "52c932c7390d7d2030eb04915aebdf166fedb781694add515d973b0571a59d02"
+    ],
+    ".agents/skills/spec-rule-miner": [
+      "7f58e1a6290085351442985d31792d28b8da03492b8d4f65d5bed45ec02ccbc5",
+      "546b9ce981bf315fbe5786db3f66c6534a3d8bd3148cb63d9676aae0035ff108"
+    ],
+    ".agents/skills/spec-app-consistency-audit": [
+      "8b1c5b87c8bd6b925cadefa4968da72de9230788f59e74bd7c98e7ae794c4d40",
+      "778e6a3441f1b8200a46117ac9d655a761063bbe614ee8dc846b3fba3a866c24"
+    ],
+    ".cursor/skills/spec-project-rules": [
+      "2ade4cf7367f612a55a0415ca1b7b277a6ed674d479ca32d586d0c3afaded8dd",
+      "347e0826992ea8e0bcd968d7dd305010ed08053dd90610a31481368f2d8d7f74"
+    ],
+    ".cursor/skills/spec-rule-miner": [
+      "d5ace2f2a71714611beb793a177566308af548b915a6d5536752f213219fb4a1",
+      "1413e31aed19222f20f425260a8c82e24124110450858c0d51103f47d107e20e"
+    ],
+    ".cursor/skills/spec-app-consistency-audit": [
+      "e16468dfa9a8b49242f9fdba246a7dc7e210e4618671a09385017e36b17269eb",
+      "93b82fd969949f388d15e772c4198a6c455b14ae56e1c445fa6c485cec3e41f9"
+    ],
+    ".kiro/skills/spec-project-rules": [
+      "359585a5398a421db6500156187b073a601bb99b4d132feb46e8e2af69929263",
+      "52c932c7390d7d2030eb04915aebdf166fedb781694add515d973b0571a59d02"
+    ],
+    ".kiro/skills/spec-rule-miner": [
+      "7f58e1a6290085351442985d31792d28b8da03492b8d4f65d5bed45ec02ccbc5",
+      "546b9ce981bf315fbe5786db3f66c6534a3d8bd3148cb63d9676aae0035ff108"
+    ],
+    ".kiro/skills/spec-app-consistency-audit": [
+      "c9e07bc8a5862ce7fc982821241029070c3489ad54f909a02de6eacd25370c0c",
+      "90be1350ed43b8ce534a18602222d1a83b1ab917914886b2e1c3731e8d3c1082"
+    ],
+    ".qoder/skills/spec-project-rules": [
+      "359585a5398a421db6500156187b073a601bb99b4d132feb46e8e2af69929263",
+      "52c932c7390d7d2030eb04915aebdf166fedb781694add515d973b0571a59d02"
+    ],
+    ".qoder/skills/spec-rule-miner": [
+      "7f58e1a6290085351442985d31792d28b8da03492b8d4f65d5bed45ec02ccbc5",
+      "546b9ce981bf315fbe5786db3f66c6534a3d8bd3148cb63d9676aae0035ff108"
+    ],
+    ".qoder/skills/spec-app-consistency-audit": [
+      "5f5273d932ff37a31c1f8dd89ae2871aa1fd5523fef51c470826a427b563e16d",
+      "70d448f7488bb0d942c515063f93725ef9cb9b366065c3988bc501458d0dac7d"
+    ],
+    ".qoder/commands/spec-app-consistency-audit.md": [
+      "8ec46103e0fc52926282f2c104d5e09d0c04201611f0b8543d9e3a0893a6ba91",
+      "a6e4ddb3dbcdc63bcdc2f4cbd1b34e7039ee0d4e47849b450d64f06e8a2300c6"
+    ],
+    ".opencode/skills/spec-project-rules": [
+      "359585a5398a421db6500156187b073a601bb99b4d132feb46e8e2af69929263",
+      "52c932c7390d7d2030eb04915aebdf166fedb781694add515d973b0571a59d02"
+    ],
+    ".opencode/skills/spec-rule-miner": [
+      "7f58e1a6290085351442985d31792d28b8da03492b8d4f65d5bed45ec02ccbc5",
+      "546b9ce981bf315fbe5786db3f66c6534a3d8bd3148cb63d9676aae0035ff108"
+    ],
+    ".opencode/skills/spec-app-consistency-audit": [
+      "37b5707128eac86b5fcc10a7cc32bbd35485510804c4d762e7c8e6ac6cd59fb1",
+      "66477ae3ec4c5cf26abc74c8c2b2dfe58d0dbb6c43c8622eb7b53e41c0a8a854"
+    ],
+    ".opencode/commands/spec-app-consistency-audit.md": [
+      "4c09069453e01e00111d32d30220a018b0525ce4af6dbefd58197724e94c4c6b",
+      "0d0c2a3f12804d189e693a6223976b3170ca9509de206efdf7d12e75aac9a395"
+    ],
+    ".claude/commands/spec/app-consistency-audit.md": [
+      "267483ffc34a27709ffda5d3c41d3f1ef312d990ac82061e980e669910e50c43",
+      "f3e63fbd40c3c2e22924672870ebf0a8e052680e5cb97dc514a6a55ae82677b7"
+    ],
+    ".qoder/commands/spec/app-consistency-audit.md": [
+      "9eef3bf547b745715a4e29cb641609d6b2bf86185929a1ab4fb44df49d89ebc6",
+      "f3e63fbd40c3c2e22924672870ebf0a8e052680e5cb97dc514a6a55ae82677b7"
+    ],
+    ".opencode/commands/spec/app-consistency-audit.md": [
+      "779fb3e7255bfae762fde45245a7b4ed5ff1f1ee7e0f83abcd5a0b653f9d5015",
+      "f3e63fbd40c3c2e22924672870ebf0a8e052680e5cb97dc514a6a55ae82677b7"
+    ]
+  }
+}

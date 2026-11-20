@@ -2,7 +2,7 @@
 
 本文说明当前 `spec-first` 会写入哪些 project-local runtime/control-plane 产物、它们由谁生成、后续如何被使用，以及哪些目录不应提交到 Git。
 
-当前版本不再生成当前能力用的图谱 readiness 产物。App consistency audit 和 quality gate 等目录是可重建的执行产物。脚本负责写入确定性事实，LLM 根据这些事实判断下一步是否使用 bounded direct source reads、`rg`、ast-grep、git diff、tests/logs、用户证据或专项审查报告。
+当前版本不再生成当前能力用的图谱 readiness 产物。quality gate 等目录是可重建的执行产物。脚本负责写入确定性事实，LLM 根据这些事实判断下一步是否使用 bounded direct source reads、`rg`、ast-grep、git diff、tests/logs、用户证据或专项审查报告。
 
 ## 总览
 
@@ -10,7 +10,6 @@
 | --- | --- | --- | --- | --- |
 | `.spec-first/config/` | `spec-runtime-setup` setup facts 阶段 | `spec-runtime-setup` | 记录 host baseline、required MCP/helper readiness、candidate tools/resources、fallback 能力和 artifact path contract；不是 query-ready direct evidence 或 live MCP proof | `runtime-capabilities.json` |
 | `.spec-first/workspace/` | parent workspace advisory 阶段 | 父 workspace 下的 `spec-runtime-setup` 或 `spec-first clean --workspace-orphans` | 保存 per-child setup/verify summary、setup-time scenario fingerprint 和 parent orphan quarantine | `project-config-bootstrap-summary.json`、`runtime-setup-summary.json`、`mcp-verify-summary.json`、`scenario-fingerprint-setup.json`、`parent-artifact-quarantine.json` |
-| `.spec-first/app-audit/runs/<run-id>/` | `spec-app-consistency-audit` App 一致性审查阶段 | `spec-app-consistency-audit`；headless 自动化下亦可直接调用 `node skills/spec-app-consistency-audit/scripts/run-audit.js mode:headless base:<ref>` | 保存移动 App PRD / Figma / source / route / architecture / analytics / i18n 静态一致性审查证据；`issue_synthesis_status` 三态(`not_run` / `llm_provided` / `fixture_provided`)区分确定性 runner 产物与上游 LLM/fixture 注入的语义 issue；markdown 摘要由下游 Report Writer 产出，不由 runner 直接生成 | 由 runner 产出: `metadata.json`、`preflight.json`、`impact-facts.json`、`issues.json`、`audit-report.json`、`app-audit-context.json`、`merged-context.json`、`artifact-manifest.json`、`headless-envelope.txt`；由下游 Report Writer 产出: `app-consistency-audit.md`、`app-consistency-audit.summary.md` |
 | `.spec-first/workflows/verification/<slug>/` | verification evidence 阶段 | 上游 verification 流程写入，`doctor` 读取 | 作为验证证据投递目录 | `verification-evidence.json` |
 | `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/` | `spec-work` final verification / closeout 阶段 | 选定 checks 后真实执行命令并记录日志；durable trigger 命中时再由 source-owned producer 写 `run.json` | 保存 repo-relative redacted logs、`verification-run-summary.v1`、可选的脱敏 review evidence、structured claim limitation 与 conditional `spec-work-run-artifact/v2`。`workflow_integrated=true` 只表示 active shipping 确实调用 producer；不代表 task progress、approval、CI、merge、release 或 field outcome | `logs/*`、`verification-run-summary.json`、可选 `review/*`、条件式 `run.json` |
 | `.spec-first/workflows/spec-debug/<workspace-slug>/<run-id>/` | `spec-debug` post-fix verification 阶段 | 修复后实际复跑 original reproducer、regression 与适用 broader checks | 保存 debug 自己执行命令的 redacted logs 与 run summary；Debug Summary / Post-Fix Quality 返回 summary ref、honest-closeout verdict 与 limitations。该 workflow 不写 spec-work run artifact | `logs/*`、`verification-run-summary.json` |
@@ -34,8 +33,6 @@
 | `docs/tasks/*-tasks.md` | 任务包派生 | `spec-write-tasks` | 保存从 plan 派生的 executable handoff、依赖、任务身份和 freshness contract | 视团队协作需要提交 |
 | `docs/solutions/**/*` | 知识沉淀 | `spec-compound` / `spec-compound-refresh` | 保存已解决问题的可复用工程经验；refresh 负责过时/重叠/漂移清理 | 通常提交 |
 | `docs/dogfood-reports/*-dogfood.md` | 分支/PR 浏览器 dogfood | `spec-dogfood` | 场景矩阵、修复记录、阻断项与 readiness 结论 | 通常提交；跨会话可 resume |
-| `docs/ai/project-rules.md` | 项目约定挖掘 | `spec-rule-miner` | 从代码证据沉淀 AI coding 规则；`AGENTS.md`/`CLAUDE.md` 常写 pointer | 通常提交 |
-| `docs/architecture.md` | 架构知识库挖掘/回写 | `spec-project-rules` | 从代码证据沉淀各端职责、依赖方向规则、shared 层复用契约与高价值隐式约定；`AGENTS.md`/`CLAUDE.md` 常写 pointer | 通常提交 |
 | `STRATEGY.md` | 产品方向 | `spec-strategy` | 产品策略与 persona / metrics 等方向文档 | 通常提交 |
 | `skills/**`（source） | Skill 包 create/revise | `spec-write-skill` | 项目拥有的 Agent Skill source；runtime 由 `spec-first init` 投影 | 提交 source；selected-host generated mirror 作为 checked-in delivery projection 默认也跟随目标项目提交，但不手改 mirror |
 
@@ -49,7 +46,6 @@
 | `docs/solutions/` | 可复用工程知识 | 后续 brainstorm/plan/work/debug/review 复用经验 |
 | `config/` | setup-owned machine facts | runtime-setup 前置校验、host readiness 指针、required helper readiness、candidate `native_tools[]` / `native_resources[]`、fallback 能力判断 |
 | `workspace/` | parent workspace advisory summaries | 多仓父目录下展示 child repo 候选、scenario fingerprint、批量维护结果和 parent orphan quarantine；不作为 repo-local truth |
-| `app-audit/runs/` | App consistency audit execution artifacts | 评审者读取静态一致性报告、degraded modes、issues 和 runtime follow-up 建议 |
 | `verification/*` | 验证证据投递目录 | `doctor` 校验与汇总 |
 | `workflows/spec-work/*` | Work run evidence | source-owned `spec-work-run-artifact read|prune`、显式 shipping/resume handoff 与维护者使用；缺失、not-readable 或 scope mismatch 时保留 unavailable/stale，不自动提升为 source authority |
 | `quality-gates/*` | 质量门机器结果 | gate 结果留痕与失败主题沉淀 |
@@ -61,7 +57,6 @@
 | --- | --- | --- | --- |
 | `config/` | `spec-runtime-setup`、`doctor`、相关 workflow | runtime-setup preflight / host readiness selection | 校验 baseline、required helper readiness、artifact path contract 和 fallback 能力；不把 discovery facts 当 query-ready evidence |
 | `workspace/` | 父 workspace 下的 LLM workflow、维护者 | workspace 只读定位或批量维护后 | 查看 child repo 候选、per-child setup summary 和 next action；不替代 child repo source truth |
-| `app-audit/runs/<run-id>` | 评审者、`spec-code-review` headless 调用、后续 QA / runtime validation | App 一致性审查后 | 查看 PRD/Figma/source 一致性问题、证据链、降级范围和运行时验证建议 |
 | `verification/<slug>` | `src/cli/commands/doctor.js` | `doctor` 检查阶段 | 校验 verification evidence 是否存在、有效、足够新 |
 | `quality-gates/ai-dev-quality-gate` | `scripts/run-ai-dev-quality-gate.js`、`src/verification/quality-feedback.js` | AI gate 执行后 | 记录 gate 结果并提取失败主题 |
 | `workflows/spec-work/<workspace-slug>/<run-id>` | source-owned reader、shipping handoff、维护者 | work closeout 后 | 在显式 target repo/workspace/run 选择下读取 compact work evidence、验证摘要和可选 `direct_evidence_used`；不得把 run artifact 当作 source scope authority |
@@ -125,36 +120,6 @@
 - 如果 shipping 阶段接受 residual findings，PR 描述应写 `Known Residuals`；无 PR 提交路径才写 `docs/residual-review-findings/<branch-or-head-sha>.md` 这类 concise durable summary。
 - 不默认把 full-detail per-reviewer JSON bundle 复制进 `docs/` 或 `.spec-first/`。
 
-
-## 6. app-audit/runs/
-
-| 项目 | 内容 |
-| --- | --- |
-| 阶段 | App consistency audit |
-| 触发 | `spec-app-consistency-audit` |
-| 目录形状 | `.spec-first/app-audit/runs/<run-id>/`，并可带 `latest-summary.json` 指针 |
-| 关键源码 | `skills/spec-app-consistency-audit/scripts/*` |
-| 事实边界 | 审计执行产物；不是 source truth，不进入 Git |
-
-### 写入内容
-
-| 文件 | 角色 |
-| --- | --- |
-| `metadata.json` | run id、scope、head sha、diff hash、worktree fingerprint 和审查模式 |
-| `artifact-manifest.json` | 本次 run 写出的 artifact 清单、hash 和 path contract |
-| `preflight.json` | 输入可用性、degraded modes、Figma reference/context 状态 |
-| `impact-facts.json` | source、diff、route、interaction 和候选影响面机器事实 |
-| `app-audit-context.json` | LLM 专家使用的聚合上下文和 capability coverage |
-| `issues.json` | 通过 deterministic evidence gate 后的结构化 issue 集合 |
-| `audit-report.json` | 机器可读审查报告 |
-| `app-consistency-audit.md` | 面向用户的静态一致性审查报告 |
-
-协作规则：
-
-- `.spec-first/app-audit/` 默认不进入 Git，报告需要共享时应摘录结论或另存为团队约定的 durable doc。
-- `figma-context:<path>` 才是可抽取 evidence；`figma-ref:<id-or-url>` 只是 reference。
-- Figma MCP 是宿主可选能力，用来 materialize 本地 JSON，不属于 required harness setup。
-- `mode:headless` 供 `spec-code-review` 等父流程消费；`mode:report-only` 不写 run artifacts。
 
 ## 7. verification/&lt;slug&gt;
 

@@ -6,7 +6,9 @@ Active workflow consumers are `spec-work`, `spec-debug`, and `spec-code-review`.
 
 Canonical fields are defined by `docs/contracts/workflows/honest-closeout.schema.json`:
 
-运行 `spec-first internal honest-closeout validate --help` 可读取输入字段和最小示例。输入只含 `run_summary_ref`、`claims`，每个 claim 只含 `claim_type`、`asserted_status`、`evidence_refs`；`verdict` 和 `reason_code` 由 validator 输出。帮助不访问目标仓库或执行校验。示例保持 `not-run`，而命令退出 0 只表示校验执行成功，完成结论仍须检查 `overall` 与逐项 verdict。
+运行 `spec-first internal honest-closeout validate --help` 可读取输入字段和最小示例。输入为 `run_summary_ref`、`claims` 和可选 `validation_scope`；每个 claim 只含 `claim_type`、`asserted_status`、`evidence_refs`。退出 0 只表示校验执行成功，须同时读取 `overall`、范围与逐项理由。
+
+涉及命令验证时输出 `validation_scope`。`recorded-run` 仅核对当次记录，不能作为当前版本通过的证明。声明当前版本通过时显式指定 `current-worktree`：摘要没有检查时的指纹、当前指纹不可取得或与记录不同，均不能得到通过判定。未指定范围时，有指纹按当前工作树比对，无指纹按历史记录解读，保持旧摘要可读。旧版消费者不支持新字段时必须升级或降级为历史查询，不得删字段后声称当前通过。
 
 - `claims[]`: `claim_type`, `asserted_status`, `evidence_refs[]`, `verdict`, and `reason_code`.
 - `claim_type`: `validation`, `impact_surface`, `review`, or `knowledge_promotion`.

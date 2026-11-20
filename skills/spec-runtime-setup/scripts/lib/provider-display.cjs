@@ -36,4 +36,13 @@ function providerDisplayFacts(provider = {}) {
   };
 }
 
-module.exports = { providerDisplayFacts };
+function providerHeadline(provider, display) {
+  const name = provider.provider || provider.id || 'unknown';
+  const lifecycle = provider.lifecycle || {};
+  const query = lifecycle.query_verified === true ? '已验证' : '未验证';
+  const server = name === 'codegraph' ? `；MCP 连通性${lifecycle.server_reachable === true ? '已验证' : '未验证'}` : '';
+  const freshness = display.currentness_status === 'unknown' ? '未验证' : display.currentness_status;
+  return `- ${name}: CLI 查询${query}；索引新鲜度：${freshness}${server} (${display.reason_code})`;
+}
+
+module.exports = { providerDisplayFacts, providerHeadline };

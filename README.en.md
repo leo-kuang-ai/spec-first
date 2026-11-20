@@ -120,12 +120,9 @@ For example, use `spec-brainstorm` for an idea with unsettled scope, `spec-plan`
 | Set product direction and roadmap | `spec-strategy` | Create or update `STRATEGY.md` |
 | Decide whether to adopt external technology | `spec-pov` | Project-grounded adoption judgment |
 | Explore unresolved interactions or product behavior | `spec-prototype` | Runnable throwaway prototype for human evaluation, not production implementation |
-| Maintain architecture knowledge and constraints | `spec-project-rules` | Architecture knowledge grounded in source |
-| Extract existing coding conventions | `spec-rule-miner` | Code-based conventions, not architecture-rule maintenance |
 | Simplify recent changes | `spec-simplify-code` | Preserve behavior; route defects to `spec-debug` |
 | Polish UI in a browser | `spec-polish` | Start the development server and inspect actual pages |
 | Verify branch or PR user flows | `spec-dogfood` | Diff-scoped browser QA with a report |
-| Check mobile App PRD/Figma/source consistency | `spec-app-consistency-audit` | Static cross-source audit, not device or simulator validation |
 | Build and verify an iOS App | `spec-test-xcode` | Explicit invocation; requires XcodeBuildMCP and a simulator |
 | Optimize against a metric | `spec-optimize` | Define a measurable goal, then evaluate evidence |
 | Iterate toward a checkable goal | `autoresearch` | Bounded verification and keep/discard cycles, not one-off diagnosis |

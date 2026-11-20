@@ -87,6 +87,8 @@ function computeWorkingTreeFingerprint(cwd = process.cwd()) {
   hash.update(headSha);
   hash.update('\0status\0');
   hash.update(status);
+  hash.update('\0index-entries\0');
+  hash.update(runGit(repoRoot, ['ls-files', '--stage', '-z']));
   hash.update('\0tracked-diff\0');
   hash.update(trackedDiff);
   hash.update('\0');

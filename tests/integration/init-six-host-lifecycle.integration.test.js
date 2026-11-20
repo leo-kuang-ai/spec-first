@@ -31,7 +31,14 @@ function tempSandbox(platform) {
 function runSpecFirst(args, sandbox) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd: sandbox.projectRoot,
-    env: { ...process.env, HOME: sandbox.home },
+    env: {
+      ...process.env,
+      HOME: sandbox.home,
+      USERPROFILE: sandbox.home,
+      CODEX_HOME: path.join(sandbox.home, '.codex'),
+      CLAUDE_CONFIG_DIR: path.join(sandbox.home, '.claude'),
+      XDG_CONFIG_HOME: path.join(sandbox.home, '.config'),
+    },
     encoding: 'utf8',
     timeout: 120000,
   });
@@ -677,14 +684,14 @@ describe('six-host init lifecycle', () => {
         adapter.workflowsRoot,
         'spec-prd',
       );
-      const appAuditRoot = path.join(
+      const optimizeRoot = path.join(
         sandbox.projectRoot,
         adapter.workflowsRoot,
-        'spec-app-consistency-audit',
+        'spec-optimize',
       );
       fs.mkdirSync(path.join(prdRoot, 'evals'), { recursive: true });
       fs.writeFileSync(path.join(prdRoot, 'evals', 'stale.json'), '{}\n');
-      fs.writeFileSync(path.join(appAuditRoot, 'README.md'), '# stale runtime maintainer README\n');
+      fs.writeFileSync(path.join(optimizeRoot, 'README.md'), '# stale runtime maintainer README\n');
     }
 
     const secondInit = runSpecFirst(initArgs, sandbox);
@@ -701,7 +708,7 @@ describe('six-host init lifecycle', () => {
       expect(fs.existsSync(path.join(
         sandbox.projectRoot,
         adapter.workflowsRoot,
-        'spec-app-consistency-audit',
+        'spec-optimize',
         'README.md',
       ))).toBe(false);
 
@@ -713,7 +720,7 @@ describe('six-host init lifecycle', () => {
       if (platform === 'claude') {
         expect(report.checks.find((check) => check.name === '.claude/skills')).toMatchObject({
           level: 'PASS',
-          message: 'found 21 standalone/internal skill directory(ies) in .claude/skills and 17 workflow mirror directory(ies) in .claude/spec-first/workflows',
+          message: 'found 19 standalone/internal skill directory(ies) in .claude/skills and 16 workflow mirror directory(ies) in .claude/spec-first/workflows',
         });
       }
       if (platform === 'cursor') {

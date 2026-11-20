@@ -94,16 +94,6 @@ describe('command companion resource paths', () => {
         '00-generic.md',
       ))).toBe(true);
 
-      const auditRoot = `${adapter.workflowsRoot}/spec-app-consistency-audit`;
-      const audit = readRuntimeCommand(projectRoot, adapter, 'spec-app-consistency-audit');
-      expect(audit).toContain(`\`${auditRoot}/scripts/run-audit.js\``);
-      expect(fs.existsSync(path.join(
-        projectRoot,
-        auditRoot,
-        'scripts',
-        'run-audit.js',
-      ))).toBe(true);
-
       const writeSkillRoot = `${adapter.workflowsRoot}/spec-write-skill`;
       const writeSkill = readRuntimeCommand(projectRoot, adapter, 'spec-write-skill');
       expect(writeSkill).toContain('## Conditional Sources');

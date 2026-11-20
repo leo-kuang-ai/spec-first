@@ -324,7 +324,7 @@ function applyActions(context, actionPlan, installations) {
     ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
     { cwd: repoRoot, timeoutMs: 10000 },
   );
-  if (!succeeded(queryResult)) {
+  if (!validQueryResult(queryResult)) {
     // bounded autonomous recovery: the Provider may transiently miss the
     // freshly indexed database; retry the same real probe once before fail.
     queryResult = run(
@@ -333,7 +333,7 @@ function applyActions(context, actionPlan, installations) {
       ['query', '__spec_first_readiness_probe__', '--limit', '1', '--json'],
       { cwd: repoRoot, timeoutMs: 10000 },
     );
-    if (!succeeded(queryResult)) return degraded(context, repoRoot, 'codegraph-query-probe-failed');
+    if (!validQueryResult(queryResult)) return degraded(context, repoRoot, 'codegraph-query-probe-failed');
   }
   const evidenceIdentity = readCurrentIdentity(context);
   const sourceAfter = sourceContentIdentity(captureSourceSnapshot({ ...context, repoRoot }));
@@ -368,6 +368,20 @@ function applyActions(context, actionPlan, installations) {
     ...(artifactEvidence ? { artifactEvidence } : { limitations: [evidenceReason] }),
     nextActions: configurationActions(context),
   });
+}
+
+function readProbeJson(result) {
+  if (!succeeded(result) || result.stdout_truncated === true) return null;
+  try {
+    return JSON.parse(result.stdout);
+  } catch {
+    return null;
+  }
+}
+
+function validQueryResult(result) {
+  const hits = readProbeJson(result);
+  return Array.isArray(hits) && hits.every((hit) => typeof hit?.node?.name === 'string');
 }
 
 function codegraphReadinessStatus(context, lifecycle) {
@@ -526,9 +540,7 @@ function commandFromSearchPath(command, searchPath, windows, env = {}) {
 
 function readStatusFacts(result, repoRoot, expectedVersion) {
   const unavailable = { ready: false, needsSync: false, needsReindex: false };
-  if (!result || !succeeded(result)) return unavailable;
-  let payload;
-  try { payload = JSON.parse(result.stdout); } catch (_error) { return unavailable; }
+  const payload = readProbeJson(result);
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)
     || payload.initialized !== true
     || typeof payload.version !== 'string'

@@ -20,7 +20,7 @@ argument-hint: "[bare baseline converge] [--installation-only] [--check|--verify
 | Failure modes | Missing dependencies, host config write failure, ambiguous parent workspace target, symlink escape, invalid registry schema, helper install failure, or unsupported host. |
 | Downstream consumers | `using-spec-first`, plan/work/review/debug workflows, doctor/update guidance, and humans repairing setup. |
 
-核心边界：Node module 准备确定性的 readiness facts；LLM workflow 决定如何使用这些事实。Setup 不得判断代码理解的语义充分性，也不得要求普通工作必须先依赖外部分析服务。CodeGraph/Graphify readiness 准备完成后，setup 可以建议将 `spec-rule-miner` 作为基于证据生成项目 AI coding rule 的后续步骤，但不得自行调用 rule mining、合成 rule 或写入 `docs/ai/project-rules.md`。
+核心边界：Node module 准备确定性的 readiness facts；LLM workflow 决定如何使用这些事实。Setup 不得判断代码理解的语义充分性，也不得要求普通工作必须先依赖外部分析服务。
 
 ## Scenario Capability
 
@@ -295,7 +295,7 @@ The final setup output should contain:
 - `Project local config`: example config, local override, gitignore safety rule, legacy markdown config signal, and retired legacy local config status. Human labels and machine fields should be de-branded; active setup facts must use `.spec-first` local config paths and neutral legacy field names.
 - `Project setup facts`: status for `tool-facts.json` and `runtime-capabilities.json`.
 - `Verification profile`: current verification profile visibility placeholder; full profile execution is v1.13 scope.
-- `Next steps`: either fix action-required rows, narrow to an explicit child repo when a single-repo retry is needed, continue to the user-intent workflow, or suggest `spec-rule-miner` as a separate follow-up after CodeGraph/Graphify readiness is prepared. This suggestion is advisory; setup must not treat rule-miner output as setup readiness and must not call `spec-rule-miner` automatically.
+- `Next steps`：处理需要操作的项目；若要针对单仓重试，明确目标子仓；环境就绪后回到用户原任务。
 
 ### Readiness Handoff
 
@@ -365,7 +365,7 @@ Setup does not:
 - run provider first generation from `--check`, `--plan`, `--verify-only`, or invalid explicit workspace override paths;
 - treat provider indexes or query probes as semantic code evidence;
 - treat setup facts as semantic code evidence;
-- invoke `spec-rule-miner`, synthesize project rules, or write `docs/ai/project-rules.md`;
+- 合成项目规则或写入 `docs/ai/project-rules.md`；
 - treat `.spec-first/config.local.yaml` as team-shared workflow policy;
 - silently copy or translate legacy project config into `.spec-first/config.local.yaml`;
 - decide issue/PR category, state, scope, accept/reject status, or implementation truth;

@@ -142,7 +142,7 @@ Trace data flow backward from the symptom to where valid state first became inva
 
 Concrete recipe:
 
-1. Read the stack trace bottom-to-top, opening each frame's source. The bottom frame is the symptom; the root cause is somewhere upstream.
+1. 按当前运行时的栈格式定位异常抛出位置，再沿调用链检查相关帧的源码。不要按输出顶部或底部猜测根因；抛出点只是开始追踪数据的位置。
 2. Identify the first frame where the input data is already invalid — that's the upper bound on where to look.
 3. Instrument the boundaries around that frame: targeted log/print statements, debugger breakpoints, or test assertions that capture *actual* values at function entry/exit. Assumed values lie; observed values don't.
 4. Walk the boundaries until valid input becomes invalid output. That transition is the root cause site.

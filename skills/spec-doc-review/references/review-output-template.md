@@ -41,7 +41,7 @@ Applied 5 fixes. 4 items need attention (2 errors, 2 omissions). 2 FYI observati
 
 | # | Section | Issue | Reviewer | Confidence | Tier |
 |---|---------|-------|----------|------------|------|
-| 1 | Requirements Trace | Goal states "offline support" but technical approach assumes persistent connectivity | coherence | 100 | manual |
+| 1 | Requirements Trace | 目标承诺离线可用，方案却要求持续联网。请决定保留离线目标并补方案，还是由产品缩小承诺。 | coherence | 100 | manual |
 
 ### P1 — Should Fix
 
@@ -49,7 +49,7 @@ Applied 5 fixes. 4 items need attention (2 errors, 2 omissions). 2 FYI observati
 
 | # | Section | Issue | Reviewer | Confidence | Tier |
 |---|---------|-------|----------|------------|------|
-| 2 | Scope Boundaries | 8 of 12 units build admin infrastructure; only 2 touch stated goal | scope-guardian | 75 | manual |
+| 2 | Scope Boundaries | 12 个单元中有 8 个建设管理后台，仅 2 个直接服务本期目标。请确认哪些后台能力本期不可缺，其他项移出本期。 | scope-guardian | 75 | manual |
 
 #### Omissions
 
@@ -93,18 +93,19 @@ Residual concerns identify supported consequential gaps whose resolution or evid
 | Persona | Status | Findings | Auto | Proposed | Decisions | FYI | Residual |
 |---------|--------|----------|------|----------|-----------|-----|----------|
 | coherence | completed | 5 | 3 | 0 | 1 | 1 | 0 |
-| feasibility | completed | 3 | 1 | 1 | 0 | 0 | 1 |
+| feasibility | completed | 2 | 1 | 1 | 0 | 0 | 1 |
 | security-lens | completed | 2 | 1 | 1 | 0 | 0 | 0 |
 | scope-guardian | completed | 2 | 0 | 0 | 1 | 1 | 0 |
 | product-lens | not activated | -- | -- | -- | -- | -- | -- |
 | design-lens | not activated | -- | -- | -- | -- | -- | -- |
 
 Dropped: 3 (anchors 0/25 suppressed)
-Chains: 1 root with 2 dependents
 Restated: 2 (residual/deferred items suppressed as duplicates of actionable findings)
 ```
 
 ## Section Rules
+
+从同一份去重后的明细计算摘要和覆盖表：待处理数是 `Proposed + Decisions`，不是 `Findings`。剩余风险和延期问题另列，不重复计入。只读评审不能把拟修改项写成已修改。
 
 - **Summary line**: Always present after the reviewer list. Format: "Applied N fixes. K items need attention (X errors, Y omissions). Z FYI observations." Omit any zero clause except the FYI clause when zero (it's informative that none surfaced).
 - **Applied fixes**: List all fixes that were applied automatically (`safe_auto` tier). Include enough detail per fix to convey the substance — especially for fixes that add content or touch document meaning. Omit section if none.

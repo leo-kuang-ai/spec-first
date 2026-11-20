@@ -228,7 +228,7 @@ describe('CodeGraph provider', () => {
         return success();
       }
       if (args[0] === 'status') return success(codegraphStatus(target));
-      if (args[0] === 'query') return success('{}');
+      if (args[0] === 'query') return success('[]');
       return failure(`unexpected ${command} ${args.join(' ')}`);
     };
     const context = {
@@ -317,6 +317,7 @@ describe('CodeGraph provider', () => {
         if (statusCount === 2) return success(codegraphStatus(target, { index: { state: 'complete', pendingRefs: 0, reindexRecommended: true } }));
         return success(codegraphStatus(target));
       }
+      if (args[0] === 'query') return success('[]');
       return success();
     };
 
@@ -390,7 +391,7 @@ describe('CodeGraph provider', () => {
     const runner = (_command, args) => {
       if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'status') return success(codegraphStatus(target));
-      if (args[0] === 'query') return success('{}');
+      if (args[0] === 'query') return success('[{"node":{"name":"sample"}}]');
       return success();
     };
 
@@ -459,7 +460,9 @@ describe('CodeGraph provider', () => {
     );
   });
 
-  test('degrades when the real CodeGraph query probe fails after indexing', () => {
+  test.each([failure('query failed'), success('diagnostic'), success('{}'), success('[{}]'),
+    { ...success('[]'), stdout_truncated: true }, { ...success('[]'), timed_out: true },
+  ])('degrades on unsuccessful or malformed CodeGraph query output: %j', (queryResult) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-query-failure');
     fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
@@ -467,7 +470,7 @@ describe('CodeGraph provider', () => {
     const runner = (_command, args) => {
       if (args[0] === '--version') return success('codegraph 1.6.0');
       if (args[0] === 'status') return success(codegraphStatus(target));
-      if (args[0] === 'query') return failure('query failed');
+      if (args[0] === 'query') return queryResult;
       return success();
     };
     const context = {
@@ -527,12 +530,15 @@ describe('CodeGraph provider', () => {
     ['worktree-mismatch', { worktreeMismatch: { worktreeRoot: '/other', indexRoot: '/old' } }],
     ['wrong-root', { projectPath: '/other' }],
     ['missing-pending', { pendingChanges: null }],
-  ])('CodeGraph JSON %s 不能仅因退出 0 成为 indexed 或执行 query', (_label, overrides) => {
+    ['truncated-status', {}, true],
+  ])('CodeGraph JSON %s 不能仅因退出 0 成为 indexed 或执行 query', (_label, overrides, truncated = false) => {
     const provider = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const target = tempRepo('codegraph-json');
     try {
       fs.mkdirSync(path.join(target, '.codegraph')); fs.writeFileSync(path.join(target, '.codegraph', 'codegraph.db'), 'db');
-      const runner = jest.fn((_command, args) => success(args[0] === '--version' ? 'codegraph 1.6.0' : codegraphStatus(target, overrides)));
+      const runner = jest.fn((_command, args) => args[0] === 'status'
+        ? { ...success(codegraphStatus(target, overrides)), stdout_truncated: truncated }
+        : success(args[0] === '--version' ? 'codegraph 1.6.0' : '[]'));
       const context = { repoRoot: target, env: {}, runner, configured: true, dependency: { version: '1.6.0' } };
       const result = provider.apply(context, { mutation: true, dependency_version: '1.6.0', actions: [] });
       expect(result.readiness_status).toBe('degraded');

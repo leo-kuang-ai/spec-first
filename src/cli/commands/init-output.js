@@ -4,21 +4,19 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { getAdapter, getSupportedPlatforms } = require('../adapters');
+const { getAdapter } = require('../adapters');
 const { formatSupportedHostFlags } = require('../helpers/supported-host-flags');
 const { getInitMessages } = require('../init-i18n');
 const {
   BrandColors,
   colorize,
   renderFullArt,
-  renderWordmark,
 } = require('../brand');
 const {
   hostDisplayName,
   formatInitHostFlagsForExample,
   initPlatformLabel,
 } = require('./init-args');
-const { findGitRoot } = require('./init-workspace');
 const { printInitDiagnostics } = require('./init-diagnostics');
 const { mergeStringArrays } = require('./init-project-plan');
 
@@ -40,21 +38,8 @@ const CRITICAL_WRITE_REASON_ORDER = Object.freeze({
   managed_host_native_pointer: 5,
 });
 
-function resolveInitBannerRoot(root) {
-  return findGitRoot(root) || root;
-}
-
-function printInitBrandBanner({ root, version, useColor }) {
-  const banner = hasAnyManagedState(root)
-    ? renderWordmark(version, { useColor })
-    : renderFullArt(version, { useColor }).trimEnd();
-  console.log(banner);
-}
-
-function hasAnyManagedState(root) {
-  return getSupportedPlatforms().some((platform) => (
-    fs.existsSync(path.join(root, getAdapter(platform).stateFile))
-  ));
+function printInitBrandBanner({ version, useColor }) {
+  console.log(renderFullArt(version, { useColor }).trimEnd());
 }
 
 function printInitPreview(plan, options = {}) {
@@ -545,7 +530,9 @@ function printInitApplySummaries(plans, results, options = {}) {
   const readyCount = normalizedPlans.reduce((count, _plan, index) => (
     normalizedResults[index] && normalizedResults[index].exit_code === 0 ? count + 1 : count
   ), 0);
-  console.log(readyCount === normalizedPlans.length
+  const languageSync = options.userLanguageSyncResult;
+  const languageFailed = languageSync && (languageSync.exit_code === 1 || languageSync.status === 'action-required');
+  console.log(readyCount === normalizedPlans.length && !languageFailed && !options.summaryUpdateFailed
     ? messages.applyRunSummary(readyCount, normalizedPlans.length)
     : messages.applyRunFailureSummary(readyCount, normalizedPlans.length));
 
@@ -565,17 +552,22 @@ function printInitApplySummaries(plans, results, options = {}) {
       && plan.writePlan && Array.isArray(plan.writePlan.operations)
       && plan.writePlan.operations.some((operation) => operation.reason === 'managed_gitignore_policy')
   ));
+  const changelogCreated = normalizedPlans.some((plan, index) => plan.changelogCreated && normalizedResults[index]?.exit_code === 0);
+  const globalWrite = options.globalDeveloperWriteResult;
+  const showProfile = globalWrite && globalWrite.developer && (globalWrite.action || globalWrite.status) !== 'preserve';
+  if (hasGitignoreChange || changelogCreated || showProfile || (languageSync && languageSync.status !== 'skipped')) {
+    console.log(`\n${messages.applyChangesHeading}`);
+  }
   if (hasGitignoreChange) {
     console.log(messages.applyGitignoreCompact);
     console.log(messages.applyRuntimeGitVisibleCompact);
   }
-  if (normalizedPlans.some((plan) => plan.changelogCreated)) {
+  if (changelogCreated) {
     console.log(messages.applyChangelogCompact);
   }
 
-  const globalWrite = options.globalDeveloperWriteResult;
   // preserve 未发生任何写入；沿用已在预览与确认提示中告知，结果段不再重复。
-  if (globalWrite && globalWrite.developer && (globalWrite.action || globalWrite.status) !== 'preserve') {
+  if (showProfile) {
     console.log(messages.applyProfileCompact(
       globalWrite.action || globalWrite.status || 'preserve',
       globalWrite.resolvedPath || globalWrite.globalPath,
@@ -583,7 +575,6 @@ function printInitApplySummaries(plans, results, options = {}) {
       globalWrite.developer.lang,
     ));
   }
-  const languageSync = options.userLanguageSyncResult;
   if (languageSync && languageSync.status !== 'skipped') {
     console.log(messages.applyLanguageCompact(
       languageSync.status,
@@ -609,6 +600,7 @@ function printInitApplySummaries(plans, results, options = {}) {
       ));
     }
   }
+  if (normalizedPlans.length) console.log(`\n${messages.applyNextHeading}`);
   printInitTopologyHandoffs(normalizedPlans, normalizedResults, options.lang || 'zh');
   if (normalizedResults.some((result) => result && (result.exit_code === 0
     || (result.workspace_summary && result.workspace_summary.parent_host_runtime
@@ -945,17 +937,11 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh', { target = proce
 function printConsolidatedNextSteps(platforms, lang = 'zh', { target = process.cwd() } = {}) {
   const zh = lang !== 'en';
   const hostNames = platforms.map((platform) => hostDisplayName(platform));
-  const doctorFlags = platforms.map((platform) => `--${platform}`).join(' ');
   console.log(zh ? `目标目录：${target}` : `Target: ${target}`);
   console.log(zh
-    ? `  已写入 projection 的宿主：${hostNames.join('、')}；宿主加载、任务能力与 workflow 结果未验证。`
-    : `  projection written for ${hostNames.join(', ')}; host loading, task capabilities and workflow results are not verified.`);
-  console.log(zh
-    ? '  主行动：在此目录重启宿主或新开会话后生效。'
-    : '  Next: in this target, restart the hosts or open a new session to take effect.');
-  console.log(zh
-    ? `  恢复（此目录的终端）：spec-first doctor ${doctorFlags}（只读，无需重跑 init）。`
-    : `  Recovery (terminal in this directory): spec-first doctor ${doctorFlags} (read-only; no re-init needed).`);
+    ? `  主行动：在此目录打开要使用的宿主（${hostNames.join(' / ')}），新建会话。`
+    : `  Next: open your preferred host (${hostNames.join(' / ')}) in this directory and start a new session.`);
+  console.log(zh ? '  配置已写入；宿主是否加载、任务能否执行尚未验证。' : '  Configuration written; host loading and task execution are not verified.');
   const piSelected = platforms.includes('pi');
   // 差异行按规范顺序列出，宿主选择顺序不影响文案稳定性。
   const previewSelected = ['cursor', 'opencode', 'zcode'].filter((platform) => platforms.includes(platform));
@@ -973,23 +959,27 @@ function printConsolidatedNextSteps(platforms, lang = 'zh', { target = process.c
         : `  · ${previewNames} (preview): local skill/command loading not verified; support claim: preview.`);
     }
   }
+  printOptionalDoctor(platforms, lang);
 }
 
 function printSingleHostNextSteps(platform, lang = 'zh', { target = process.cwd() } = {}) {
   const host = hostDisplayName(platform);
   const preview = ['cursor', 'opencode', 'zcode', 'pi'].includes(platform);
   console.log(lang === 'en' ? `Target: ${target}` : `目标目录：${target}`);
-  console.log(lang === 'en'
-    ? `  ${host}: projection written; host loading, task capabilities and workflow results are not verified.${preview ? ' Support: preview.' : ''}`
-    : `  ${host}：projection 已写入；宿主加载、任务能力与 workflow 结果未验证。${preview ? '支持上限：preview。' : ''}`);
   const activation = platform === 'pi'
     ? (lang === 'en' ? 'open Pi and complete project trust; without trust, project skills are not loaded'
       : '打开 Pi 并完成项目信任；未信任时不会加载项目 skill')
     : (lang === 'en' ? `restart ${host} or open a new session` : `重启 ${host} 或新开会话`);
   console.log(lang === 'en' ? `  Next: in this target, ${activation}.` : `  主行动：在此目录${activation}。`);
   console.log(lang === 'en'
-    ? `  Recovery (terminal in this target): spec-first doctor --${platform} (read-only; no re-init needed).`
-    : `  恢复（此目录的终端）：spec-first doctor --${platform}（只读，无需重跑 init）。`);
+    ? `  Configuration written; host loading and task execution are not verified.${preview ? ' Support: preview.' : ''}`
+    : `  配置已写入；宿主是否加载、任务能否执行尚未验证。${preview ? '支持级别：预览（preview）。' : ''}`);
+  printOptionalDoctor([platform], lang);
+}
+
+function printOptionalDoctor(platforms, lang) {
+  console.log(lang === 'en' ? '  If the host does not load the configuration, check from this directory (read-only):' : '  若宿主未加载配置，在此目录的终端运行只读检查：');
+  console.log(`    spec-first doctor ${platforms.map((platform) => `--${platform}`).join(' ')}`);
 }
 
 function printInitTaskGuidance(lang) {
@@ -1143,7 +1133,6 @@ function printOperationPathSample(operations, maxEntries = Infinity, options = {
 module.exports = {
   MAX_PREVIEW_DETAIL_LINES,
   MAX_PREVIEW_PATH_SAMPLES_PER_GROUP,
-  hasAnyManagedState,
   hasInitDiagnostic,
   printGlobalDeveloperWriteSummary,
   printHelp,
@@ -1160,5 +1149,4 @@ module.exports = {
   printUserLanguageSyncDetails,
   printUserLanguageSyncPreview,
   printWorkspaceInitApplySuccess,
-  resolveInitBannerRoot,
 };

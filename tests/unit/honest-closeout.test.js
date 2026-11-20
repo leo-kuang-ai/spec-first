@@ -164,6 +164,41 @@ describe('honest closeout contract and validator', () => {
     }
   });
 
+  test('旧客户端字段改变后，历史验证不能为当前工作树签收', () => {
+    const repo = makeRepo();
+    const { computeWorkingTreeFingerprint } = require('../../skills/spec-work/scripts/working-tree-fingerprint.cjs');
+    try {
+      fs.writeFileSync(path.join(repo, '.gitignore'), '.spec-first/\n');
+      writeJson(path.join(repo, 'order.json'), { id: 'A01', order_id: 'A01' });
+      execFileSync('git', ['add', '.'], { cwd: repo });
+      execFileSync('git', ['commit', '-qm', 'fixture'], { cwd: repo });
+      const runId = 'checked-tree';
+      const input = runSummaryPayload(repo, runId);
+      const digest = computeWorkingTreeFingerprint(repo).fingerprint;
+      const command = "require('node:assert/strict').equal(require('./order.json').order_id, 'A01'); console.log('OK')";
+      const run = () => execFileSync(process.execPath, ['-e', command], { cwd: repo, stdio: 'pipe' });
+      fs.writeFileSync(path.join(repo, input.checks[0].log_path), run());
+      input.checks[0].command = `node -e ${JSON.stringify(command)}`;
+      input.checked_worktree_fingerprint = digest;
+      const inputPath = writeJson(path.join(repo, '.spec-first/input.json'), input);
+      const record = writeVerificationRunSummary({ inputPath, runId, targetRepo: repo });
+      expect(record.exitCode).toBe(0);
+      const claims = [{ claim_type: 'validation', asserted_status: 'passed', evidence_refs: ['verification-run-summary:typecheck'] }];
+      const validate = (scope, ref = record.output.run_summary_ref) => validateHonestCloseout({ targetRepo: repo, payload: { claims, run_summary_ref: ref, validation_scope: scope } });
+      expect(validate('current-worktree').overall).toBe('verified');
+      writeJson(path.join(repo, 'order.json'), { id: 'A01' });
+      expect(run).toThrow();
+      expect(validate('current-worktree')).toMatchObject({ overall: 'degraded', claims: [{ reason_code: 'verification-worktree-changed' }] });
+      expect(validate(undefined).overall).toBe('degraded');
+      expect(validate('recorded-run')).toMatchObject({ overall: 'verified', validation_scope: 'recorded-run' });
+      const legacy = writeRunSummary(repo, 'legacy');
+      expect(validate('current-worktree', legacy)).toMatchObject({ overall: 'degraded', claims: [{ reason_code: 'verification-worktree-unbound' }] });
+      expect(validate(undefined, legacy)).toMatchObject({ overall: 'verified', validation_scope: 'recorded-run' });
+    } finally {
+      fs.rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
   test('fails closed on a stored run summary with duplicate check ids before id-map lookup', () => {
     const repo = makeRepo();
     try {

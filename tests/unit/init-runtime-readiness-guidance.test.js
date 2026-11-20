@@ -14,6 +14,22 @@ function captureOutput(render) {
 }
 
 describe('init runtime readiness guidance', () => {
+  test('按结果、实际配置变更、下一步排序，不把语言同步失败显示为整体完成', () => {
+    const output = captureOutput(() => printInitApplySummaries([
+      { platform: 'codex', projectRoot: '/tmp/example' },
+    ], [{ exit_code: 0 }], {
+      lang: 'zh', userLanguageSyncResult: { exit_code: 1, status: 'action-required', reason_code: 'sync-failed' },
+    })).join('\n');
+    expect(output).toMatch(/初始化需处理[^\n]*1\/1[\s\S]*配置与文件[\s\S]*sync-failed[\s\S]*下一步[\s\S]*目标目录/);
+  });
+
+  test('失败计划不宣称创建文件，也不输出空的配置分区', () => {
+    const output = captureOutput(() => printInitApplySummaries([
+      { platform: 'codex', projectRoot: '/tmp/example', changelogCreated: true },
+    ], [{ exit_code: 1 }], { lang: 'zh' })).join('\n');
+    expect(output).toContain('初始化需处理');
+    expect(output).not.toMatch(/已创建 CHANGELOG|配置与文件/);
+  });
   test.each(['zh', 'en'])('binds activation, task input, conditional setup and recovery to scope (%s)', (lang) => {
     const target = path.resolve('/tmp/project with spaces');
     const lines = captureOutput(() => printInitNextSteps('codex', lang, { target }));
@@ -89,7 +105,7 @@ describe('init runtime readiness guidance', () => {
     const target = path.resolve('/tmp/项目 目录-α');
     const output = captureOutput(() => printInitNextSteps('codex', 'zh', { target })).join('\n');
     expect(output).toContain(`目标目录：${target}`);
-    expect(output).toContain(`恢复（此目录的终端）：spec-first doctor --codex`);
+    expect(output).toMatch(/若宿主未加载配置[^\n]*\n\s+spec-first doctor --codex$/m);
   });
 
   test('keeps guidance independent of historical directories', () => {

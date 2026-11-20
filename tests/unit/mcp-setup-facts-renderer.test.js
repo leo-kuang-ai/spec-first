@@ -736,7 +736,7 @@ describe('spec-runtime-setup renderer', () => {
     });
 
     expect(text).toContain('ffmpeg [cli]: ready (ready)');
-    expect(text).toContain('graphify: fresh (ready)');
+    expect(text).toContain('graphify: CLI 查询未验证；索引新鲜度：fresh (ready)');
     expect(text).not.toContain('安装 ffmpeg');
     expect(text).not.toContain('graphify --refresh');
     expect(text).toContain('继续目标 spec-* workflow');
@@ -891,7 +891,7 @@ describe('spec-runtime-setup renderer', () => {
       runtimeCapabilities: { setup_summary: { baseline_ready: true, host_runtime_ready: true, generated_runtime_manifest: { status: 'current' } } },
     }, { executionSummary: { overall_status: 'ready', reason_code: 'setup-ready', scope: 'full', selected_ids: [], required_provider_ids: ['graphify'] } });
 
-    expect(text).toContain('graphify: unknown (currentness-not-verified-in-read-only-check)');
+    expect(text).toContain('graphify: CLI 查询已验证；索引新鲜度：未验证');
     expect(text).toContain('readiness_scope: install-index-ready; probe_status: query-verified');
   });
 

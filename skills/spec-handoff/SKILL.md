@@ -44,7 +44,7 @@ Read [Artifact Contract](references/artifact-contract.md) before writing.
    ```
 
    Resolve `SKILL_DIR` from this loaded Skill's package. The helper owns containment, symlink rejection, private directories, collision-free naming, exclusive creation, frontmatter serialization, and the final SHA-256 receipt. It does not decide semantic adequacy or redact the payload for you.
-7. Treat creation as complete only when the returned artifact exists and the receipt reports `status: written`. Report the repo-relative path, SHA-256, access/retention limitations, and a short description of what was captured.
+7. 托管写入以 helper 返回 `status: written` 并核对实际文件与 SHA-256 为准，报告仓库相对路径。自选本地路径用支持独占新建的写入能力；若已存在或无法安全新建则停止，不覆盖也不另写默认副本。回读实际文件核对预期内容并计算 SHA-256；不要求或补造 `status: written`。仓库外报告标注为本机的绝对路径。两种情况都说明访问和留存限制，核验失败不报成功。
 8. End with one copyable invocation using the exact Skill name exposed by the active host:
 
    ```text

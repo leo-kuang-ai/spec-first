@@ -83,3 +83,4 @@ prepareFixture("reqonly-plan", {
   "package.json": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
   "src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
 });
+fs.appendFileSync('.git/info/exclude', '\n/.spec-first/workflows/\n');

@@ -334,7 +334,7 @@ describe('CLI smoke checks', () => {
       expect(fs.existsSync(path.join(
         consumerRoot,
         runtimeRoot,
-        'spec-app-consistency-audit',
+        'spec-optimize',
         'README.md',
       ))).toBe(false);
       expect(fs.existsSync(path.join(

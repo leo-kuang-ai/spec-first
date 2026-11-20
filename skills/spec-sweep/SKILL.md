@@ -108,7 +108,7 @@ Read `references/run.md` now and follow its Phase 2 procedure.
 
 For 2d, process one item at a time in cursor order: authorized ack or own-identity existing ack -> read-back confirmation -> `upsert-item` -> `cursor-advance`. Never advance past an unrecorded or ack-deferred item, including by advancing for a later item from the same source. A source with `approved: false` receives no ack or close-out; still fetch and upsert its items as `ack_deferred`. Every upsert carries the configured `sensitive` flag. Raw media is never committed.
 
-Accept a claimed fix ref only when its entire value is a bare PR number (`#?\d+`) or commit SHA (`[0-9a-f]{7,40}`) before any git/gh invocation. Other values remain unresolved claims.
+修复引用在进入 git/gh 前，按 `references/run.md` §2f 区分 PR 编号与提交引用并整串校验。仅形态合法不构成合入证据；无法解析或无法核对默认分支时保持未关闭。
 
 **Stop classes:** `LOCKED` records `aborted-locked` and stops; `LEASE-LOST` stops source writes and records `partial`; any engine result that cannot persist state stops further source-side writes. Inspect status words as well as exit codes: an exit code of zero alone does not prove success. A failed ack holds its cursor, while a recoverable media failure is recorded and the remaining phases continue.
 

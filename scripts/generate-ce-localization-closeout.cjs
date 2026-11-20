@@ -55,13 +55,11 @@ function refreshReport(deterministic) {
 }
 const strings = (value) => Array.isArray(value) ? value : [value];
 const LOCAL_ONLY_SKILL_IDS = [
-  'spec-app-consistency-audit', 'spec-polish', 'spec-prd',
-  'spec-project-rules', 'spec-rule-miner', 'spec-write-tasks', 'using-spec-first',
+  'spec-polish', 'spec-prd', 'spec-write-tasks', 'using-spec-first',
 ];
 
 const skills = [
   ['autoresearch', 'autonomous goal-directed iterate-and-verify loop', 'A1', 'bounded improvement loop with safety-screened commands and no auto-ship', 'converge measurable goals without unsafe side effects'],
-  ['spec-app-consistency-audit', 'mobile App PRD/Figma/local-source consistency', 'A1', 'consistency evidence and actionable report', 'cross-source audit before runtime validation'],
   ['spec-brainstorm', 'ambiguous product or engineering intent framing', 'A1', 'right-sized requirements-only plan', 'reduce scope ambiguity before planning'],
   ['spec-code-review', 'source diff review and risk explanation', 'A1', 'prioritized findings with evidence', 'catch regressions before delivery'],
   ['spec-commit', 'authorized local commit preparation', 'A1', 'scoped commit candidate', 'preserve authorization and exact write set'],
@@ -81,12 +79,10 @@ const skills = [
   ['spec-pov', 'decisive project-grounded external input verdict', 'A2', 'adopt/defer/reject verdict', 'avoid abstract technology decisions'],
   ['spec-prd', 'brownfield PRD planning readiness', 'A1', 'implementation-ready requirements', 'reduce ambiguity before planning'],
   ['spec-product-pulse', 'time-windowed product signal report', 'A2', 'status-aware pulse report', 'support evidence-based prioritization'],
-  ['spec-project-rules', 'map and maintain monorepo architecture boundary knowledge', 'A3', 'evidence-graded architecture knowledge base', 'align AI changes with project boundaries'],
   ['spec-promote', 'launch or promotion copy for shipped work', 'A1', 'authorized promotion draft', 'communicate shipped value safely'],
   ['spec-prototype', 'throwaway prototype for unresolved behavior', 'A1', 'human-decision prototype receipt', 'resolve behavior uncertainty before production work'],
   ['spec-resolve-pr-feedback', 'evaluate and resolve PR feedback', 'A1', 'conflict-aware landed fixes', 'reduce review turnaround and regressions'],
   ['spec-riffrec-feedback-analysis', 'analyze explicit Riffrec feedback capture', 'A1', 'privacy-bounded feedback analysis', 'turn feedback into actionable product work'],
-  ['spec-rule-miner', 'mine actual repository coding conventions', 'A3', 'source-evidenced project rules', 'improve future generated code fit'],
   ['spec-runtime-setup', 'setup and verify harness readiness', 'A1', 'host/status readiness facts', 'avoid setup-driven false readiness'],
   ['spec-simplify-code', 'simplify recently changed code safely', 'A3', 'behavior-preserving simplification', 'reduce maintenance cost without losing safeguards'],
   ['spec-strategy', 'create or update product strategy', 'A2', 'durable strategy decision', 'align future work with product value'],

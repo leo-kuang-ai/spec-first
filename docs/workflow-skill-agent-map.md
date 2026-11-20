@@ -40,7 +40,6 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 | `spec-compound-refresh` | spec-compound-refresh | 审查并刷新 docs/solutions/ 下已漂移的 learning 与 pattern 文档，更新/合并/替换/删除，维持知识库新鲜度 | 无具名 prompt asset（可用匿名 subagent 做调查与 replacement 的上下文隔离） |
 | `spec-mcp-setup` | spec-mcp-setup | 安装、配置并验证 spec-first 工作流所需宿主运行时，建立就绪基线 | 无 |
 | `spec-write-skill` | spec-write-skill | 创建、修改、迁移或修复 project-owned Agent Skill：full apply 先形成紧凑 Design Record 与最小 eval plan，map/shape/topology 按 owner、consumer、carrier、架构或风险变化展开，并以 exact write set/hash 绑定 mutation；对现有/外部 package 做显式请求的零执行只读 readiness 验证；spec-first 治理按 project profile 加载 | 无 |
-| `spec-app-consistency-audit` | spec-app-consistency-audit | 对移动 App 的 PRD、Figma、源码、路由、架构边界等做静态一致性审查 | 专家 prompts 位于 `skills/spec-app-consistency-audit/prompts/` |
 | `spec-polish` | spec-polish | 启动 dev server、在浏览器打开功能并协作迭代改进 | 无（`disable-model-invocation`，浏览器迭代，不自动触发） |
 
 `spec-write-skill` 的 portable core 适用于普通 repo；target/project profile 按证据加载。它的 workbench 由 LLM/human 判断 Skill 形状、模块与语义充分性，scripts 只核验 source shape、preview hash/scope/write-set 和 payload closure；宿主没有原子 conditional patch primitive 时 apply 必须停止。只读质量审查但不做 package readiness 时保持 bounded source review；第三方安装走 installer；generated runtime patch/regeneration 走 runtime maintenance，source revision 才进入本 workflow。

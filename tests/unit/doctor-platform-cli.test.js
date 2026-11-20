@@ -144,6 +144,11 @@ describe('doctor host CLI version probes', () => {
 
   test.each([
     [
+      'zero exit after timeout',
+      { status: 0, stdout: '1.2.3', error: Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' }) },
+      'kiro_cli_version_check_timeout',
+    ],
+    [
       'timeout',
       { status: null, stdout: '', stderr: '', error: Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' }), timedOut: true },
       'kiro_cli_version_check_timeout',
@@ -170,5 +175,12 @@ describe('doctor host CLI version probes', () => {
       loader_evidence: false,
       reason_codes: [reasonCode],
     });
+  });
+
+  test.each(['win32', 'linux', 'darwin'])('%s：版本可由标准错误返回', (platform) => {
+    expect(checkPlatformCli('codex', {
+      platform,
+      runner: () => ({ status: 0, stdout: '', stderr: 'codex 1.2.3\n' }),
+    })).toMatchObject({ level: 'PASS', detectedVersion: '1.2.3' });
   });
 });

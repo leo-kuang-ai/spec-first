@@ -420,8 +420,8 @@ function checkPlatformCli(platform, options = {}) {
   const result = isWindows
     ? runner(options.comSpec || process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', `${command} --version`], { encoding: 'utf8' })
     : runner(command, ['--version'], { encoding: 'utf8' });
-  if (result.status === 0) {
-    const output = result.stdout.trim();
+  if (result.status === 0 && !result.error && !result.signal) {
+    const output = String(result.stdout || '').trim() || String(result.stderr || '').trim();
     return {
       level: 'PASS',
       name: displayName,

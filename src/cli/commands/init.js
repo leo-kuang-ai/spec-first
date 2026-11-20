@@ -58,7 +58,6 @@ const {
   printInitPreview,
   printInitPreviews,
   printWorkspaceInitApplySuccess,
-  resolveInitBannerRoot,
 } = require('./init-output');
 
 async function runInit(argv, promptOverrides = {}) {
@@ -116,10 +115,7 @@ async function runInit(argv, promptOverrides = {}) {
   let activeLang = defaultLang;
   const useColor = detectColorSupport();
 
-  // 品牌 banner 对所有 init 形态展示（交互、-y、dry-run）：首次安装显示完整
-  // logo，刷新场景显示紧凑 wordmark（形态语义见 printInitBrandBanner）。
   printInitBrandBanner({
-    root: resolveInitBannerRoot(workspaceRoot),
     version: pkg.version,
     useColor,
   });
@@ -219,6 +215,7 @@ async function runInit(argv, promptOverrides = {}) {
     const userLanguageSyncResult = applyUserLanguageSyncPlan(userLanguageSyncPlan);
     const summaryUpdateFailures = persistWorkspaceUserLanguageSyncSummaries(plans, results, userLanguageSyncResult);
     printInitApplySummaries(plans, results, {
+      summaryUpdateFailed: summaryUpdateFailures.length > 0,
       lang: interactiveInput.lang,
       globalDeveloperWriteResult,
       userLanguageSyncResult,

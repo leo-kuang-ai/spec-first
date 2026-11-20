@@ -9,6 +9,7 @@ Canonical fields are defined by `docs/contracts/verification/verification-run-su
 输入与输出不是同一形状。运行 `spec-first internal verification-run-summary record --help` 可读取当前输入字段、状态枚举和最小示例；`read --help` 提供回读参数。帮助只读且不要求目标仓库，示例默认为 `not-run`，必须以实际命令结果和日志替换后才能声明通过。输出的 `schema_version`、`generated_at` 由 writer 生成，不放入输入。
 
 - `profile`: the profile source, active profile name, and source path.
+- `checked_worktree_fingerprint`：可选，取自 `spec-work-working-tree-fingerprint/v1` 的 `fingerprint`。在同一目标仓库、整组检查开始前采集，并在检查结束后核对一致，才能将开始时的值写入摘要。不覆盖被 Git 忽略的输入、外部服务或运行中改动后又恢复的文件，也不证明命令确实由受监督进程执行。缺证据就留空（省略字段），不要在记录阶段取现值补填。
 - `checks[]`: `id`, `service`, `command`, `status`, `exit_code`, `ran`, `required_tools`, `missing_tools`, `log_path`, `reason_code`, and `redaction_status`.
 
 Status boundaries:

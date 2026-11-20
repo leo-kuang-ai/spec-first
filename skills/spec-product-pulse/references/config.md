@@ -3,11 +3,7 @@
 Read this before interpreting any `pulse_*` value.
 
 
-**Read config.** Resolve `<repo-root>` at runtime by running
-`git rev-parse --show-toplevel` with the shell tool. Then read
-`<repo-root>/.spec-first/config.local.yaml` with the native file-read tool. If
-the root cannot be resolved or the file does not exist, treat this as a first
-run. Otherwise extract the `pulse_*` keys listed below. Reports remain owned by
+**读取配置。** 运行 `git rev-parse --show-toplevel`。无法解析目标仓库时，只请求目标路径，不启动访谈，也不按 cwd 推测配置位置。成功后读取 `<repo-root>/.spec-first/config.local.yaml`；文件不存在或未配置产品名才进入首次访谈。否则读取下列 `pulse_*` 键。Reports remain owned by
 the fixed `docs/pulse-reports/` contract; this Skill does not introduce a
 global configurable artifact root.
 

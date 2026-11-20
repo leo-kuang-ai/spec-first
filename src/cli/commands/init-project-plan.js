@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { findPreservedRetiredAssets } = require('../retired-skills');
 
 const {
   buildFilteredAssetSet,
@@ -25,6 +26,7 @@ const {
   planHardResetManagedAssets,
   planObsoleteManagedAssetRemoval,
   planRetiredRuntimeAssetPrune,
+  planSharedSkillRetirement,
   readState,
   readStateFileRaw,
   summarizeOperationPlan,
@@ -186,6 +188,7 @@ function buildProjectInitPlan({
     }
   }
   const manifest = loadPluginManifest();
+  const sharedRetirement = planSharedSkillRetirement(normalizedRoot, adapter, previousState, platforms);
   const filteredAssetSet = buildFilteredAssetSet(adapter.id);
   const runtimeCommands = adapter.hasCommands
     ? filteredAssetSet.commands.map((command) => ({
@@ -267,6 +270,7 @@ function buildProjectInitPlan({
     ...assetSync.syncedAssets,
     platform,
   });
+  if (adapter.skillsRoot === '.agents/skills') previewState.sharedSkillRetirementV1 = true;
 
   if (platform === 'claude') {
     try {
@@ -325,8 +329,10 @@ function buildProjectInitPlan({
     }
   }
 
+  const obsoletePlan = planObsoleteManagedAssetRemoval(normalizedRoot, previousState, previewState, adapter);
   const preSyncPlan = mergeOperationPlans(
-    planObsoleteManagedAssetRemoval(normalizedRoot, previousState, previewState, adapter),
+    sharedRetirement,
+    obsoletePlan,
     planRetiredRuntimeAssetPrune(normalizedRoot, adapter),
     planLegacyDeveloperProfileCleanup(normalizedRoot),
   );
@@ -342,6 +348,9 @@ function buildProjectInitPlan({
   });
 
   const operationPlan = mergeOperationPlans(destructiveResetPlan, preSyncPlan, initWritePlan);
+  for (const relative of findPreservedRetiredAssets(normalizedRoot, adapter, operationPlan)) {
+    diagnostics.push({ level: 'warn', code: 'retired_asset_preserved', message: `保留退役入口，请核对其内容及宿主归属：${relative}` });
+  }
   // 显式性必须来自 parseInitArgs 的 flag 事实与交互确认结果,不能从已解析的
   // name/lang 反推:后者带 global profile / git user.name / 'zh' 回落,永不为空,
   // 会让 preserve 分支永久不可达,并把每次 init 都报成 overwrite。
