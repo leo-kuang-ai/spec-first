@@ -399,6 +399,24 @@ describe('spec-prd Contract Reset replay', () => {
         status: 'failed',
         structural_reason_codes: expect.arrayContaining(['run_audit_manifest_missing']),
       });
+      const preserved = path.join(runDir, 'audit-after-cleanup-error');
+      fs.mkdirSync(path.join(runDir, 'control'), { recursive: true });
+      const remove = fs.rmSync;
+      const fault = jest.spyOn(fs, 'rmSync').mockImplementation((target, options) => {
+        if (path.basename(target) === 'control') throw new Error('injected cleanup failure');
+        return remove(target, options);
+      });
+      try {
+        const partial = prepareRunAudit({ runRoot: runDir, outDir: preserved, repoRoot, cleanup: true });
+        expect(partial).toMatchObject({ status: 'prepared_cleanup_incomplete', cleanup: {
+          completed: ['namespaces'], remaining: ['control', '.prepare'],
+        } });
+        expect(fs.existsSync(path.join(runDir, 'namespaces'))).toBe(false);
+        expect(fs.existsSync(path.join(runDir, 'control'))).toBe(true);
+        expect(validateRunDirectory(preserved, { repoRoot, requireRunAudit: true }).status).toBe('passed');
+      } finally {
+        fault.mockRestore();
+      }
     } finally {
       fs.rmSync(repoRoot, { recursive: true, force: true });
       fs.rmSync(parent, { recursive: true, force: true });

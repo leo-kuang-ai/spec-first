@@ -1,6 +1,6 @@
 # Tracker Detection and Defer Execution
 
-Canonical owner: the `spec-work` package's co-located `references/tracker-defer.md` source. The `spec-lfg` package carries a byte-identical package-local projection because the current plugin has no cross-skill import mechanism across every host runtime root. Keep both copies identical; `tests/unit/spec-work-consumer-chain-contracts.test.js` and the five-host projection contract enforce parity.
+`spec-work` owns the residual-filing policy. Edit `skills/_shared/references/tracker-defer.md` in the source repository; `npm run sync:shared-references` distributes a byte-identical package-local projection to `spec-work` and `spec-lfg`. Installed callers read their own copy.
 
 This reference covers how residual actionable findings are filed in the project's tracker. Loaded by caller workflows (for example `spec-work` Residual Work Gate, or `lfg` residual handling) — not by `spec-code-review`, which stops after the report.
 
@@ -38,12 +38,12 @@ Used by `spec-work` Residual Work Gate and similar caller flows when the user ch
 
 ### Non-interactive mode
 
-Used by autonomous callers like `lfg` that must not prompt. All blocking questions are skipped; the fallback chain is executed silently in order. Behavior:
+Used by autonomous callers like `lfg` that must not prompt. Consider only destinations covered by the user's authorization (tracker, project or repository, audience, and finding content).
 
 Non-interactive mode still requires explicit tracker deferral authorization. The caller must supply `tracker_deferral_authorization: authorized`; headless/autonomous execution, delivery authorization, tracker availability, or a residual finding does not grant it. When the fact is missing, do not probe or invoke any external sink. Return every finding in `no_sink` with `tracker_deferral_authorization_missing` so the caller can preserve it in an already-authorized PR body or local artifact.
 
 - No confirmation on the first generic-label Defer; proceed directly.
-- On execution failure, automatically fall to the next tier without prompting. Record the failure.
+- On a confirmed failure, try another destination only if it is already authorized. For example, permission to file in a private Linear project does not authorize GitHub Issues. With no authorized fallback, retain the failure locally. If the creation result is unknown, reconcile it before retrying to avoid duplicate tickets.
 - On total chain exhaustion (every tier failed or no sink available), return findings in the `no_sink` bucket so the caller can route them to another surface (e.g., inline them in a PR description).
 - Return a structured result: `{ filed: [{ finding_id, tracker, url }], failed: [{ finding_id, tracker, reason }], no_sink: [{ finding_id, title, severity, file, line }] }`.
 
@@ -79,7 +79,7 @@ Typical probe sequence:
 
 1. Consult the project's instructions already in context for tracker references — don't open or name specific instruction files; read one directly only when the relevant instructions aren't in context (subdirectory scope, or a fresh subagent). If nothing found, set `tracker_name = null`, `confidence = low`.
 2. **Probe the named tracker when one was found.** For GitHub Issues, run `gh auth status` and `gh repo view --json hasIssuesEnabled`. For Linear or other connector/MCP-backed trackers, first discover available tools via the platform's tool-discovery primitive (e.g., `ToolSearch` in Claude Code) rather than assuming absence from an unloaded tool, then verify the discovered tool is responsive. For API-backed trackers, verify credentials wherever the platform exposes them (environment, connector auth, or a documented secrets location) — not only shell env vars. Set `named_sink_available` from the probe result.
-3. **Probe the GitHub Issues fallback to compute `any_sink_available`.** Even when the named tracker was found and probed, `gh` matters for the `no_sink` bucket decision so that a run with no documented tracker but working `gh` still offers Defer.
+3. **Probe the GitHub Issues fallback to compute `any_sink_available` only when that destination is authorized.** An unapproved fallback is not an available sink for this finding.
    - If `named_sink_available = true`: `any_sink_available = true` (no further probes needed).
    - Otherwise, probe GitHub Issues via `gh auth status` + `gh repo view --json hasIssuesEnabled` (skip if already probed in step 2). If it works, `any_sink_available = true`.
    - Otherwise, `any_sink_available = false`.
@@ -94,13 +94,13 @@ When Interactive mode's routing question is skipped entirely (R2 zero-findings c
 - When `any_sink_available = true` but either `confidence = low` or `named_sink_available = false` (a fallback tier is working instead): the labels read generically — `File an issue per finding`, `Defer — file a ticket`. Before executing the first Defer of the session, the agent confirms the effective tracker choice with the user using the platform's blocking question tool.
 - When `any_sink_available = false`: option C is omitted from the routing question, option B (Defer) is omitted from the walk-through per-finding options, and the agent tells the user why in the routing question's stem.
 
-Non-interactive mode skips label decisions entirely — it acts silently on the detected sink.
+Non-interactive mode skips label decisions; availability does not grant authority to write.
 
 ---
 
 ## Fallback chain
 
-When the named tracker is unavailable or no tracker is named, fall back in this order. Prefer the project's detected tracker; use `gh` only when no named tracker was found or the named one is unreachable.
+When the named tracker is unavailable or no tracker is named, consider candidates in this order. Before probing or writing, limit candidates to authorized destinations. In interactive mode, obtain authorization for a different destination and audience before using it. In headless mode, keep the finding if no authorized destination remains.
 
 1. **Named tracker** (MCP tool, CLI, or API the agent can invoke directly, identified via Detection above)
 2. **GitHub Issues via `gh`** — when `gh auth status` succeeds and the current repo has issues enabled (`gh repo view --json hasIssuesEnabled` returns `true`)
@@ -141,9 +141,9 @@ Options:
 - `Fall back to next sink` — move this finding's Defer to the next tier in the fallback chain (e.g., from Linear to GitHub Issues)
 - `Convert to Skip — record the failure` — abandon this Defer, note the failure in the completion report's failure section, and continue the walk-through or bulk flow
 
-**Non-interactive mode:** do not prompt. Automatically fall through to the next tier. If every tier fails, record the finding in the `failed` bucket of the structured return and continue. If the chain exhausts with no sink ever available, the finding ends up in the `no_sink` bucket.
+**Non-interactive mode:** do not prompt. If no authorized attempt succeeded, return `failed` when an attempted write failed, or `no_sink` when no permitted sink was available. Do not publish to another audience to avoid a residual.
 
-When a high-confidence named tracker fails at execution, the cached `named_sink_available` is set to `false` for the rest of the session. Subsequent Defer actions fall straight through to the next tier without retrying a confirmed-broken sink. `any_sink_available` is only downgraded to `false` when every tier has been confirmed broken — a failed Linear call that succeeds via `gh` keeps `any_sink_available = true`.
+When a named tracker is confirmed unavailable, cache that fact for this run. A cached available alternative still needs matching authorization for this finding.
 
 Only when no blocking question tool is in the current tool list or a real question call errors, fall back to numbered options and waiting for the user's reply (Interactive mode only).
 

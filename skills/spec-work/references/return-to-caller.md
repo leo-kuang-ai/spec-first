@@ -26,6 +26,8 @@ PR creation, and CI watching after implementation. In this mode `spec-work`
 performs implementation and local verification only, then returns a structured
 summary instead of running the standalone shipping tail.
 
+When a person also needs a status update, lead with what changed, what was verified, what remains uncommitted or unshipped, and who acts next. Keep this explanation outside any JSON-only response; never cite a plan that was not used.
+
 Return:
 
 - `status`: `complete`, `blocked`, or `failed`

@@ -8,6 +8,7 @@ input:
     First run `node prepare-eval.cjs` once in this isolated fixture.
     That preparation alone may create the baseline commit; no task commit or landing is authorized.
     Use spec-prd to validate planning readiness of docs/brainstorms/2026-09-01-expense-export-requirements.md. Return a report only; do not change the file.
+    Return the report as one JSON object: can_enter_spec_plan ("yes" or "no"), blocking_questions (an array of IDs explicitly marked as blocking in the source), and explanation (your reasoning in words).
 context:
   repo_fixture: evals/fixtures/repos/rough-prd
   git:

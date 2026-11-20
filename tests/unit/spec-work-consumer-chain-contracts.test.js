@@ -23,6 +23,7 @@ describe('spec-work review consumer chain contracts', () => {
     }
     expect(followup).toMatch(/do not re-run the review/i);
     expect(followup).toContain('in-band JSON');
+    expect(followup).toMatch(/summary is for navigation only[\s\S]*do not apply fixes/i);
   });
 
   test('durable handoffs use materialized repo-local evidence or a structured summary', () => {
@@ -56,7 +57,8 @@ describe('spec-work review consumer chain contracts', () => {
   });
 
   test('keeps spec-work as the tracker-defer owner and projects one byte-identical LFG copy', () => {
-    expect(tracker).toContain("Canonical owner: the `spec-work` package's co-located `references/tracker-defer.md` source");
+    expect(tracker).toBe(read('skills/_shared/references/tracker-defer.md'));
+    expect(tracker).toContain('only if it is already authorized');
     expect(tracker).toContain('package-local projection');
     expect(lfgTracker).toBe(tracker);
     expect(lfgSkill).toContain('Load `references/tracker-defer.md` in **non-interactive mode**');

@@ -77,7 +77,7 @@ The system must consume the existing event intake, resolve the current notificat
 
 ## Verification Contract
 
-- Verify R1 by changing the notification preference immediately before dispatch and observing fail-closed suppression.
+- Verify R1 at the send boundary with two separate events: return a disabled preference for the first; make the preference lookup fail for the second. Assert zero sends for each event and distinguish suppression from lookup failure in the delivery evidence.
 - Verify R2 by replaying the same event identifier and observing one delivery.
 - Verify R3 by checking success, suppression, and terminal failure delivery evidence.
 

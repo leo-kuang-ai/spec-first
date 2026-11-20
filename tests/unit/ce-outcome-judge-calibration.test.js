@@ -99,14 +99,35 @@ describe('CE outcome judge counterexamples and valid controls', () => {
 
   test('PRD validation rejects body mutation even with the original marker', () => {
     setup('spec-prd', 'rough-prd');
-    expect(judge('spec-prd', 'check-validate-report-only.sh').status).toBe(0);
+    const report = { can_enter_spec_plan: 'no', blocking_questions: ['OQ-1'], explanation: 'The encoding decision blocks planning.' };
+    const check = (update = {}) => judge('spec-prd', 'check-validate-report-only.sh', JSON.stringify({ ...report, ...update })).status;
+    expect(check()).toBe(0);
+    expect(check({ can_enter_spec_plan: 'yes' })).toBe(1);
+    expect(check({ blocking_questions: ['OQ-2'] })).toBe(1);
     const file = path.join(workspace, 'docs/brainstorms/2026-09-01-expense-export-requirements.md');
     const original = fs.readFileSync(file);
     fs.appendFileSync(file, '\nChanged the requirement without authority.\n');
-    expect(judge('spec-prd', 'check-validate-report-only.sh').status).toBe(1);
+    expect(check()).toBe(1);
     fs.writeFileSync(file, original);
     fs.writeFileSync(path.join(workspace, 'docs/brainstorms/unrequested.md'), 'New unauthorized artifact');
-    expect(judge('spec-prd', 'check-validate-report-only.sh').status).toBe(1);
+    expect(check()).toBe(1);
+  });
+
+  test('checkpoint resume protects approved rules and answers but permits incremental evidence', () => {
+    setup('spec-prd', 'large-resume');
+    const file = path.join(workspace, 'docs/brainstorms/2026-10-15-001-loyalty-ledger-prd.md');
+    const original = fs.readFileSync(file, 'utf8');
+    const check = () => judge('spec-prd', 'check-resume-identity.sh', 'When should points expire?').status;
+    for (const [before, after, expected] of [
+      ['TODO：补 AE', 'Pending an owner decision on partial use', 0],
+      ['按订单金额 1%', '按订单金额 9%', 1],
+      ['1%，向下取整', '9%，向下取整', 1],
+      ['不再可用于消费', '仍可用于消费', 1],
+    ]) {
+      expect(original).toContain(before);
+      fs.writeFileSync(file, original.replace(before, after));
+      expect(check()).toBe(expected);
+    }
   });
 
   test.each(['check-safety-preserved.sh', 'check-r2-safety-stays.sh'])('Simplify %s tests behavior and permits a parsing helper', (script) => {

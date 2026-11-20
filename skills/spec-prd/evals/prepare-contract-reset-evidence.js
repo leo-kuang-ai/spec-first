@@ -120,9 +120,28 @@ function sha256(value) {
   return `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
 }
 
-function removePartialOutput(tempDir, outDir) {
-  fs.rmSync(tempDir, { recursive: true, force: true });
-  fs.rmSync(outDir, { recursive: true, force: true });
+function publishPrivateDirectory(tempDir, outDir) {
+  fs.renameSync(tempDir, outDir);
+  try {
+    fs.chmodSync(outDir, 0o700);
+  } catch (error) {
+    fs.rmSync(outDir, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+function cleanPublishedInputs(report, targets, remove) {
+  const completed = [];
+  for (const [index, target] of targets.entries()) {
+    try {
+      if (remove(target) !== false) completed.push(target);
+    } catch (error) {
+      return { ...report, status: 'prepared_cleanup_incomplete', cleanup: {
+        completed, remaining: targets.slice(index), reason: error.message,
+      } };
+    }
+  }
+  return report;
 }
 
 function splitFrontmatter(text) {
@@ -655,21 +674,8 @@ function prepareEvidence(options) {
     writePrivateFile(path.join(tempDir, 'retained-evidence-manifest.json'), retainedManifestBytes);
     resolveConfinedPath(runContext, tempDir, 'durable evidence temporary output', { allowDirectory: true });
     resolveConfinedPath(runContext, outDir, 'durable evidence output', { mustExist: false });
-    fs.renameSync(tempDir, outDir);
-    fs.chmodSync(outDir, 0o700);
-
-    if (options.cleanup === true) {
-      const revalidatedCleanupPaths = validateCleanupPaths({
-        runContext,
-        cleanupPaths: native.raw_cleanup_paths,
-        outDir,
-        provenance,
-      });
-      for (const cleanupPath of revalidatedCleanupPaths) {
-        fs.rmSync(cleanupPath, { recursive: true, force: true });
-      }
-    }
-    return {
+    publishPrivateDirectory(tempDir, outDir);
+    const report = {
       schema_version: 'contract-reset-evidence-preparation/v1',
       artifact_type: 'generated',
       status: 'prepared',
@@ -678,8 +684,16 @@ function prepareEvidence(options) {
       hashes: retained.hashes,
       raw_cleanup_count: options.cleanup === true ? cleanupPaths.length : 0,
     };
+    if (options.cleanup !== true) return report;
+    const targets = cleanupPaths.map((target) => path.relative(runContext.absolute, target).split(path.sep).join('/'));
+    const result = cleanPublishedInputs(report, targets, (target) => {
+      const [safe] = validateCleanupPaths({ runContext, cleanupPaths: [target], outDir, provenance });
+      fs.rmSync(safe, { recursive: true, force: true });
+    });
+    if (result.cleanup) result.raw_cleanup_count = result.cleanup.completed.length;
+    return result;
   } catch (error) {
-    removePartialOutput(tempDir, outDir);
+    fs.rmSync(tempDir, { recursive: true, force: true });
     throw error;
   }
 }
@@ -820,30 +834,8 @@ function prepareRunAudit(options) {
     writePrivateFile(path.join(tempDir, 'run-audit-manifest.json'), auditManifestBytes);
     resolveConfinedPath(runContext, tempDir, 'run audit temporary output', { allowDirectory: true });
     resolveConfinedPath(runContext, outDir, 'run audit output', { mustExist: false });
-    fs.renameSync(tempDir, outDir);
-    fs.chmodSync(outDir, 0o700);
-    if (options.cleanup === true) {
-      for (const relativePath of cleanupRelativePaths) {
-        const cleanupPath = path.join(runContext.absolute, relativePath);
-        let safeCleanupPath;
-        try {
-          safeCleanupPath = resolveConfinedPath(
-            runContext,
-            cleanupPath,
-            `run audit cleanup ${relativePath}`,
-            { allowDirectory: true },
-          );
-        } catch (error) {
-          if (error && (error.reason_code === 'path_missing' || error.code === 'ENOENT')) continue;
-          throw error;
-        }
-        if (pathsOverlap(safeCleanupPath, outDir)) {
-          throw new Error(`run audit cleanup overlaps durable output: ${relativePath}`);
-        }
-        fs.rmSync(safeCleanupPath, { recursive: true, force: true });
-      }
-    }
-    return {
+    publishPrivateDirectory(tempDir, outDir);
+    const report = {
       schema_version: 'contract-reset-run-audit-preparation/v1',
       artifact_type: 'generated',
       status: 'prepared',
@@ -852,8 +844,20 @@ function prepareRunAudit(options) {
       reason_codes: validation.reason_codes,
       retained_file_count: retained.length + 1,
     };
+    if (options.cleanup !== true) return report;
+    return cleanPublishedInputs(report, cleanupRelativePaths, (relativePath) => {
+      let safe;
+      try {
+        safe = resolveConfinedPath(runContext, relativePath, `run audit cleanup ${relativePath}`, { allowDirectory: true });
+      } catch (error) {
+        if (error.reason_code === 'path_missing' || error.code === 'ENOENT') return false;
+        throw error;
+      }
+      if (pathsOverlap(safe, outDir)) throw new Error(`run audit cleanup overlaps durable output: ${relativePath}`);
+      fs.rmSync(safe, { recursive: true, force: true });
+    });
   } catch (error) {
-    removePartialOutput(tempDir, outDir);
+    fs.rmSync(tempDir, { recursive: true, force: true });
     throw error;
   }
 }
@@ -896,7 +900,7 @@ function main(argv = process.argv.slice(2)) {
         cleanup: args.cleanup,
       });
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    return 0;
+    return report.status === 'prepared' ? 0 : 2;
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     return 2;

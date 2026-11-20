@@ -129,6 +129,20 @@ const headText = execFileSync('git', ['show', 'HEAD:' + prdPath], { env: cleanEn
 assert.ok(specLineOf(headText), 'Fixture checkpoint missing spec_id');
 const prdText = regular(prdPath).toString();
 assert.equal(specLineOf(prdText), specLineOf(headText), 'spec_id identity changed on resume');
+function decisionRows(text) {
+  return text.split(/\r?\n/).filter((line) => line.trimStart().startsWith('|'))
+    .map((line) => line.trim().split('|').slice(1, -1).map((cell) => cell.trim()));
+}
+const before = decisionRows(headText);
+const after = decisionRows(prdText);
+const approved = before.filter((cells) => cells[2]?.startsWith('owner-answered'));
+const answers = before.filter((cells) => /^\d{4}-\d{2}-\d{2}$/.test(cells[3]));
+assert.ok(approved.length && answers.length, 'Fixture has no closed rules or answers');
+for (const row of [...approved, ...answers]) {
+  const matches = after.filter((cells) => cells[0] === row[0]);
+  assert.equal(matches.length, 1, 'Missing or ambiguous decision: ' + row[0]);
+  assert.deepEqual(matches[0].slice(1, 3), row.slice(1, 3), 'Closed decision changed: ' + row[0]);
+}
 // ready declaration asserts anchor contract frontmatter token (message layer prose citation of original contract text is legally valid)
 // First-round live misfire example: the product pose sentence references the ready-for-planning token, which is incorrectly flagged as a negative at the sentence level.
 assert.ok(!/^status:\s*ready-for-planning/m.test(prdText), 'Resume flipped artifact status to ready-for-planning');

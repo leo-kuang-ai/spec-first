@@ -5,6 +5,7 @@ input:
   prompt: |
     First run `node prepare-eval.cjs` once to prepare this isolated fixture.
     Only that preparation may create its baseline commit; it grants no task commit authority.
+    Keep the existing wording of owner-approved requirements and recorded owner answers; you may add evidence or clarify open items.
     （spec-prd skill 已安装，请按它工作。）
 
     上次会话在这个仓库写 PRD 写到一半中断了，产物在

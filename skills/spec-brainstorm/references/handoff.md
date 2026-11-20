@@ -141,7 +141,7 @@ HTML, or the closing summary will point users at a file that was never written.
 When complete and ready for planning, display:
 
 ```text
-Brainstorm complete!
+Requirements are ready for planning. This handoff does not authorize implementation.
 
 Plan artifact: <absolute path to unified plan>  # omit line if no artifact was created
 

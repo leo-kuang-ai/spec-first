@@ -6,6 +6,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const {
   detectInstallChannels,
@@ -21,6 +22,32 @@ const HOUR = 60 * 60 * 1000;
 function makeStateHome() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-reminder-'));
 }
+
+test('a failed registry lookup leaves the real doctor command result and exit code unchanged', () => {
+  const home = makeStateHome();
+  const cli = path.resolve(__dirname, '../../bin/spec-first.js');
+  const entry = `
+    require('node:os').userInfo = () => ({ homedir: process.env.HOME });
+    Object.defineProperty(process.stderr, 'isTTY', { value: true });
+    global.fetch = async () => { process.stderr.write('lookup-attempted\\n'); throw new Error('offline'); };
+    require(process.argv[1]);
+  `;
+  const run = (optOut) => spawnSync(process.execPath, ['-e', entry, cli, 'doctor', '--json'], {
+    cwd: home, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: home, USERPROFILE: home,
+      SystemRoot: process.env.SystemRoot, SPEC_FIRST_NO_UPDATE_NOTIFIER: optOut },
+  });
+  try {
+    const control = run('1');
+    const failedLookup = run('0');
+    expect(control.stderr).not.toContain('lookup-attempted');
+    expect(failedLookup.stderr).toBe('lookup-attempted\n');
+    expect(failedLookup.status).toBe(control.status);
+    const diagnosis = (output) => JSON.parse(output, (key, value) => key === 'observed_at' ? undefined : value);
+    expect(diagnosis(failedLookup.stdout)).toEqual(diagnosis(control.stdout));
+  } finally {
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+});
 
 function statePathOf(homeRoot) {
   return path.join(homeRoot, '.spec-first', 'version-reminder.json');

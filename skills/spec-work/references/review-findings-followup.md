@@ -28,12 +28,14 @@ This reference loads **after** review has run. In the spec-work shipping flow, s
 
 Reuse the review output already in hand:
 
-- Parsed JSON (`status`, `actionable_findings`, `findings`, `artifact_path`, `run_id`) **or** the markdown Actionable Findings summary captured by the caller
+- Complete same-run JSON (`status`, `actionable_findings`, `findings`, `artifact_path`, `run_id`), returned in band or read from the exact returned artifact. Match the review run and reviewed scope before using its validation decisions.
 - Run artifact dir: the exact non-null `artifact_path` returned by that review (`review.json`, per-reviewer JSON for `why_it_matters`); never reconstruct it from `run_id`
 
 If `status` is `failed`, stop shipping and surface `reason`. If `degraded`, note partial reviewer coverage before applying anything.
 
 If `artifact_path` is null, missing, or unreadable, use the complete in-band JSON already returned by the review and record `review-artifact-unavailable`. Do not re-run the review just to recover an artifact. Detail that exists only in a missing per-reviewer file remains a limitation; never invent `why_it_matters` or evidence.
+
+A Markdown summary is for navigation only. If it is all that remains, preserve the findings as residuals, report that same-run validation evidence is missing, and do not apply fixes or clear the review gate. An older run's JSON is not a substitute.
 
 ### Fallback — invoke `spec-code-review` only for cold callers
 
@@ -52,7 +54,7 @@ spec-code-review mode:agent plan:<plan-path> base:<merge-base-or-ref>
 
 For a required task review, the cold caller must also pass the paired `task-pack:<path> task:<task_id> task-context:<path>` contract produced by spec-work. Missing task context is not repaired here.
 
-For human / interactive shipping, invoke `spec-code-review` without `mode:agent` if markdown tables are preferred. Capture the same JSON / Actionable Findings and artifact dir listed above before applying.
+For human / interactive shipping, invoke `spec-code-review` without `mode:agent` if markdown tables are preferred. Use the returned structured result for any subsequent apply step.
 
 ## Required task review followup
 
@@ -60,7 +62,7 @@ When this reference is consuming a Task Card's `review_gate: required`, keep the
 
 ## Inputs for apply
 
-- `actionable_findings` from JSON, or the Actionable Findings section from markdown
+- `actionable_findings` from the same review's JSON, matched to the full findings and their validation status
 - Full finding detail when needed: `review.json` / artifact `findings`, or `{reviewer}.json` for `why_it_matters` and `evidence`
 - Stable finding `#` — reuse in commits, residual sinks, and subagent prompts
 

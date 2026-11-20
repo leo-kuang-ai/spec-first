@@ -265,7 +265,7 @@ exits and any durable handoff.
 ```
 ## Debug Summary
 **Problem**: [What was broken]
-**Root Cause**: [Full causal chain, with file:line references]
+**Root Cause**: [Confirmed causal chain with source references, or unknown: state the observation, competing explanations, and next discriminating check]
 **Target Repo / Scenario**: [selected repo/surface and any bounded/degraded capability]
 **Recommended Tests**: [Tests to add/modify to prevent recurrence, with specific file and assertion guidance]
 **Fix**: [What was changed — or "diagnosis only" if Phase 3 was skipped]

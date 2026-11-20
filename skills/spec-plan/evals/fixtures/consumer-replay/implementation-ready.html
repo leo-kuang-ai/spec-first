@@ -78,7 +78,7 @@
     <section id="verification-contract">
       <h2>Verification Contract</h2>
       <ul>
-        <li>Verify R1 by changing the notification preference immediately before dispatch and observing fail-closed suppression.</li>
+        <li>Verify R1 at the send boundary with two separate events: return a disabled preference for the first; make the preference lookup fail for the second. Assert zero sends for each event and distinguish suppression from lookup failure in the delivery evidence.</li>
         <li>Verify R2 by replaying the same event identifier and observing one delivery.</li>
         <li>Verify R3 by checking success, suppression, and terminal failure delivery evidence.</li>
       </ul>

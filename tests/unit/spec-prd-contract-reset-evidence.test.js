@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const {
+  main,
   prepareEvidence,
   prepareRunAudit,
 } = require('../../skills/spec-prd/evals/prepare-contract-reset-evidence');
@@ -615,6 +616,32 @@ describe('spec-prd Contract Reset evidence producer', () => {
       expect(fs.existsSync(fixture.outDir)).toBe(false);
     } finally {
       chmodSpy.mockRestore();
+      cleanupFixture(fixture);
+    }
+  });
+
+  test('keeps the published packet when the second raw cleanup fails', () => {
+    const fixture = createNativeRun('# Product Contract\n\nKeep this packet.\n');
+    const remove = fs.rmSync;
+    const fault = jest.spyOn(fs, 'rmSync').mockImplementation((target, options) => {
+      if (path.basename(target) === 'transcript.txt') throw new Error('injected cleanup failure');
+      return remove(target, options);
+    });
+    const stdout = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    try {
+      expect(main(['--run-root', fixture.runRoot, '--native-output', fixture.nativeManifestPath,
+        '--out-dir', fixture.outDir, '--cleanup', '--json'])).toBe(2);
+      const result = JSON.parse(stdout.mock.calls[0][0]);
+      expect(result).toMatchObject({
+        status: 'prepared_cleanup_incomplete', raw_cleanup_count: 1,
+        cleanup: { completed: [fixture.native.raw_cleanup_paths[0]], remaining: [fixture.native.raw_cleanup_paths[1]] },
+      });
+      expect(sha256(fs.readFileSync(path.join(fixture.outDir, 'blind-packet.md')))).toBe(readJson(result.manifest_path).hashes.blind_packet);
+      expect(fs.existsSync(path.join(fixture.rawRoot, 'provider.log'))).toBe(false);
+      expect(fs.existsSync(path.join(fixture.rawRoot, 'transcript.txt'))).toBe(true);
+    } finally {
+      stdout.mockRestore();
+      fault.mockRestore();
       cleanupFixture(fixture);
     }
   });

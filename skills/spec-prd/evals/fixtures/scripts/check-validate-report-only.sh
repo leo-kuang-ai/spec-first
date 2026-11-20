@@ -122,4 +122,9 @@ checkFixture({
   }
 }, {}, {});
 
+const report = JSON.parse(process.env.EVAL_FINAL_MESSAGE);
+assert.equal(report.can_enter_spec_plan, 'no', 'An explicit product decision still blocks planning');
+assert.deepEqual(report.blocking_questions, ['OQ-1'], 'Identify the explicit encoding blocker, not the unknown volume decision');
+assert.ok(typeof report.explanation === 'string' && report.explanation.trim(), 'Missing diagnostic explanation');
+
 EVAL_JUDGE_NODE

@@ -265,6 +265,14 @@ describe('SUP judge hardening', () => {
     test('single Chinese/English recommendation or question passes', () => {
       expect(judge(script, '推荐入口：spec-brainstorm。原因：目标用户尚未确定。下一步：描述目标用户。').status).toBe(0);
       expect(judge(script, 'Recommended entrypoint: spec-plan').status).toBe(0);
+      expect(judge(script, '推荐入口：spec-plan 或 spec-work').status).toBe(1);
+      expect(judge(script, 'Recommended entrypoint: spec-plan / spec-work').status).toBe(1);
+      expect(judge(script, 'Recommended entrypoint: Direct Lane or spec-plan').status).toBe(1);
+      expect(judge(script, 'Recommended entrypoint: not spec-plan').status).toBe(1);
+      expect(judge(script, 'Recommended entrypoint: Direct Lane').status).toBe(0);
+      expect(judge(script, '推荐入口：spec-plan，而不是 spec-work。').status).toBe(0);
+      expect(judge(script, 'Recommended entrypoint: spec-plan, not spec-work, or spec-ideate').status).toBe(1);
+      expect(judge(script, 'Recommended entrypoint: spec-plan\nReason: spec-work needs a settled design.').status).toBe(0);
       expect(judge(script, '你希望先确定目标用户吗？').status).toBe(0);
     });
 

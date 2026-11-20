@@ -302,6 +302,8 @@ After Stage 6, stop. Never push, open PRs, or file tickets from this skill. Ordi
 
 After Stage 6 **in default mode**, emit a compact **Actionable Findings** summary for callers:
 
+This human-readable index does not establish eligibility to apply a fix. Direct callers to this run's structured findings and validation status; if unavailable, identify the gap without implying the summary can replace them.
+
 - List each actionable finding (`gated_auto` or `manual` with `downstream-resolver`) with stable `#`, severity, file:line, title, `autofix_class`, whether `suggested_fix` is present, and `confidence`.
 - Include the returned `artifact_path` when one was written; when null, state the artifact limitation and keep the in-band summary complete.
 - When the actionable queue is empty, state `Actionable findings: none.` explicitly.

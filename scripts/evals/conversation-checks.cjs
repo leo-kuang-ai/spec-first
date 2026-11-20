@@ -46,6 +46,14 @@ function oneRouteDecision() {
   if (questions.length && recommendations.length) {
     assert.fail('A recommendation must not also ask the user a question');
   }
+  if (recommendations.length === 1) {
+    const field = recommendations[0].replace(/^[\s*\-]*(?:Recommended entrypoint|推荐入口|建议入口|建议使用)[*\s]*[:：]?\s*/i, '')
+      .split(/(?:reason|next action|原因|理由|下一步)\s*[:：]/i)[0];
+    const choice = field.replace(/(?:rather than|instead of|\bnot\b|而非|而不是|不是|不推荐)\s*[`*]*(?:[a-z][\w-]*|直接处理)[`*]*/gi, '')
+      .replace(/[`*]/g, '').replace(/[.,;，。；\s]+$/, '').trim();
+    assert.match(choice, /^(?:[a-z][\w-]*|direct lane|直接处理|spec-first\s+[a-z][\w-]*(?:\s+--[\w-]+)*)$/i,
+      'Expected one entrypoint in the recommendation field');
+  }
   assert.ok((questions.length === 1 && recommendations.length === 0)
     || (questions.length === 0 && recommendations.length === 1), 'Expected one question or one recommendation');
 }

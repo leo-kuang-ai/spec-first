@@ -85,7 +85,7 @@ Save the reconciliation conclusion or missing-intent list in Completion Response
 
 4. **Residual Work Gate** (applies whenever any review leaves actionable residuals, including inline/manual review)
 
-   After code review and review-findings followup, inspect the **Actionable Findings** summary (or read `review.json` under the returned non-null `artifact_path` if the summary was truncated). If `artifact_path` is unavailable, use the in-band JSON and preserve the limitation; do not re-run review just to recreate a temp artifact. If one or more actionable `downstream-resolver` findings were not applied in followup, do not proceed to Final Validation until they are resolved or durably recorded.
+   After code review and review-findings followup, use the **Actionable Findings** summary to locate residuals. Determine fix eligibility from `review.json` under the returned non-null `artifact_path` or from complete same-run in-band JSON. A summary alone cannot clear this gate. If `artifact_path` is unavailable, preserve the limitation; do not re-run review just to recreate a temp artifact. If one or more actionable `downstream-resolver` findings were not applied in followup, do not proceed to Final Validation until they are resolved or durably recorded.
 
    **Honor existing repair authorization:** When the current user or visible caller has requested review and repair, resolve actionable residuals within scope and rerun affected verification without asking again whether to fix the same issue. Ask only about new decisions that change the product, acceptance, permissions, or material consequences.
 
@@ -97,7 +97,7 @@ Save the reconciliation conclusion or missing-intent list in Completion Response
 
    Options (four or fewer, self-contained labels):
    - `Apply/fix now` — load `references/review-findings-followup.md`, use authorized batched fix workers or inline fallback for remaining eligible findings, and run tests. Commit only when separately authorized; optionally re-run `spec-code-review` only after the diff changed materially.
-   - `File tickets via project tracker` — load `references/tracker-defer.md` in Interactive mode; the agent files tickets in the project's detected tracker (or `gh` fallback, or leaves them in the report if no sink exists) and proceeds to Final Validation.
+   - `File tickets via project tracker` — load `references/tracker-defer.md` in Interactive mode. File only in an authorized destination; keep other findings in the report.
    - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before shipping. If a PR will be created or updated in Phase 4, include them in the PR description's "Known Residuals" section (the agent owns this when calling `spec-commit-push-pr`). If the user later chooses the no-PR `spec-commit` path, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, stage it with the implementation commit, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
    - `Stop — do not ship` — abort the shipping workflow. The user will handle findings manually before re-invoking.
 
