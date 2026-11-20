@@ -1,10 +1,6 @@
 id: resume-checkpoint-identity
-title: resume 中断的 checkpoint PRD 应沿用既有 spec_id 与已关闭决定,不得重开新 PRD 或声称 ready
-description: |
-  验证 resume-risk 触发面：既有 checkpoint PRD（can_enter_spec_plan: no、
-  未决 OQ）在中断后继续时，必须保留 spec_id 身份与已关闭决定；
-  允许增量写与继续询问 next_owner_question，不得另起新 PRD 路径，
-  不得在 OQ 未关闭时声称 ready-for-planning 或 can_enter_spec_plan: yes。
+title: "The interrupted checkpoint PRD shall use the existing spec_id and the already-closed decision; no new PRD shall be reopened or declared ready."
+description: "Verify the resume-risk trigger surface: when a checkpoint PRD (can_enter_spec_plan: no, pending OQ) is resumed after interruption, it must retain the spec_id identity and the previously closed decision; incremental writes and continuation of asking next_owner_question are allowed, but no new PRD path shall be initiated, and no claim of ready-for-planning or can_enter_spec_plan: yes shall be made until the OQ is closed."
 input:
   prompt: |
     First run `node prepare-eval.cjs` once to prepare this isolated fixture.

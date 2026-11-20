@@ -41,8 +41,8 @@ describe('spec-work execution strategy contracts', () => {
   });
 
   test('separates dispatch authorization, capability, and isolation', () => {
-    expect(strategy).toContain('依赖链上必须顺序执行的单元优先');
-    expect(strategy).toContain('只有当前上下文拥挤且 fresh context');
+    expect(strategy).toContain('Units that must be executed sequentially in the dependency chain');
+    expect(strategy).toContain('only when the current context is congested and the fresh context can practically assist the unit');
     expect(strategy).toContain('worker_dispatch_authorization');
     expect(strategy).toContain('dispatch_authorization_missing');
     expect(strategy).toContain('subagent_capability_missing');

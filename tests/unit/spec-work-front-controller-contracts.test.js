@@ -77,8 +77,8 @@ describe('spec-work front controller and reference reachability', () => {
     expect(section(intake, 'Fallback')).toMatch(/stop before creating or continuing execution tasks/i);
     expect(section(strategy, 'Fallback')).toMatch(/run inline/i);
     expect(section(strategy, 'Fallback')).toMatch(/do not push.*do not open a PR/is);
-    expect(section(feedback, 'Fallback')).toMatch(/最窄已知检查.*claim ceiling/is);
-    expect(section(quality, 'Fallback')).toMatch(/不输出架构矩阵/is);
+    expect(section(feedback, 'Fallback')).toMatch(/narrowest known check.*claim ceiling/is);
+    expect(section(quality, 'Fallback')).toMatch(/do not output the architecture matrix/is);
     expect(section(shipping, 'Fallback')).toMatch(/do not claim completion.*commit.*push.*open a PR/is);
   });
 

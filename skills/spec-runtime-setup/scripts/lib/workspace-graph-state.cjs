@@ -143,7 +143,7 @@ function writeWorkspaceGraphState({
       try {
         fs.rmSync(tempPath, { force: true });
       } catch (_error) {
-        // 主写入结果已经携带可操作的失败原因。
+        // The main write result already carries actionable failure reasons.
       }
     }
   }

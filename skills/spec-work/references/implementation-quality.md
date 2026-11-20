@@ -1,93 +1,93 @@
 # Implementation Quality And Architecture Fit
 
-本 reference 是 `spec-work` 的 implementation-quality owner。它负责 durable-surface trigger、current-source capability inventory、`reuse / extend / compose / new` recheck、thin-glue ownership、future-only refusal、wrong-owner escape、material deviation note 和 simplification classification。
+This reference is the implementation-quality owner for `spec-work`. It is responsible for durable-surface trigger, current-source capability inventory, `reuse / extend / compose / new` recheck, thin-glue ownership, future-only refusal, wrong-owner escape, material deviation note, and simplification classification.
 
-它不重新设计 plan。`spec-plan` 负责架构设计；`spec-work` 只检查 plan/task decision 在当前 source 中是否仍然适配。需要新的 public contract、跨模块架构、schema/runtime/provider/source-of-truth 决策时，停止并回到 `spec-plan` 或 task-pack regeneration。
+It does not redesign the plan. `spec-plan` is responsible for architectural design; `spec-work` only verifies whether the plan/task decision remains compatible with the current source. Stop and return to `spec-plan` or task-pack regeneration when new public contract, cross-module architecture, schema/runtime/provider/source-of-truth decisions are required.
 
 ## Owned
 
-- 在 durable surface mutation 前做 current-source capability inventory 与四姿态 recheck。
-- 约束 thin-glue owns/does-not-own、failure/degradation/observability/evidence seam。
-- 拒绝 future-only wrapper、wrong-owner reuse 与未授权架构扩张。
-- 在 phase boundary 分类 simplification，并记录 material deviation/claim limitation。
+- Conduct a current-source capability inventory and review of the four implementation options prior to durable surface mutation.
+- Constraints: thin-glue owns/does-not-own, failure/degradation/observability/evidence seam.
+- Reject future-only wrappers, wrong-owner reuse, and unauthorized architectural expansion.
+- In phase boundary classification simplification, and record material deviation/claim limitation.
 
 ## Not Owned
 
-- 重新设计 plan、发明 acceptance/public contract 或替代 `spec-plan` 的 architecture decision。
-- 把通用 best practice、单一 nearby pattern 或 provider candidate 变成 hard rule。
-- 用脚本裁决 owner fit、四姿态或 simplification 语义。
+- Redesign the plan, invent an acceptance/public contract or alternative `spec-plan` architecture decision.
+- Turn generic best practices, single nearby pattern, or provider candidate into hard rules.
+- Use a script to decide ownership fit, four-posture, or simplification semantics.
 
 ## Trigger
 
-在新增或实质改变以下 durable surface 前读取：dependency、file、abstraction、helper、wrapper、adapter、orchestrator、public contract、schema、config/runtime surface、source-of-truth entry、workflow handoff、provider/repo boundary、generator、template、agent/skill prompt、artifact contract 或 generated runtime delivery。
+Read before adding or substantially modifying any of the following durable surfaces: dependency, file, abstraction, helper, wrapper, adapter, orchestrator, public contract, schema, config/runtime surface, source-of-truth entry, workflow handoff, provider/repo boundary, generator, template, agent/skill prompt, artifact contract, or generated runtime delivery.
 
 ## Fallback
 
-以下通常不触发完整 lens：typo/docs wording、changelog-only、test expectation 的 bounded update、已明确 owner 内的局部实现、纯格式化、无 durable surface 的小修。它们继续遵守 scope/source/runtime/verification 边界，但不输出架构矩阵或长 decision note。
+The following typically do not trigger a full lens: typos/documentation wording, changelog-only changes, bounded updates based on test expectations, localized implementations with clearly assigned owners, pure formatting, and minor fixes without a durable surface. They continue to adhere to the scope/source/runtime/verification boundaries, but do not output the architecture matrix or lengthy decision note.
 
 ## Current-Source Capability Inventory
 
-在 invention 前做 bounded inventory：
+Perform bounded inventory before invention:
 
-1. 当前 source 是否已有能力完整满足需求；
-2. 当前 owner、source-of-truth、public/internal contract 和 extension point 是什么；
-3. 是否可以通过 caller、config、现有 workflow 或窄 adapter 协调，而无需复制第二套实现；
-4. plan 中的 `compose / thin-glue` 或 `new` 判断是否已因 current source 演化而过时；
-5. generated runtime mirror 只作为 drift/consumer evidence，永远不是 candidate owner。
+1. Does the current source already have the capability to fully meet the requirements?
+2. What are the current owner, source-of-truth, public/internal contract, and extension point?
+3. Can coordination be achieved through caller, config, existing workflow, or narrow adapter without duplicating a second implementation?
+4. Determine whether `compose / thin-glue` or `new` in plan has become outdated due to evolution of current source;
+5. The generated runtime mirror serves solely as drift/consumer evidence and is never the candidate owner.
 
-停止条件是“足以判断 fit”，不是“证明仓库里绝无相似代码”。Provider/graph 只用于候选导航，重要 owner/contract 仍从 source/test/doc 确认。
+The stopping condition is "sufficient to judge fit," not "proof that there is absolutely no similar code in the repository."Provider/graph is used solely for candidate navigation; key owner/contract responsibilities still require confirmation from source/test/doc.
 
 ## Four-Posture Recheck
 
-对 material durable surface 选择一个 right-sized 姿态：
+Choose the option that fits the proposed change:
 
-- `reuse`：现有 capability/contract 已满足，直接使用，不加 wrapper；
-- `extend`：现有 owner 本来就拥有该边界，可以吸收 focused behavior 而不混责；
-- `compose / thin-glue`：多个 authoritative capability 保持独立，由窄 seam 连接；
-- `new`：reuse/extend/compose 都会混淆职责、扭曲 contract、隐藏 coupling 或制造 ambiguous source of truth，因此新边界有当前需求支撑。
+- `reuse`: The existing capability/contract is already sufficient; use it directly without wrapping.
+- `extend`: The existing owner already possesses this boundary and can absorb the focused behavior without shifting responsibility;
+- `compose / thin-glue`: Multiple authoritative capabilities remain independent, connected only through a narrow seam;
+- `new`: Reusing, extending, or composing will all blur responsibilities, distort contracts, hide coupling, or introduce an ambiguous source of truth; thus, a new boundary must be justified by current requirements.
 
-Reuse 不是 quota。若 nearby capability 是 wrong owner，不得为了“少建文件”把业务规则硬塞进去；优先寻找正确 owner/extension seam，确实无法承载时再使用 plan 已授权的新边界。单一可疑 nearby pattern、generic best practice 或 imagined future consumer 都不能独立授权新 abstraction。
+Reuse is not a quota. If the nearby capability is owned by the wrong party, business rules must not be forcibly inserted to "reduce file count"; instead, prioritize identifying the correct owner or extension seam. Only when the seam cannot support the requirement should a plan be used to establish a newly authorized boundary. No single suspicious nearby pattern, generic best practice, or imagined future consumer can independently authorize a new abstraction.
 
-证据冲突时使用：confirmed active standard/source-of-truth > explicit plan/task decision > owner/source module boundary > nearby pattern。若 plan 与 current source 的有效 owner 明显漂移，选择 current valid posture并记录 material deviation；若这会改变 acceptance/public boundary，停止回 plan。
+Use the following priority order when evidence conflicts: confirmed active standard/source-of-truth > explicit plan/task decision > owner/source module boundary > nearby pattern. If the plan's effective owner shows a significant drift from the current source's effective owner, adopt the current valid posture and record a material deviation; if this would alter acceptance/public boundaries, stop implementation and return to planning.
 
 ## Thin-Glue Boundary
 
-Thin glue 可以拥有：
+Thin glue can have:
 
-- contract/representation translation；
-- sequencing 与 orchestration；
-- participant failure propagation；
-- partial failure 的聚合、rollback/fallback/degradation routing；
-- cross-step observability、trace/correlation 和 evidence aggregation；
-- 明确的 safety/authorization boundary。
+- contract/representation translation;
+- sequencing vs. orchestration
+- participant failure propagation;
+- Aggregation of partial failures; rollback/fallback/degradation routing
+- cross-step observability, trace/correlation, and evidence aggregation
+- A clear safety/authorization boundary.
 
-Thin glue 不拥有：
+Thin glue does not have:
 
-- duplicated domain truth 或新的业务 policy；
-- participant 已拥有的 validation rule 的复制品；
-- parallel durable state / second source of truth；
-- 为了隐藏失败而吞掉 error、partial result 或 owner identity；
-- 与协调无关的 convenience API 或 future-only option。
+- duplicated domain truth or new business policy;
+- participant's copy of the existing validation rule;
+- parallel durable state / second source of truth;
+- To suppress failures by swallowing error, partial result, or owner identity;
+- Convenience APIs or future-only options unrelated to coordination.
 
-如果 wrapper 没有增加真实 translation、sequencing、safety 或 evidence/observability boundary，删除或不创建它。若 glue 开始决定领域规则、持久状态或最终 truth，应把行为移回正确 owner，或依据 plan 授权建立真正的新边界。
+If the wrapper does not add real translation, sequencing, safety, or evidence/observability boundary, delete or do not create it. If glue begins to decide domain rules, persistent state, or final truth, the behavior should be moved back to the correct owner, or genuinely new boundaries should be established based on the plan.
 
-Compose 时至少能回答：
+Can respond at least when composing:
 
-- 每个 participant 仍对什么 authoritative；
-- glue owns / does-not-own 什么；
-- 单个 participant 失败、多个 partial failure、timeout/retry 时如何传播；
-- degraded path 对 caller 如何可见；
-- 日志、metrics、artifact、reason_code 如何保留跨 seam 证据。
+- Each participant remains authoritative for what;
+- glue owns / does-not-own what;
+- How failures (single participant failure, multiple partial failures, timeout/retry) are propagated;
+- How is the degraded path visible to the caller?
+- How to preserve cross-seam evidence for logs, metrics, artifacts, and reason_code.
 
 ## Scope And Authorization Stop-Back
 
-如果 active plan/task 没有授权新的 public API/contract、cross-module abstraction、schema/runtime/config surface、source-of-truth entry、workflow handoff、provider/repo boundary 或 generated runtime delivery，不在实现阶段临场设计。停止 mutation并返回：发现的 direct evidence、当前四姿态候选、为什么这会改变 scope/ownership，以及建议的 `spec-plan` / `spec-write-tasks` repair path。
+If the active plan/task does not have authorization for new public API/contract, cross-module abstraction, schema/runtime/config surface, source-of-truth entry, workflow handoff, provider/repo boundary, or generated runtime delivery, it shall not proceed to on-the-spot design during the implementation phase. Stop mutation and return: direct evidence found, current four implementation options, rationale for how this changes scope/ownership, and recommended repair path for `spec-plan` / `spec-write-tasks`.
 
-“实现起来顺手”“以后可能复用”“行业通常这样做”不是 authorization。
+“It's convenient to implement”, “might be reusable later”, “it's commonly done in the industry” are not authorization.
 
 ## Material Deviation Note
 
-只有当 recheck 改变 plan 的 material implementation direction、拒绝明显 overbuild、保留非显然 protected code，或选择 different owner/seam 时，记录 compact note：
+Record a compact note only when recheck changes the plan's material implementation direction, rejects an obvious overbuild, retains non-obvious protected code, or selects a different owner/seam.
 
 - `question`
 - `planned_posture`
@@ -99,25 +99,25 @@ Compose 时至少能回答：
 - `consequence`
 - `limitations` / `deferred_reason`
 
-普通 local edit 保持安静，不生成空矩阵或 ceremony note。
+Normal local edit remains silent, without generating empty matrices or ceremony notes.
 
 ## Simplification At Phase Boundaries
 
-在一个 behavior cluster / dependency wave 完成后，或进入 final review 前做一次；不要每改一行就抽 helper。先分类再行动：
+Perform the helper check once after a behavior cluster/dependency wave is completed, or before entering final review; do not run the helper after every single line change. Classify first, then act:
 
-| 分类 | 行动 |
+| Classification | Action |
 | --- | --- |
-| `remove-now` | 删除 current-run dead code、duplicate wrapper、unused file/import/test、speculative option，复跑同一 feedback loop。 |
-| `minimality-debt` | 真实但 out-of-scope 的 debt 进入现有 `deferred_follow_up[]` / review residual / tracker sink，记录 title、reason、evidence、owner；不顺手扩大 scope，不新建 debt schema。 |
-| `protected` | 保留 security、data integrity、privacy、a11y、observability、rollback、compatibility、required verification 或 confirmed owner constraint；缺口作为 `protected-gap` residual/review focus。 |
-| `architecture-mismatch` | Plan 已授权的 wrong-layer/duplicate-owner/source-runtime 问题在 scope 内修；需要新架构决策则 stop-back。 |
+| `remove-now` | Remove current-run dead code, duplicate wrapper, unused file/import/test, speculative option, and rerun the same feedback loop. |
+| `minimality-debt` | Real but out-of-scope debt is routed to the existing `deferred_follow_up[]` / review residual / tracker sink, recording title, reason, evidence, and owner; do not expand scope inadvertently, do not create a new debt schema. |
+| `protected` | Retain security, data integrity, privacy, a11y, observability, rollback, compatibility, required verification, or confirmed owner constraint; treat gaps as `protected-gap` residual/review focus. |
+| `architecture-mismatch` | Fix authorized wrong-layer/duplicate-owner/source-runtime issues within scope; halt and request architectural decision if new architecture is required. |
 
-Extract helper 不是默认答案。只有当 helper 有稳定 owner、当前重复语义、清晰 contract，且减少 coupling/duplication而不隐藏控制流时才提取。两段看起来相似但语义/生命周期不同的代码可以保持分离。
+Extract helper is not the default answer. Extract only when the helper has a stable owner, current semantic repetition, a clear contract, and reduces coupling/duplication without hiding control flow. Two code segments that appear similar but have different semantics or lifecycles can remain separated.
 
-Simplification 不能删除 required check、error propagation、a11y state、observability breadcrumb 或安全边界来追求 LOC。也不能把当前 run 没造成的 broad debt包装成“cleanup”。
+Simplification must not remove required checks, error propagation, a11y state, observability breadcrumbs, or security boundaries in pursuit of LOC. We can't package the broad debt caused by the current run as a "cleanup" task.
 
 ## Fallback And Claim Boundary
 
-无法确认 owner、source-of-truth 或 architecture fit 时，不新增未授权 durable surface；使用现有最窄路径、返回 blocker/limitation并回 plan。Source contract tests只能证明这些 prompt anchors 存在，不能证明模型已稳定作出正确四姿态判断；fresh-source/host/field evidence缺失时按层声明。
+Do not add unapproved durable surfaces when owner, source-of-truth, or architecture fit cannot be confirmed; use the existing narrowest path, return blocker/limitation, and revert plan. Source contract tests can only verify the existence of these prompt anchors, not prove that the model has stably made correct four-posture judgments; when fresh-source/host/field evidence is missing, declarations are made at the layer level.
 
-Scripts 可以 inventory paths、读取 git、验证 schema/hash/containment；LLM 负责 owner fit、四姿态、thin-glue充分性、material deviation与 simplification语义判断。
+Scripts can inventory paths, read Git, and validate schema/hash/containment; LLMs handle owner fit, four postures, thin-glue adequacy, material deviation, and simplification semantic judgment.

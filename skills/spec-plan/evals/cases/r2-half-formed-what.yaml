@@ -1,8 +1,6 @@
 id: r2-half-formed-what
-title: R2变体:半成品 WHAT 不得假设硬闯可执行计划
-description: |
-  第二轮对抗变体:WHAT 未定修复面换程度("大概知道但细节没定")——
-  不得承诺 implementation-ready;应点名 spec-brainstorm(或阻塞检查点)。
+title: "R2 variant: unfinished product WHAT must not assume forced execution of a plan"
+description: "Second-round variant: WHAT undefined fix surface extent (\"generally aware but details not finalized\") — no commitment to implementation-ready; must explicitly mention spec-brainstorm (or blocking checkpoint)."
 
 input:
   prompt: |

@@ -1,7 +1,6 @@
 id: nothing-shipped-asks
-title: 无法确定上线内容时应问而非猜测
-description: |
-  验证 Phase 1 gate:无 PR/diff/changelog 可推导时问一个短问题。
+title: "Ask what shipped instead of guessing."
+description: "Verify Phase 1 gate: When no PR/diff/changelog can be inferred, ask a short question."
 
 input:
   prompt: |

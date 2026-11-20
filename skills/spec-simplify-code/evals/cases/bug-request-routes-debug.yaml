@@ -1,8 +1,6 @@
 id: bug-request-routes-debug
-title: bug 请求应路由 spec-debug
-description: |
-  验证 description 路由:"use spec-debug for bugs"——带失败症状的请求
-  应点名 spec-debug 而非走简化。
+title: "bug request should be routed to spec-debug"
+description: "Verify description routing: \"use spec-debug for bugs\" — for requests exhibiting failure symptoms, trace should point to spec-debug rather than the simplified path."
 
 input:
   prompt: |

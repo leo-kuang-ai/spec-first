@@ -42,31 +42,31 @@ describe('spec-work feedback and implementation quality contracts', () => {
     ]) {
       expect(feedback).toContain(marker);
     }
-    expect(feedback).toMatch(/Fallback.*最窄已知验证/is);
-    expect(feedback).toMatch(/LLM.*选择哪些 checks.*语义充分/is);
+    expect(feedback).toMatch(/Fallback.*narrowest known check/is);
+    expect(feedback).toMatch(/LLM determines which checks and scenarios are semantically sufficient/is);
   });
 
   test('feedback owner selects slices by contract and risk while keeping tests behavior-observable', () => {
     expect(feedback).toContain('## Slice Selection');
-    expect(feedback).toMatch(/默认选择 vertical slice.*独立观察.*实现.*验证/is);
-    expect(feedback).toMatch(/多个 consumer 共享同一输入\/输出\/error contract.*最早可运行反馈.*contract-first.*立即回到.*vertical slice/is);
-    expect(feedback).toMatch(/最高损失.*最高不确定性.*最难回滚.*risk-first.*最小 proof\/characterization/is);
-    expect(feedback).toMatch(/rollback-friendly.*可撤销 seam.*orphan.*重复效果.*中间状态/is);
-    expect(feedback).toMatch(/语义判断.*不是文件类型或关键词分类/is);
+    expect(feedback).toMatch(/Default to a vertical slice: implement and verify one independently observable behavior/is);
+    expect(feedback).toMatch(/contract-first.*only when multiple consumers share the same input\/output\/error contract.*early runnable feedback.*immediate transition.*vertical slice/is);
+    expect(feedback).toMatch(/maximum loss, maximum uncertainty, or the most difficult-to-rollback assumption.*risk-first.*minimal proof\/characterization/is);
+    expect(feedback).toMatch(/Rollback-friendly.*reversible seam.*orphans, duplicate effects, or unpredictable intermediate states/is);
+    expect(feedback).toMatch(/semantic judgments, not file type or keyword classifications/is);
 
     expect(feedback).toContain('## Test Design Quality');
-    expect(feedback).toMatch(/DAMP.*名称.*setup.*断言.*表达行为和业务状态/is);
-    expect(feedback).toMatch(/state over interaction.*可观察.*只有 interaction itself is the contract.*调用次数或调用顺序/is);
+    expect(feedback).toMatch(/DAMP.*names, setup, and assertions should directly express behavior and business states/is);
+    expect(feedback).toMatch(/state over interaction.*observable return values.*Only when the interaction itself constitutes the contract.*number of calls or call order/is);
     expect(feedback).toContain('real implementation -> high-fidelity fake -> stub -> mock');
-    expect(feedback).toMatch(/No observed RED means no TDD-history claim.*run-local evidence.*production change 前.*RED\/TDD/is);
-    expect(feedback).toMatch(/跳过 serialization.*middleware.*callback.*permission.*retry.*error translation.*不能作为.*integration proof/is);
+    expect(feedback).toMatch(/No observed RED means no TDD-history claim.*run-local evidence prior to a production change.*RED\/TDD history/is);
+    expect(feedback).toMatch(/bypasses serialization, middleware, callback, permission, retry, or error translation cannot serve as valid proof of end-to-end integration/is);
   });
 
   test('risk-triggered proof strength distinguishes mutation testing, coverage, baseline, and anti-gaming', () => {
     expect(feedback).toContain('## Risk-Triggered Proof Strength');
     expect(feedback).toMatch(/source mutation.*mutation testing/is);
     expect(feedback).toMatch(/equivalent mutant.*survivor.*error/is);
-    expect(feedback).toMatch(/changed-line coverage.*不等于.*行为证明/is);
+    expect(feedback).toMatch(/Changed-line coverage.*does not necessarily prove behavior/is);
     expect(feedback).toMatch(/pre-existing baseline.*task-introduced/is);
     expect(feedback).toMatch(/anti-gaming.*false-green/is);
     expect(feedback).toMatch(/named failure mode.*canonical command identity|canonical command identity.*named failure mode/is);
@@ -90,10 +90,10 @@ describe('spec-work feedback and implementation quality contracts', () => {
       expect(quality).toContain(posture);
     }
     expect(quality).toContain('Current-Source Capability Inventory');
-    expect(quality).toMatch(/generated runtime mirror.*不是 candidate owner/is);
-    expect(quality).toMatch(/wrong owner.*不得/is);
-    expect(quality).toMatch(/单一.*nearby pattern.*不能.*授权/is);
-    expect(quality).toMatch(/imagined future consumer.*不能.*授权/is);
+    expect(quality).toMatch(/generated runtime mirror.*never the candidate owner/is);
+    expect(quality).toMatch(/wrong party, business rules must not be forcibly inserted/is);
+    expect(quality).toMatch(/No single.*nearby pattern.*can independently authorize/is);
+    expect(quality).toMatch(/imagined future consumer can independently authorize/is);
   });
 
   test('thin glue owns coordination and exposes failure without copying truth', () => {
@@ -102,9 +102,9 @@ describe('spec-work feedback and implementation quality contracts', () => {
     expect(quality).toMatch(/partial failure.*degradation/is);
     expect(quality).toMatch(/observability.*evidence aggregation/is);
     expect(quality).toMatch(/duplicated domain truth/is);
-    expect(quality).toMatch(/validation rule.*复制/is);
+    expect(quality).toMatch(/copy of the existing validation rule/is);
     expect(quality).toMatch(/parallel durable state/is);
-    expect(quality).toMatch(/没有增加真实 translation.*不创建/is);
+    expect(quality).toMatch(/does not add real translation.*delete or do not create it/is);
   });
 
   test('scope-changing architecture is returned to the planning owner', () => {
@@ -112,7 +112,7 @@ describe('spec-work feedback and implementation quality contracts', () => {
     expect(quality).toMatch(/public API\/contract.*schema\/runtime\/config.*provider\/repo boundary/is);
     expect(quality).toContain('spec-plan');
     expect(quality).toContain('spec-write-tasks');
-    expect(quality).toMatch(/不在实现阶段临场设计/is);
+    expect(quality).toMatch(/shall not proceed to on-the-spot design during the implementation phase/is);
   });
 
   test('simplification classifies deletion, debt, protected behavior, and wrong-layer work', () => {
@@ -122,7 +122,7 @@ describe('spec-work feedback and implementation quality contracts', () => {
     for (const protectedSurface of ['security', 'data integrity', 'a11y', 'observability', 'required verification']) {
       expect(quality).toContain(protectedSurface);
     }
-    expect(quality).toMatch(/Extract helper.*不是默认答案/is);
+    expect(quality).toMatch(/Extract helper is not the default answer/is);
     expect(quality).toContain('deferred_follow_up[]');
   });
 
@@ -194,10 +194,10 @@ describe('spec-work feedback and implementation quality contracts', () => {
 test('test discovery reverse-looks-up contract suites by asserted target', () => {
   const feedback = read('skills/spec-work/references/feedback-and-tests.md');
   const shipping = read('skills/spec-work/references/shipping-workflow.md');
-  expect(feedback).toContain('按断言目标反查');
-  expect(feedback).toContain('常不 import 目标文件');
-  expect(feedback).toContain('命中的套件纳入本次 check 选择');
-  expect(shipping).toContain('按 touched paths 在测试目录反查命中的管辖合同套件');
-  expect(shipping).toContain('release 治理套件');
+  expect(feedback).toContain('Reverse-lookup by assertion target');
+  expect(feedback).toContain('governance, byte-budget, ordering, and projection contracts typically do not import the target files');
+  expect(feedback).toContain('test suites that match are included in the current check selection');
+  expect(shipping).toContain('reverse-tracing touched paths in the test directory');
+  expect(shipping).toContain('release governance suite');
   expect(shipping).toContain('test:release:governance');
 });

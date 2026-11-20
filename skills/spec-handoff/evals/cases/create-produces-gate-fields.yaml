@@ -1,10 +1,6 @@
 id: create-produces-gate-fields
-title: create 产出含 gate 四字段的 spec-handoff/v1 artifact
-description: |
-  验证 create 主路径：显式创建交接时，经包内 writer 产出受管 artifact，
-  frontmatter 含 handoff gate 四字段（summary/source_refs/freshness/limitations）
-  且非空；judge 计算同一 artifact 的真实 SHA-256，并要求完成汇报包含
-  指向该文件的精确、可复制 resume 调用。
+title: "create output containing gate four-field spec-handoff/v1 artifact"
+description: "Verify the create main path: explicitly create an handoff when the writer within the package produces a managed artifact, and the frontmatter contains the handoff gate fields (summary/source_refs/freshness/limitations) and is non-empty; judge computes the actual SHA-256 of the same artifact and requires a report that includes an exact, reproducible resume call pointing to that file."
 
 input:
   prompt: |

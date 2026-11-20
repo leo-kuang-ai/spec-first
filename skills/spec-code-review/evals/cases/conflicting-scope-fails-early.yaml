@@ -1,8 +1,6 @@
 id: conflicting-scope-fails-early
-title: 冲突 scope 参数必须在审查前失败
-description: |
-  验证 base: 与 branch target 同时出现时，mode:agent 返回单个失败 JSON，
-  不继续执行审查、不制造 findings，也不修改工作区。
+title: "The conflict scope parameter must fail before review."
+description: "Verification base: When both the base and branch target are present, mode:agent returns a single failure JSON, does not proceed with the review, does not generate findings, and does not modify the workspace."
 
 input:
   prompt: |

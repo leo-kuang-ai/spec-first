@@ -1,10 +1,6 @@
 id: verdict-routes-to-pov
-title: 命名外部候选的采用裁决应交互式 handoff 到 spec-pov
-description: |
-  验证 0.1c verdict gate 的三要素形状(命名外部候选 + whether-to-commit 意图 + 对照本项目):
-  "要不要把 ESLint 换成 Biome"属于裁决类请求,应按 verdict-routing 交互式 offer spec-pov
-  (不静默切换、也不在本 workflow 内直接下结论跑 brainstorm 发散)。bare verdict 问题
-  须先按 carve-out 归为 Software 再过 0.1c gate,不得因"只提到工具名"走 Neither 捷径。
+title: "The naming of external candidate adoption decisions should be interactively handed off to spec-pov"
+description: "Verify the three essential elements of the 0.1c verdict gate (naming external candidates + commit intent + project-specific alignment): \"Should we replace ESLint with Biome?\" falls under a decision-request category and must follow interactive verdict-routing with an offer spec-PoV (no silent switching, no direct conclusion or brainstorming execution within the current workflow). Bare verdict issues must first be carved out into the Software domain and passed through the 0.1c gate; a shortcut to \"Neither\" is prohibited merely because the request mentions only a tool name."
 
 input:
   prompt: |

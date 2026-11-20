@@ -10,7 +10,7 @@ function inspectGitHealth(targetPath = process.cwd()) {
   try {
     root = fs.realpathSync(resolvedRoot);
   } catch {
-    // 目标可能在检查期间消失；保留已解析路径供确定性诊断。
+    // The target might disappear during inspection; retain the parsed path for deterministic diagnosis.
   }
   const gitEntry = path.join(root, '.git');
   if (!fs.existsSync(gitEntry)) {

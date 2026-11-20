@@ -1,9 +1,6 @@
 id: direct-lane-simple-howto
-title: 轻量一次性问答应留在 Direct Lane 不进 workflow
-description: |
-  验证 Direct Lane 判据：当前上下文的轻量事实/一次性 how-to 解释不进入任何 spec-* workflow，
-  不产生 Entering 宣告，也不产生路由推荐（Recommended entrypoint / 推荐入口），
-  由入口治理器直接作答。
+title: "Lightweight one-time responses should remain in Direct Lane and not enter workflow."
+description: "Validate the Direct Lane criterion: the lightweight facts/contextual knowledge or one-time how-to explanation in the current context does not trigger any spec-* workflow, generates no \"Entering\" declaration, and produces no route recommendation (Recommended entrypoint / recommended entry), and is directly answered by the entry governor."
 
 input:
   prompt: |

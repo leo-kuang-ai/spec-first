@@ -76,9 +76,9 @@ Activated when a plain-language goal is given without `Metric:`/`Verify:`. Class
 
 ### Orchestration Loop Steps
 
-Backed by `scripts/orchestrate.sh` （确定性状态与出口检查；目标语义分类由 LLM 判断）. Subcommands exposed: `classify`, `next-hop`, `units`, `plateau`, `screen-cmd`, `verdict`, `validate-state`, `screen-state-predicate`.
+Backed by `scripts/orchestrate.sh` (deterministic state and export validation; target semantic classification determined by LLM). Subcommands exposed: `classify`, `next-hop`, `units`, `plateau`, `screen-cmd`, `verdict`, `validate-state`, `screen-state-predicate`.
 
-1. **Classify** — `scripts/orchestrate.sh classify "<goal>"` → v1 advisory JSON 关键词候选；LLM 根据完整目标、否定语义和语言选择 archetype/mode。无匹配不默认 explore，多匹配不按数组顺序选第一项；候选不授权执行，结果进入下一步确认。
+1. **Classify** — `scripts/orchestrate.sh classify "<goal>"` → v1 advisory JSON keyword candidates; LLM selects archetype/mode based on complete goal, negated semantics, and language. No default exploration on no match; when multiple matches exist, do not select the first item in array order; candidate actions without authorization are not executed; results proceed to next-step confirmation.
 2. **Derive predicate** — reuse `plan` logic to produce a concrete Success predicate: exact shell command + expected output. For `optimize-metric`, run the full plan/wizard derivation internally.
 3. **Confirm** — ONE `request_user_input` showing: archetype, mode, concrete predicate (command + expected output), terminal choice (stop-at-verified vs proceed-to-ship). Misclassifications are caught here, not mid-run.
 4. **Round-0 dry-run** — prove the predicate command runs and returns a value; safety-screen every derived command via `screen-cmd`; print projected cycle budget. Stop here if `--dry-run`.
@@ -90,7 +90,7 @@ Backed by `scripts/orchestrate.sh` （确定性状态与出口检查；目标语
    e. Fold hop's `handoff.json` into `orchestrator-state.json`.
    f. `scripts/orchestrate.sh units` → recompute **Units remaining**.
 6. **Stop conditions** (checked after each hop):
-   - 先消费 `verdict`：存在 pending verify、未解决失败、错误或连续 3 次未知指标时不得收敛；仅验证完成且 predicate met 时进入 ship gate（pipeline 包含 ship）或 `CONVERGED`。
+   - Consume `verdict` first: convergence is prohibited if there are pending verifications, unresolved failures, errors, or three consecutive unknown metrics; entry into the ship gate (pipeline contains ship) or `CONVERGED` occurs only after verification completion and predicate met.
    - `scripts/orchestrate.sh plateau orchestrator-state.json` → true → stop + report `PLATEAU`.
    - Cycles > ceiling (default 50, override `--max-cycles N`) → stop + report `CEILING`.
    - Hop outcome `blocked`/`failed` with no alternative route → checkpoint + stop + report `BLOCKED`.

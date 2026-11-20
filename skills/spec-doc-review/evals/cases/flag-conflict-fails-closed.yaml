@@ -1,9 +1,6 @@
 id: flag-conflict-fails-closed
-title: 冲突 mutation token 应 fail closed 且不读文档
-description: |
-  验证 Phase 0 exact-token 合同:多个 mutation:* token 同时出现属于 flag conflict,
-  必须在读文档或派发 reviewer 之前 fail closed,返回固定错误并点名冲突 token,
-  不得猜测优先级。
+title: "Conflict mutation token should fail closed and not read documentation"
+description: "Verify Phase 0 exact-token contract: multiple mutations: * if multiple tokens appear simultaneously, it constitutes a flag conflict; a fail closed must occur before reading documentation or dispatching a reviewer; return a fixed error and explicitly name the conflicting tokens; no prioritization may be guessed."
 
 input:
   prompt: |

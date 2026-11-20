@@ -87,8 +87,8 @@ describe('spec-brainstorm clarification, scenarios, and resume contract', () => 
     expect(lfg).toContain('Use only when the current user explicitly requests spec-lfg');
     expect(lfg).toContain('Code readiness, a completed plan, or model inference');
     expect(handoff).toContain('Ship it autonomously with `spec-lfg`');
-    expect(handoff).toContain('委派一组独立、只读的 reviewer 执行代码审查');
-    expect(handoff).toContain('不授权任意 worker dispatch');
+    expect(handoff).toContain('a group of independent, read-only reviewers to perform code reviews and apply approved fixes');
+    expect(handoff).toContain('does not authorize any worker dispatch');
     expect(handoff).toContain('caller-owned target origin');
     expect(handoff).toContain('does not authorize a project server command');
     expect(handoff).not.toContain('may start and clean up one project-authorized local dev server');
@@ -117,8 +117,8 @@ describe('spec-brainstorm clarification, scenarios, and resume contract', () => 
 
         expect(operation).toBeDefined();
         expect(operation.contents).toContain('Ship it autonomously with `spec-lfg`');
-        expect(operation.contents).toContain('委派一组独立、只读的 reviewer 执行代码审查');
-        expect(operation.contents).toContain('不授权任意 worker dispatch');
+        expect(operation.contents).toContain('a group of independent, read-only reviewers to perform code reviews and apply approved fixes');
+        expect(operation.contents).toContain('does not authorize any worker dispatch');
         expect(operation.contents).toContain("The current user's selection is the explicit request");
         expect(operation.contents).toContain('Immediately invoke the\n`spec-lfg` skill');
         expect(operation.contents).toContain('complete argument payload');

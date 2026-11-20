@@ -104,9 +104,9 @@ An approved optimization spec, clean tree, executable harness, baseline approval
 4. Run it once and validate the output
 5. Present the harness and its output to the user for review
 
-评测集从已观察的失败与目标行为构建，并将数据、harness、rubric、selection/holdout 划分与 seed 纳入 `scope.immutable`。同一类别需能分别支持选择与确认，不以固定条数替代语义覆盖。holdout 数据与细节不进入 selection 命令、实验 worker 或假设上下文；不同 seed 本身不证明 item 互斥。
+The evaluation set is constructed from observed failures and target behaviors, and the data, harness, rubric, selection/holdout splitting, and seed are included in `scope.immutable`. The same category shall separately support selection and confirmation; fixed quantity shall not be used to substitute semantic coverage. The holdout data and details are not passed into the selection command, experiment worker, or hypothesis context; different seeds alone do not prove item exclusivity.
 
-对已有输入可运行的空输出、常量输出或已知好/坏样例做 harness 反证检查，不能让平凡捷径获得同等好分。只执行已授权的命令；缺少输入或权限时记录 `not-run`，失败则先修测量，不启动优化。结果随 baseline 留证；这些检查不替代人工标签校准或独立 judge。
+Perform harness-based refutation checks on existing inputs with empty outputs, constant outputs, or known good/bad examples; prevent trivial shortcuts from achieving equivalent high scores. Execute only authorized commands; record `not-run` when input or permissions are missing, and perform a preliminary measurement before failure, without initiating optimization. Results are relative to the baseline; these checks do not replace manual label calibration or independent judgment.
 
 ### 1.3 Establish Baseline
 
@@ -142,7 +142,7 @@ baseline:
 
 If primary type is `judge`, also run the judge evaluation on baseline output to establish the starting judge score. Apply the entry's independence and dispatch boundaries before scoring: if authorized, isolated judges are unavailable, record the concrete blocker and stop Phase 1 without an inline substitute or invented baseline score.
 
-确认集 baseline 不在 Phase 1 提前打分供选择使用。配置 holdout 时，在 selection 已满足 keep 后才对精确 reference/candidate source identities 收集完整确认配对，沿用相同 gates、必需目标、阈值与样本协议；最终 integrated snapshot 再确认。确认命令另有 exact command/cwd/environment/effects envelope，已有 selection 授权不能代替它。
+Confirm that the baseline set is not scored or made available for selection ahead of Phase 1. When configuring holdout, complete pairing confirmation for precise reference/candidate source identities is collected only after selection has satisfied the keep criteria, using the same gates, required targets, thresholds, and sample protocols; final integrated snapshot is then verified. The confirm command has a specific command/cwd/environment/effects envelope; existing selection authorization does not supersede it.
 
 ### 1.4 Parallelism Readiness Probe
 
@@ -190,7 +190,7 @@ Present to the user via the platform question tool:
 - **Clean-tree status**: confirmed clean
 - **Worktree budget**: current count and projected usage
 - **Judge budget**: estimated per-experiment judge cost and configured `max_total_cost_usd` cap (or an explicit note that spend is uncapped)
-- **确认边界**：holdout 配置与冻结身份、互斥依据、完整样本成本；未配置或无法隔离时说明 claim 仅限 selection，不伪造确认。
+- **Confirming Boundaries**: holdout configuration and frozen identity, mutual exclusion criteria, and complete sample cost; when not configured or isolation is impossible, state that claims are limited to selection and do not permit forged verification.
 
 **Options:**
 1. **Proceed** -- approve baseline and parallel config, move to Phase 2

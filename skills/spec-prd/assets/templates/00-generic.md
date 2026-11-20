@@ -1,333 +1,266 @@
-# <需求名称> 增量需求文档
+# <Feature name>: Incremental Product Requirements
 
-> 本模板是所有 PRD artifact 的 product-bundled 正文骨架。Frontmatter、machine-owned section、readiness receipt 与 finalize 字段必须从 `references/prd-output-template.md` 组合，不能从本文件自行预填。
->
-> **使用规则**：标 **[core]** 的 section 始终必填；标 **[conditional]** 的 section 按需求规模与 surface 决定是否展开。再叠加一个 primary surface 模板；只有真实 mixed surface 才增加必要 secondary template。
->
-> **行业 overlay**：只有输入、项目 source 或当前执行对话用户明确证券/交易行业上下文时，才叠加 `../overlays/securities.md`。没有行业信号时不得加载该 overlay。
->
-> **WHAT not HOW**：本文只写产品行为、业务规则、范围、验收。数据库 schema、接口字段设计、文件改动、任务拆解、技术选型一律不写，留给 `spec-plan`。
->
-> **问答边界**：所有需要人类补充或裁决的问题都询问当前执行对话的用户。项目中的合规、法务或技术材料可以作为 source refs，但不是第二个人类问答路由。
+Use this body for every PRD. Compose frontmatter, machine-owned sections, readiness receipts, and finalize fields from `references/prd-output-template.md`; do not prefill them here. Write the deliverable in the user's language. Retain canonical section identities when localizing headings.
+
+Include every **[core]** section. Expand **[conditional]** sections when the scope or risk calls for them. Add one primary surface template; add secondary templates only for genuine mixed-surface requirements. Load `../overlays/securities.md` only when the input, project sources, or current user establish a securities or trading context.
+
+Describe product behavior, rules, scope, and acceptance, not database schemas, API field designs, file edits, tasks, or technology choices. Those belong to `spec-plan`. Ask the user in the current conversation for any human decision. Legal, compliance, and technical materials can supply evidence, not a second interview route.
 
 ---
 
-## PRD 元数据 [core]
-
-| 项 | 内容 |
-| --- | --- |
-| 需求名称 | |
-| 需求编号 / spec_id | |
-| 业务域 | <项目中的业务能力或模块> |
-| 目标 surface | App / H5-PC / Admin / Backend / Mixed / Generic |
-| 目标地区 / 市场 / tenant | 不涉及时写明不涉及 |
-| 目标用户 / 客户类型 | |
-| 是否触及付费、资金或交易 | 是 / 否（若是，写明影响点） |
-| 是否触及个人信息或敏感数据 | 是 / 否（若是，写明数据类型与脱敏要求） |
-| 是否需要外部规则或专业意见 | 是 / 否 / 待确认；只记录 source/确认条件 |
-| 相关文档 | 原型 / 设计稿 / 现有需求 / 业务规则 / 第三方规则 |
-
+<!-- prd:section=summary -->
 ## Summary [core]
 
-用一句话讲清「给谁、在什么场景、解决什么问题、做成什么样」。
+Start with who does what today, what changes, and which existing behavior stays the same. Tie each open product decision to an affected scenario. Do not reopen settled questions or add a second executive summary.
 
-> 例：为 CRM 运营提供统一的入金审核备注能力，在处理入金单据时记录沟通、复核意见和后续追溯依据。
+> Example: Operations staff currently open each deposit individually to see its review note. The list will show that note without changing edit permissions. One decision remains: should people without read access see an explanation or no column at all?
+
+## PRD Metadata [core]
+
+| Field | Value |
+| --- | --- |
+| Requirement name | |
+| Requirement ID / `spec_id` | |
+| Business domain | Project capability or module |
+| Target surface | App / H5-PC / Admin / Backend / Mixed / Generic |
+| Region, market, or tenant | State when not applicable |
+| Target users or customer types | |
+| Payments, funds, or trades affected? | Yes or no; identify the impact |
+| Personal or sensitive data affected? | Yes or no; name the data and masking requirements |
+| External rules or professional review needed? | Yes, no, or open; cite the source or confirmation condition |
+| Related documents | Prototype, design, previous requirements, business rules, or third-party policy |
 
 ## Change Delta [core]
 
-> 增量需求的核心。说清这次相对现有系统**改了什么**，把新需求和现有能力分清楚。
+Distinguish new requirements from existing capabilities. Describe what remains unchanged, what differs, and who is affected; “as before” is not sufficient.
 
-| 变化类型 | 内容 | 涉及现有能力 | 用户/数据/运营影响 | 证据 tag |
+| Change | Behavior | Existing capability | User, data, or operational impact | Evidence tag |
 | --- | --- | --- | --- | --- |
-| keep（保持不动） | | | | |
-| extend（在现有上扩展） | | | | |
-| replace（替换现有行为） | | | | |
-| remove（下线/移除） | | | | |
-| unknown（待确认） | | | | |
+| keep | | | | |
+| extend | | | | |
+| replace | | | | |
+| remove | | | | |
+| unknown | | | | |
 
-证据 tag 取值：`confirmed-source`（已读源码/测试/文档确认）/ `user-stated`（用户明确）/ `source-candidate`（候选线索，未经源码确认）/ `external-research`（外部资料，需标日期与来源）/ `assumption`（推断）。
-
-涉及历史逻辑时，不得写「沿用历史逻辑」或「与之前一致」作为唯一说明；必须写清差异、保留点和影响范围。
-
-> **写好示例（增量风格）**：
-> ✗ 模糊：`extend｜优化用户列表`
-> ✓ 具体：`extend｜用户列表增加"批量禁用"｜复用现有列表筛选与分页(confirmed-source: admin/user_list)｜涉及权限与操作审计｜confirmed-source`
-> 关键差别:替换了哪条现有行为、复用了什么、不碰什么,要让 plan 不必猜。
+Use `confirmed-source` for inspected code, tests, or docs; `user-stated` for an explicit statement; `source-candidate` for an unconfirmed lead; `external-research` for dated external sources; and `assumption` for an inference. Instead of “improve the user list,” say “add bulk disable, retain existing filtering and pagination, and enforce permissions and audit logging.” Cite the evidence for each retained behavior.
 
 ## Requirements [core]
 
-> 一条需求 = 一个可独立验收的最小行为。用编号 + EARS 句式：「当 <触发条件> 时，<角色/系统> 应 <可观察的行为>」。
+Give each independently testable behavior an ID. Use the EARS form: when a trigger occurs, the actor or system shall produce an observable outcome.
 
-| 编号 | 触发条件 | 角色 | 系统行为 | 用户可见结果 | 证据 / 约束引用 |
+| ID | Trigger | Actor | System behavior | User-visible result | Evidence or constraint |
 | --- | --- | --- | --- | --- | --- |
 | R-01 | | | | | |
 | R-02 | | | | | |
 
-业务规则单独编号（避免散落在截图/口头说明）：
+Number business rules separately (`BR-001`, `BR-002`). Replace vague terms such as “better” or “appropriate” with a quantity, state, or boundary. Example: when an administrator selects one or more users and confirms bulk disable, the selected accounts become disabled, their rows show the new status, and an audit entry records the action.
 
-- BR-001：<一条规则，"当 X 时应 Y">
-- BR-002：
+Assign each requirement a priority (P0/P1/P2 or MoSCoW). Specify what may be reduced and what blocks release. For security, privacy, compliance, funds, or irreversible changes, explicitly resolve whether any fallback is acceptable; do not infer one from this template.
 
-> **写好示例（增量风格 + 反模糊词）**：
-> ✗ 模糊：`支持批量操作，体验更好`（"等/相关/更好"这类词让 plan 无从验收）
-> ✓ 具体：`R-01｜当管理员在用户列表勾选 ≥1 行并点"批量禁用"时，系统应弹二次确认、确认后将选中用户置为已禁用并写审计日志，列表实时刷新被禁用状态`
-> 反模糊词:不写"等/相关/合适的/更好";数量、状态、边界都要可验收。
-
-**优先级分级（必填——专业 PRD 与功能清单的分水岭）**：每条需求标 P0/P1/P2 或 MoSCoW（Must/Should/Could/Won't）。回答“排期被砍时先砸哪些、哪些可降级、哪些阻塞上线”。涉及安全、隐私、合规、资金或不可逆数据变更时，必须显式说明可否降级，不从模板直接假定答案。
-
-| 编号 | 优先级 | 可降级方案 | 是否阻塞上线 |
+| ID | Priority | Acceptable fallback | Blocks release? |
 | --- | --- | --- | --- |
-| R-01 | P0 / Must | | 是 / 否 |
+| R-01 | P0 / Must | | Yes / No |
 | R-02 | | | |
 
 ## Scope Boundaries [core]
 
-### 本期做
+### In scope
 
-- <待填写>
+- <Behavior included in this release>
 
-### 本期不做（Non-Goals，重要——防止 AI/研发自行扩展）
+### Non-goals
 
-- <待填写>
+- <Behavior deliberately excluded>
 
-### 与其它模块/需求的关系
+### Related modules or requirements
 
-> 依赖或关联的其它模块，用明确文档名 + 章节引用，不写「见上文」「见大需求」。
+- <Named document and section; avoid “see above”>
 
-- <待填写>
+### Regional, market, and tenant differences
 
-### 跨地区 / 市场 / tenant 边界
-
-| 差异项 | 默认规则 | 地区 / 市场 / tenant A | 地区 / 市场 / tenant B | 是否本期覆盖 |
+| Difference | Default rule | Region, market, or tenant A | Region, market, or tenant B | In scope? |
 | --- | --- | --- | --- | --- |
-| 可用能力 | | | | 是 / 否 |
-| 权限 / 数据范围 | | | | 是 / 否 |
-| 时间 / 时区 | | | | 是 / 否 |
-| 文案 / 规则 | | | | 是 / 否 |
-| 付费 / 结算 | | | | 是 / 否 |
+| Available capabilities | | | | |
+| Permissions and data access | | | | |
+| Time and time zones | | | | |
+| Wording and rules | | | | |
+| Billing and settlement | | | | |
 
 ## Acceptance Examples [core]
 
-> 一条核心需求至少 1 条正向 + 1 条异常验收。用 Given/When/Then 或 EARS 等价。每条标注覆盖的 R 编号。
+Give each core requirement at least one positive and one exceptional case. Link every example to the requirement it tests. Use Given/When/Then or an equivalent EARS statement.
 
 ```text
-AE-01（对应 R-01）
-Given <前置状态>
-When <用户动作>
-Then <可观察结果>
-
-AE-02（对应 R-02，异常）
-Given <前置状态>
-When <异常输入/操作>
-Then <系统拒绝并提示，且不产生未声明的状态、数据或审计副作用>
+AE-01 (R-01): Given <initial state>, when <action>, then <observable result>.
+AE-02 (R-01): Given <initial state>, when <invalid action>, then <rejection and feedback>, with no unintended state, data, or audit effects.
 ```
 
-命中相应风险时，验收还应覆盖：重复提交、状态冲突、弱网/超时、部分成功、用户取消、低权限用户、旧数据/旧客户端和地区差异。
+Where relevant, cover duplicate submissions, conflicting states, timeouts, partial success, cancellation, limited permissions, legacy data or clients, and regional differences.
 
 ## Evidence And Assumptions [core]
 
-> 无证据的 metrics、客户反馈、业务规则、文案、监管口径，必须进这里，不得写成系统事实。
+Record unsupported metrics, customer feedback, rules, wording, and regulatory interpretations here, not as established facts.
 
-| 主张 | 类型 | 证据来源 / 为何是假设 | 确认路径 |
+| Claim | Evidence tag | Source or reasoning | How to confirm |
 | --- | --- | --- | --- |
-| | confirmed-source / user-stated / source-candidate / external-research / assumption | | source / 当前执行对话用户 |
+| | confirmed-source / user-stated / source-candidate / external-research / assumption | | Source or current user |
 
-涉及权限、用户数据、资金/交易、审计或合规时，在此显式标注涉及的**权限边界、数据敏感性、合规点**；无法确认的进 Outstanding Questions。
+For permissions, user data, funds, trading, audits, or compliance, state access boundaries, sensitivity, and applicable rules. Move unresolved decisions to Outstanding Questions.
 
 ## Problem Frame [conditional]
 
-为什么做。业务现状、用户问题、运营问题或外部变化。不写实现。建议写清：
-
-- 不做的风险：用户损失、运营成本、数据/合规风险、支持成本或机会损失。
-- 业务价值：提升完成率、准确性、效率、可追溯性或风险控制能力。
+Describe the present user or operational problem or external change. What would inaction cost users, operations, support, or risk management? What improvement would matter? Keep implementation out of this section.
 
 ## Goals / Success Metrics [conditional]
 
-| 目标类型 | 目标描述 | 衡量口径 | 数据来源 |
+| Goal | Desired outcome | Measure | Data source |
 | --- | --- | --- | --- |
-| 业务目标 | | | |
-| 用户目标 | | | |
-| 风险 / 合规目标 | | | |
-| 运营效率目标 | | | |
+| Business | | | |
+| User | | | |
+| Risk or compliance | | | |
+| Operational efficiency | | | |
 
-若没有可信指标，不要编造目标值；写成可观察口径或进入 Assumptions / Outstanding Questions。
+Acceptance examples establish whether the behavior is correct before release. Success metrics show whether the user's problem diminishes after release. Without a trustworthy baseline, name an observable signal or record the unknown; do not invent a target.
 
 ## Current System Snapshot [conditional]
 
-> 写 PRD 前对齐的现状摘要。覆盖相关现有能力、流程、页面/路由、权限/角色、状态/异常、配置。每条标 evidence tag。现状只用于约束需求、提示复用、暴露风险，**不得反向扩大产品范围**。
-
-| 现状项 | 当前行为 | 证据 tag |
+| Existing capability, flow, route, role, state, exception, or setting | Observed behavior | Evidence tag |
 | --- | --- | --- |
+
+Use the snapshot to constrain requirements, identify reuse, and expose risks, never to expand product scope.
 
 ## Glossary [conditional]
 
-| 术语 | 定义 | 来源 |
+| Term | Meaning | Source |
 | --- | --- | --- |
 
-## 领域模型 / 核心实体 [conditional]
+## Domain Model and Core Entities [conditional]
 
-> 当需求涉及多个相互关联的业务对象时填写。写**产品视角的实体含义与关系**，不写数据库表结构、字段类型、外键（那是 `spec-plan` 的 HOW）。
+For related business objects, describe product meaning and relationships, not tables, types, or foreign keys. Add a small relationship diagram when it clarifies ownership or cardinality.
 
-| 实体 | 业务含义 | 关键属性（产品视角） | 与其它实体的关系 |
+| Entity | Business meaning | Product attributes | Relationship to other entities |
 | --- | --- | --- | --- |
-| | | | 一对多 / 多对多 / 归属 |
-
-> 关系复杂时可附一句话说明或简单关系图。
 
 ## Actors [conditional]
 
-| 角色 | 使用场景 | 用户目标 | 权限 / 数据边界 |
+| Role | Scenario | User goal | Permissions and data boundaries |
 | --- | --- | --- | --- |
 
 ## Use Cases [conditional]
 
-> 核心用例含：actor、trigger、precondition、main path、alternative/error path、outcome、covered requirements。
+### UC-01 <Use case>
 
-### UC-01 <用例名>
-
-- Actor：
-- Trigger：
-- Precondition：
-- Main path：1. … 2. …
-- Alternative / Error path：
-- Outcome：
-- Covers：R-0x
+- Actor and trigger:
+- Precondition:
+- Main path:
+- Alternative or error path:
+- Outcome:
+- Covers: R-01
 
 ## Interaction Requirements [conditional]
 
-> 当需求含用户交互时必填。覆盖：入口、状态、反馈文案、确认/取消、空态、加载态、错误态、可访问性/国际化。
+Required for user interactions. Describe entry points, feedback, confirmation and cancellation, empty/loading/error states, accessibility, and localization. For payments, irreversible actions, sensitive submissions, or elevated access, specify confirmation, the result of cancellation, and the audit trail.
 
-| 元素 | 是否必须 | 展示/交互规则 | 文案 | 风险 / 约束 |
+| Element | Required? | Display or interaction | Wording | Risk or constraint |
 | --- | --- | --- | --- | --- |
-
-付费、不可逆操作、敏感资料提交、权限提升等高风险场景，必须写清确认动作、取消后结果和留痕需求。
 
 ## Data / Compliance Boundaries [conditional]
 
-> 触及个人信息、付费/交易、审计、导出或受监管记录时必填。
+Required for personal information, payments or trading, audits, exports, or regulated records.
 
-| 数据/记录 | 类型 | 展示规则 | 操作规则 | 留痕/保存口径 | 待确认项 |
+| Record | Classification | Visibility or masking | View, edit, or export rules | Audit and retention | Open question |
 | --- | --- | --- | --- | --- | --- |
-| 用户身份信息 | 个人信息/敏感个人信息 | 脱敏/明文/不可见 | 查看/编辑/导出 | | |
-| 业务记录 | 业务数据 | | | | |
-| 付费 / 交易记录 | 财务或交易记录 | | | | |
-| 用户确认记录 | 合规或产品确认记录 | | | | |
-| 操作日志 | 审计记录 | | | | |
+| User identity | Personal or sensitive | | | | |
+| Business record | Operational | | | | |
+| Payment or trade | Financial | | | | |
+| User confirmation | Compliance or product decision | | | | |
+| Operation log | Audit | | | | |
 
 ## Exception Handling [conditional]
 
-> 当需求触及异常路径时必填。
+When exceptional paths apply, cover empty or excessive input, state conflicts, timeouts, duplicate submissions, partial success, cancellation or rollback, insufficient access, ineligible users, and invalid time windows as appropriate.
 
-| 场景 | 系统表现 | 用户提示 | 是否可重试 | 是否产生状态/数据/审计副作用 |
+| Scenario | System behavior | User feedback | Retry allowed? | State, data, or audit effects |
 | --- | --- | --- | --- | --- |
-| 输入为空 | | | | |
-| 输入超限 | | | | |
-| 状态冲突 | | | | |
-| 弱网/超时 | | | | |
-| 重复提交 | | | | |
-| 部分成功 | | | | |
-| 撤销/回滚 | | | | |
-| 低权限/无权限 | | | | |
-| 用户条件不满足 | | | | |
-| 时间窗口不支持 | | | | |
 
 ## Release / Operation Readiness [conditional]
 
-> 触及灰度、配置、运营手册、专业审阅、老数据、批处理或第三方规则时必填。
+Use for staged rollout, configuration, runbooks, specialist review, legacy data, batch processes, or third-party rules.
 
-| 项 | 结论 | 证据 / 决定路径 | 是否阻塞上线 |
+| Item | Decision or status | Evidence or decision path | Blocks release? |
 | --- | --- | --- | --- |
-| 必要专业审阅 | 已通过 / 待审 / 不涉及 | | 是 / 否 |
-| 灰度策略 | | | |
-| 老版本兼容 | | | |
-| 存量数据处理 | | | |
-| 运营 SOP | | | |
-| 客服口径 | | | |
-| 回滚后用户感知 | | | |
+| Required professional review | Approved / pending / not applicable | | |
+| Rollout strategy | | | |
+| Old client compatibility | | | |
+| Existing data | | | |
+| Operations runbook | | | |
+| Customer support guidance | | | |
+| User experience after rollback | | | |
 
 ## Dependencies / Constraints / Risks [conditional]
 
-> 涉及外部系统/团队/审批、有硬性约束，或这次需求有做不成的风险时填写。三者关系紧密，合并在一段；小增量可省略，命中外部依赖或高风险时必填。写**产品级**依赖与约束，不写技术实现方案（接口怎么调、用什么中间件归 `spec-plan`）。
+Required for external dependencies or high-risk changes; omit for a small independent increment. Describe product dependencies, not interface designs or middleware choices.
 
-**前置依赖**（依赖哪些外部系统/团队/审批才能开工）：
-
-| 依赖项 | 依赖方 | 需要对方做什么 | 是否阻塞开工 | 当前状态 |
+| Dependency | Team, system, or approver | Required action | Blocks start? | Status |
 | --- | --- | --- | --- | --- |
-| | 行情源 / 柜台 / 风控 / 合规审阅 / 第三方 / 其它团队 | | 是 / 否 | 已就绪 / 进行中 / 待确认 |
 
-**约束**（实现不能突破的产品级边界，非技术方案）：
+Name regulatory restrictions, deadlines, budgets, resource constraints, and user-visible compatibility requirements. For each delivery risk, state its impact and mitigation or explicit acceptance.
 
-- 监管 / 合规约束：<如某辖区不允许某行为>
-- 时间 / 预算 / 资源约束：<如必须在某监管期限前上线>
-- 技术 / 兼容约束（产品可感知的）：<如必须兼容某低版本客户端>
+## Nonfunctional Requirements [conditional]
 
-**交付风险与缓解**（什么情况下这事会失败或有坑，怎么应对）：
+Required for critical paths, high traffic, large volumes, availability-sensitive behavior, or security and compliance needs. State user-observable requirements rather than implementation choices.
 
-| 风险 | 影响 | 缓解 / 接受 |
-| --- | --- | --- |
-| | | |
-
-## 非功能需求（NFR）[conditional]
-
-> 涉及关键业务链路、高并发、大数据量、可用性敏感或安全合规要求时必填。写**产品可感知的指标与约束**，不写技术实现。
-
-| 类别 | 产品级要求 | 衡量口径 | 是否阻塞上线 |
+| Dimension | Product requirement | How to measure | Blocks release? |
 | --- | --- | --- | --- |
-| 性能 / 时延 | 如提交确认、数据刷新、列表首屏的可接受时延 | | 是 / 否 |
-| 并发 / 容量 | 峰值并发、数据规模预期 | | |
-| 可用性 / 连续性 | 关键使用窗口内可用性、降级策略、灾备 | | |
-| 安全 | 认证、授权、敏感数据加密/脱敏、防重放/防篡改 | | |
-| 隐私 / 合规 | 个人信息最小化、数据地域边界、审计留痕 | | |
-| 可观测 | 关键操作是否可监控、告警、追溯 | | |
-| 可访问性 / 国际化 | 大字号、无障碍、多语言、时区/区域格式 | | |
+| Latency | Confirmation, refresh, or first screen | | |
+| Capacity | Peak concurrency and data volume | | |
+| Continuity | Availability windows, degradation, recovery | | |
+| Security | Authentication, authorization, masking, replay or tamper protection | | |
+| Privacy and compliance | Data minimization, residency, audit | | |
+| Observability | Monitoring, alerting, traceability | | |
+| Accessibility and localization | Large fonts, assistive technology, languages, regional formats | | |
 
-## 数据留存期限 [conditional]
+## Data Retention [conditional]
 
-> 触及需长期保存的业务、用户确认、审计或上报记录时必填。保存期限、导出、归档和销毁口径必须带 source 或当前执行对话用户决定；未确认项进入 Outstanding Questions。
+Required for long-lived business, consent, audit, or reporting records. Cite a source or a current-user decision for retention, export, archival, and disposal. Move unresolved terms to Outstanding Questions.
 
-| 记录类型 | 保存期限 / 决定条件 | 可查询角色 | 到期处理 | 证据 tag |
+| Record | Retention period or decision condition | Who can query it? | Action at expiry | Evidence tag |
 | --- | --- | --- | --- | --- |
-| | | | 归档 / 脱敏 / 销毁 | |
 
-## 需求追溯矩阵 [conditional]
+## Requirements Traceability Matrix [conditional]
 
-> 中大型或高风险需求建议填写，确保每条需求可追溯到验收、约束和证据，避免漏验收或把假设当事实。
+For medium, large, or high-risk changes, map each requirement to acceptance, constraints, and evidence so no requirement goes untested and no assumption becomes fact.
 
-| 需求编号 | 关联业务规则 | 验收编号 | 约束 / 风险 | 证据 / 规则依据 | 优先级 |
+| Requirement | Rule | Acceptance | Constraint or risk | Evidence | Priority |
 | --- | --- | --- | --- | --- | --- |
 | R-01 | BR-001 | AE-01 | | | P0 |
 
-## 必要审阅 / 会签（Sign-off）[conditional]
+## Required Review and Sign-off [conditional]
 
-> 触及监管、资金/交易、隐私、安全或需要专业意见的内容时按项目规则填写。会签记录是 source evidence，不改变“所有人类问题只问当前执行对话用户”的交互边界。
+Follow project rules for regulated activity, funds, privacy, security, or specialist review. Sign-off is source evidence; it does not authorize contacting anyone other than the current user for product decisions.
 
-| 会签方 | 确认对象 | 结论 | 口径 / 依据 | 确认人 | 日期 | 是否阻塞上线 |
+| Reviewer | Subject | Approved, conditional, or pending | Basis | Signatory | Date | Blocks release? |
 | --- | --- | --- | --- | --- | --- | --- |
-| 合规 | | 通过 / 有条件通过 / 待确认 | | | | 是 / 否 |
-| 风控 | | | | | | |
-| 法务（如涉及） | | | | | | |
+| Compliance | | | | | | |
+| Risk | | | | | | |
+| Legal, if applicable | | | | | | |
 
-## 待闭合问题候选 [conditional]
+## Open Question Candidates [conditional]
 
-> 这是 authoring prompt，不是 machine schema。先查 source，只把仍会改变 WHAT、验收或范围的缺口移入 `references/prd-output-template.md` 唯一 canonical `Outstanding Questions` section；所有人类问题只询问当前执行对话的用户。
+This is an authoring aid, not a machine section. Check sources first. Move only gaps that still affect behavior, acceptance, or scope into the single canonical `Outstanding Questions` section from `references/prd-output-template.md`. Ask the current user when a decision is needed.
 
-| 候选缺口 | 先查 source | PRD write target | 推荐答案 / 待确认原因 |
+| Gap | Source to check | PRD write target | Recommended answer or reason still open |
 | --- | --- | --- | --- |
-| | | | |
 
----
+## Change History
 
-## 变更记录
-
-| 日期 | 修改人 | 变更内容 |
+| Date | Author | Change |
 | --- | --- | --- |
-| YYYY-MM-DD | <姓名> | 初稿 |
-
----
+| YYYY-MM-DD | <Name> | Initial draft |
 
 ## Handoff
 
-- 只有 `references/prd-output-template.md` 要求的 machine sections 齐全、finalize/checker receipt 有效，且语义判断确认 planning 不会发明 WHAT 时，才可推荐进入 `spec-plan`。
-- 需要审查完整性/一致性 → `spec-doc-review`。
-- 仍有未决产品行为 → 继续 refine 或记入 Outstanding Questions。
-- **不要**直接进入 `spec-work`。
+- Recommend `spec-plan` only when the machine sections required by `references/prd-output-template.md` are present, the finalize/checker receipt is valid, and planning need not invent product behavior.
+- Route completeness or consistency review to `spec-doc-review`.
+- Refine unresolved behavior or record it in Outstanding Questions.
+- Do not go directly to `spec-work`.

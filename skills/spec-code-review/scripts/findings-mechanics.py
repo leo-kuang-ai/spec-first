@@ -149,7 +149,7 @@ def merge_group(group: list[tuple[dict[str, Any], str, tuple[str, ...]]]) -> dic
     has_first_evidence = nonempty_string(merged.get("first_evidence"))
     if confidence >= 75 and not has_first_evidence:
         confidence = 50
-    # 同模型 persona 的共识保留为贡献记录；自动提分还需要已验证的跨模型 peer。
+    # The consensus retention of the same model persona is recorded as a contribution; automatic promotion also requires a verified cross-model peer.
     if (len(independent) >= 2 and has_first_evidence
             and any(cross_model_peer(n) for n in independent)
             and any(reviewer != "synthesis" for _, reviewer, _ in group)):

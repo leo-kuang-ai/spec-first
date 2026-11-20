@@ -1,8 +1,6 @@
 id: simple-qa-not-triggered
-title: 普通 Q&A 不应触发深度教学 artifact
-description: |
-  验证 description 反例:ordinary Q&A 不做 durable teaching artifact——
-  一句话能答的问题应直接回答,不产教学文档。
+title: "Ordinary Q&A should not trigger deep teaching artifact"
+description: "Counterexample for description: ordinary Q&A does not constitute a durable teaching artifact—questions that can be answered in one sentence should be answered directly, without generating teaching documents."
 
 input:
   prompt: |

@@ -9,7 +9,7 @@ const { readStableRegularFile } = require('../lib/regular-file-snapshot.cjs');
 
 const PACKAGE = '@colbymchenry/codegraph';
 
-// npm shim 的 --version 也可能下载或清理 cache；只把已安装平台包交给真实 runner。
+// The npm shim's --version may also download or clear cache; only pass the genuinely installed platform packages to the real runner.
 function prepareCodegraphLaunch({ command, args = [], env = process.env, cwd = process.cwd(), platform = process.platform, arch = process.arch } = {}) {
   const unchanged = { ok: true, command, args };
   const basename = path.basename(String(command || '')).toLowerCase();
@@ -26,7 +26,7 @@ function prepareCodegraphLaunch({ command, args = [], env = process.env, cwd = p
       const directory = path.dirname(executable);
       const candidates = [path.join(directory, 'node_modules', '@colbymchenry', 'codegraph')];
       if (path.basename(directory).toLowerCase() === '.bin') candidates.push(path.join(directory, '..', '@colbymchenry', 'codegraph'));
-      // 只识别 npm global prefix 与 local .bin 布局；不解释或执行 wrapper 文本。
+      // Recognizes only npm global prefix and local .bin layouts; does not interpret or execute wrapper text.
       const candidate = candidates.find((root) => fs.existsSync(path.join(root, 'npm-shim.js')));
       if (candidate) packageRoot = fs.realpathSync(candidate);
     }
@@ -49,7 +49,7 @@ function prepareCodegraphLaunch({ command, args = [], env = process.env, cwd = p
     const prefix = windows
       ? ['--liftoff-only', '--disable-warning=ExperimentalWarning', safeFile(bundleRoot, 'lib/dist/bin/codegraph.js')]
       : [];
-    // 仅绑定已解析包元数据与入口路径；不声称验证安装后二进制或传递依赖字节。
+    // Binds only resolved package metadata and entry point paths; does not claim to verify installed binaries or transmitted dependency bytes.
     const inventory = [packageRoot, manifest.name, manifest.version, bundleRoot, bundle.name, bundle.version, executablePath, prefix];
     return { ok: true, command: executablePath, args: [...prefix, ...args], provider_identity: {
       package: manifest.name,
@@ -107,7 +107,7 @@ function resolveExecutable(command, env, cwd, windows) {
         if (!fs.statSync(candidate).isFile()) continue;
         fs.accessSync(candidate, windows ? fs.constants.F_OK : fs.constants.X_OK);
         return candidate;
-      } catch (_error) { /* 按 PATH 顺序继续查找，不执行探针。 */ }
+      } catch (_error) { /* Continue in PATH order without running a probe. */ }
     }
   }
   return null;

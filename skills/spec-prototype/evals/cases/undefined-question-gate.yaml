@@ -1,8 +1,6 @@
 id: undefined-question-gate
-title: 无问题定义应先收敛问题不直接开做
-description: |
-  验证 entry gate:裸"做个原型"没有可圈定的待答问题,
-  应先收敛问题(bounded)否则 unresolved;不得直接进入构建。
+title: "Problem definition should be refined first; no direct action should be taken without convergence on the problem."
+description: "Verify entry gate: \"Just do a prototype\" has no clearly defined pending questions to answer; problems must first be bounded otherwise they remain unresolved; direct construction is not permitted."
 
 input:
   prompt: |

@@ -1,6 +1,6 @@
 # Session-Settled Decisions
 
-本协议携带当前对话中用户已作出的决策，避免再次讨论已定事项。维护源为 `skills/_shared/references/settled-decisions.md`；修改后运行 `node scripts/sync-shared-references.js`，生成 spec-plan 与 spec-brainstorm 的独立分发副本。回归检查为 `tests/unit/settled-decisions-contracts.test.js`。
+This agreement carries forward the user's decisions made in the current conversation, avoiding re-discussion of already settled matters. The source is `skills/_shared/references/settled-decisions.md`; after modification, run `node scripts/sync-shared-references.js` to generate independent distribution copies of spec-plan and spec-brainstorm. Regression check is for `tests/unit/settled-decisions-contracts.test.js`.
 
 ## The settlement test
 

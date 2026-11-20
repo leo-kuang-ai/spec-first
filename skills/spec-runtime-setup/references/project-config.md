@@ -7,7 +7,7 @@ Read this reference before any project-local config mutation. It carries the det
 Project-local setup has two separate surfaces:
 
 1. Setup-owned facts: `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, and when applicable `.spec-first/workspace/scenario-fingerprint-setup.json`.
-2. Local config bootstrap: `.spec-first/config.local.example.yaml`, local override state for `.spec-first/config.local.yaml`, and `.gitignore` coverage for `.spec-first/*.local.yaml`. Missing local override means `defaults-active`，不是“未处理的可选项”。
+2. Local config bootstrap: `.spec-first/config.local.example.yaml`, local override state for `.spec-first/config.local.yaml`, and `.gitignore` coverage for `.spec-first/*.local.yaml`. Missing local override means `defaults-active`, not "unhandled option".
 
 Local config bootstrap is project-local and local-only. It may refresh the example, create the local override, and ensure the ignore rule only through an explicitly authorized project-config action. It reports legacy project config signals for manual review, but never copies legacy files, translates old key names, or treats old defaults as spec-first truth.
 

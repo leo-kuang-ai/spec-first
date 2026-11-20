@@ -65,7 +65,7 @@ function resolveSpecFirstPackageRoot(context, setupScriptDir) {
       const packageJson = JSON.parse(fs.readFileSync(path.join(candidate, 'package.json'), 'utf8'));
       if (packageJson.name === 'spec-first') return candidate;
     } catch (_error) {
-      // 投影后的 runtime skill 可能不与已安装 package 相邻。
+      // The projected runtime skill may not be adjacent to the installed package.
     }
   }
   return null;
@@ -161,7 +161,7 @@ function writeScenarioFingerprintArtifact(repoRoot, outputPath, artifact) {
       throw reasonError('scenario-fingerprint-artifact-invalid', '已提交的 scenario fingerprint schema 无效。');
     }
   } catch (error) {
-    try { fs.rmSync(tempPath, { force: true }); } catch (_cleanupError) { /* 保留主错误 */ }
+    try { fs.rmSync(tempPath, { force: true }); } catch (_cleanupError) { /* Preserve the original error. */ }
     if (!error.reason_code) error.reason_code = 'scenario-fingerprint-write-failed';
     throw error;
   }
@@ -192,7 +192,7 @@ function scenarioFingerprintCliReason(result) {
     const parsed = JSON.parse(String(result && result.stdout ? result.stdout : ''));
     if (parsed && parsed.error && parsed.error.code) return parsed.error.code;
   } catch (_error) {
-    // 回退到下方的 bounded process 结果。
+    // Roll back to the bounded process result below.
   }
   return result && (result.timed_out || result.timeout)
     ? 'scenario-fingerprint-timeout'

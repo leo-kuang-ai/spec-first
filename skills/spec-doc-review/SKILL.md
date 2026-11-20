@@ -63,11 +63,11 @@ Read [Task Pack Review Lens](references/task-pack-review-lens.md) only when Phas
 
 ### Subagent Template
 
-准备已授权的 reviewer dispatch 时读取 [Subagent Template](references/subagent-template.md)；inline 审查不因模板存在而分派。
+When preparing an authorized reviewer dispatch, read the [Subagent Template](references/subagent-template.md); inline reviews are not dispatched due to the presence of a template.
 
 ### Findings Schema
 
-构造或校验 findings envelope 前读取 [Findings Schema](references/findings-schema.json)。
+Read the [Findings Schema](references/findings-schema.json) prior to constructing or validating a findings envelope.
 
 Selected reviewer prompt assets live under `references/personas/`. Read only the prompt files selected for the current review.
 

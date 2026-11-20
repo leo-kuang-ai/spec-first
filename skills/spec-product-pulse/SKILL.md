@@ -60,7 +60,7 @@ Read `references/config.md`, `references/setup.md`, and `references/run.md` at t
 
 ### Phase 0: Route by Config State
 
-Resolve `<repo-root>` at runtime with `git rev-parse --show-toplevel` as described in `references/config.md`. 找不到仓库时只请求目标路径，不开始访谈、查询或写入。根目录已确认且配置不存在或 `pulse_product_name` 未设，才进入首次访谈；显式 setup/reconfigure/edit config 同样需要已确认的仓库。已有有效配置则运行报告。
+Resolve `<repo-root>` at runtime using `git rev-parse --show-toplevel` as described in `references/config.md`. When the repository is not found, request only the target path and skip initiation, inquiry, or writing. The root directory is verified and the configuration does not exist or `pulse_product_name` is not set, then the initial interview is triggered; explicitly running setup/reconfigure/edit config also requires a verified repository. If valid configuration exists, execute the report.
 
 The active keys include `pulse_product_name`, `pulse_lookback_default`, `pulse_primary_event`, `pulse_value_event`, `pulse_completion_events`, `pulse_quality_scoring`, `pulse_quality_dimension`, `pulse_analytics_source`, `pulse_tracing_source`, `pulse_payments_source`, `pulse_db_enabled`, `pulse_metric_sources`, `pulse_pending_metrics`, `pulse_excluded_metrics`, and `pulse_schedule`. Invalid or missing values use the defaults documented in `references/config.md`; do not guess.
 

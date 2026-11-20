@@ -2,11 +2,11 @@
 
 This optional pass is independent coverage only when a governed peer job completes with matching authorization, payload, provider, model, and result evidence. The presence of a peer CLI or runner is never enough.
 
-## 当前暂缓与重评条件
+## Current conditions for suspension and reevaluation
 
-当前保持 dormant：尚无可认证的宿主 producer 通道，不能用自填文件证明实际 provider/model 身份。`spec-code-review` 的维护 owner 负责在宿主提供可验证身份回执、或业务明确需要独立跨模型证据时重评；普通任务继续使用串行审查并披露独立覆盖缺失。
+Currently in dormant state: No authenticated host producer channel available; cannot use self-filled files to verify actual provider/model identity. The owner responsible for `spec-code-review` is in charge of re-evaluating when a verifiable identity assertion is provided by the host, or when business requirements explicitly necessitate independent cross-model evidence; for regular tasks, serial review continues with disclosure of missing independent coverage.
 
-激活前先在隔离目标验证来源认证、请求与输入 hash 绑定、实际 provider/model、回放/篡改拒绝及 cleanup，再用小范围真实任务比较新增发现与调用/协调成本。仅当这些证据支持价值时接通现有 adapter；否则继续暂缓或退役该可选路径，不以绕过第 8 项准入来制造激活结果。
+Before activation, verify the source authentication, request, and input hash binding, actual provider/model, replay/alteration rejection, and cleanup; then compare newly discovered issues with real-world task samples to evaluate call/coordination overhead. Enable the existing adapter only if the evidence supports the value; otherwise, defer or retire the optional path without creating an activation result by bypassing item 8.
 
 ## Admission gates
 

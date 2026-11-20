@@ -13,5 +13,5 @@ test('registry 对外版本标识与 loader 验证的 source 版本一致', () =
   expect(schema.properties.schema_version.const).toBe(version);
   expect(schema.$id).toBe(`https://spec-first.dev/schemas/${version}.json`);
   expect(schema.title).toBe(`spec-runtime-setup registry ${version.split('.').pop()}`);
-  expect(docs).toContain(`schema version 为 \`${version}\``);
+  expect(docs).toContain(`schema version \`${version}\``);
 });

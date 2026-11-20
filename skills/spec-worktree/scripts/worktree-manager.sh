@@ -393,8 +393,8 @@ is_env_example_file() {
   esac
 }
 
-# 调用方显式 opt in 时，将主仓库的 .env* 文件复制到 worktree，
-# 跳过文档化示例/模板，并备份已存在的目标文件。
+# When the caller explicitly opts in, copy the .env* files from the main repository to the worktree.
+# Skip documentation examples/templates and backup existing target files.
 copy_env_files() {
   local worktree_path="$1"
   local copied=0
@@ -546,7 +546,7 @@ create_worktree() {
   if git fetch --quiet origin "refs/heads/$from_branch"; then
     base_ref="refs/remotes/origin/$from_branch"
     base_oid=$(git rev-parse --verify 'FETCH_HEAD^{commit}') || return 1
-    # 自定义 fetch 映射可能不更新跟踪分支；只在其确实指向本次提交时沿用跟踪行为。
+    # Custom fetch mapping may not update tracking branches; tracking behavior is applied only when the branch indeed points to the current commit.
     if [[ $(git rev-parse --verify "$base_ref^{commit}" 2>/dev/null) != "$base_oid" ]]; then
       base_ref="$base_oid"
     fi

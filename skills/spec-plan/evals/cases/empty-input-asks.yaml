@@ -1,8 +1,6 @@
 id: empty-input-asks
-title: 空输入应先问要规划什么
-description: |
-  验证 Feature Description gate:无输入时询问"要规划什么",等待回应,
-  不得凭空推进。
+title: "Empty input should first ask what is to be planned"
+description: "Verify Feature Description gate: When no input is provided, prompt \"What would you like to plan?\" and wait for a response; do not proceed without one."
 
 input:
   prompt: |

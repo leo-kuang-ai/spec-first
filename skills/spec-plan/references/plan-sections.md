@@ -172,7 +172,7 @@ message or `docs/solutions/` if they're worth carrying forward.
 When an implementation-ready software plan is warranted, these sections are
 present. They carry the contracts downstream consumers depend on.
 
-在已有的 Goal Capsule 里用读者能核对的行为说明改什么、哪些相关行为保持不变、为什么选这个做法、用什么结果判断成功。不另设摘要，也不复述整份合同。例如：“把重发发票入口从详情页扩展到已支付订单列表；详情页照旧。复用已有发送服务，让两个入口遵循同一资格规则。验收时分别用已支付和未支付订单检查入口。”这是写法示例，不是默认产品规则。
+In the existing Goal Capsule, use reader-verifiable behavioral statements to specify what has changed, which related behaviors remain unchanged, why this approach was selected, and what success criteria will be used to determine success. No separate summary is provided, and the entire contract is not restated. For example: "Expand the 'reissue invoice' entry from the details page to the list of paid orders; the details page remains unchanged."Reuse the existing sending service, ensuring both entry points follow the same eligibility rules. During acceptance, check the entry using both paid and unpaid order entries. This is a writing example, not the default product rule.
 
 - **Goal Capsule** — objective, recommended approach, authority hierarchy,
   decision focus, verification focus, largest risk or scope boundary, stop
@@ -226,11 +226,11 @@ present. They carry the contracts downstream consumers depend on.
     paths, not an exhaustive restatement. **Omit it below ~10 units** — there
     the per-unit `Dependencies`/`Files` (and any sequencing or dependency
     diagram) already suffice, and an index would be ceremony.
-- **Verification Contract** — repo-specific commands and quality gates；在相关时
-  写明 Product Contract confirmation、largest unproven risk、proof-intent status、
-  evidence authority、source binding 与 required-proof reconciliation，同时说明
-  哪些 tests 证明计划、何时适用 `release:validate`，以及需要何种 behavioral skill
-  evaluation。避免使用泛化的 "run tests"
+- **Verification Contract** — repo-specific commands and quality gates; when applicable
+  Specify Product Contract confirmation, largest unproven risk, proof-intent status
+  evidence authority, source binding, and required-proof reconciliation
+  Which tests verify the plan, when is `release:validate` applicable, and what behavioral skills are required?
+  evaluation. Avoid using generic "run tests"
   language when the repo has concrete commands. When the goal is
   optimization-shaped (build time, latency, coverage, bundle size), express a
   measurable threshold as the exit criterion (e.g., "p95 latency < 200ms",
@@ -417,7 +417,7 @@ metadata blocks enrichment for repair. Whether a non-`active` source later
 enters execution remains the existing consumer's decision; this producer does
 not add an intake gate.
 
-当前用户明确要求补完非活跃历史计划时，按 `SKILL.md` Phase 0.1 核验并复用有效后继，或创建仅覆盖已确认剩余范围的新计划。旧计划原文、状态与旧 task-pack pins 保持不变；新计划正文记录历史来源、替代关系、当前证据和验收边界。只读审阅不触发新计划生产，历史完成声明不替代当前验证。
+When the current user explicitly requests to complete non-active historical plans, validate and reuse a valid successor according to Phase 0.1 of `SKILL.md`, or create a new plan covering only the confirmed remaining scope. The original plan text, status, and old task-pack pins remain unchanged; the new plan body records historical sources, substitution relationships, current evidence, and acceptance boundaries. Read-only review does not trigger new production plans; historical completion declarations do not supersede current validations.
 
 HTML plans do not carry `status`. Likewise, knowledge-work,
 universal-planning, answer-seeking, and approach-plan outputs do not carry

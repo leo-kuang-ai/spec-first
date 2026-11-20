@@ -1,10 +1,6 @@
 id: recommendation-only-format
-title: 推荐类请求应推荐 0-1 入口且不直接开始
-description: |
-  已初始化的 spec-first 仓库里，"第一个功能还没想好做什么"的推荐类请求应推荐
-  spec-ideate（需要 0-1 方向/选项）或 spec-brainstorm（想法已定但未决）之一；
-  recommendation-only 场景不得直接宣告进入任何 workflow（Entering）。
-  模板字段语言跟随用户语言，中文变体合法，断言不锚定英文模板词。
+title: "Recommendation requests should recommend 0-1 entry points and should not initiate directly"
+description: "In an initialized spec-first repository, requests where \"the first feature hasn't been clearly defined yet\" should be recommended either spec-ideate (for 0-1 direction/option) or spec-brainstorm (when ideas exist but are undecided); in recommendation-only scenarios, no workflow entry (Entering) should be directly declared. Template field language follows the user's language, with Chinese variants being valid, and assertions do not anchor to English template terms."
 
 input:
   prompt: |

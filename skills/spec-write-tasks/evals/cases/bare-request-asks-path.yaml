@@ -1,8 +1,6 @@
 id: bare-request-asks-path
-title: 裸拆分请求应询问源计划路径
-description: |
-  验证 Input 合同:bare task-splitting 请求必须解析到恰好一个本地源计划;
-  解析歧义时询问路径,不猜测。
+title: "A bare split request should inquire about the source plan path."
+description: "Verify Input contract: a bare task-splitting request must be parsed to exactly one local source plan; resolve ambiguities by querying the path, not by guessing."
 
 input:
   prompt: |

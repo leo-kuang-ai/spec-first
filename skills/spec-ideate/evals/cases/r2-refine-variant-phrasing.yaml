@@ -1,8 +1,6 @@
 id: r2-refine-variant-phrasing
-title: R2变体:换措辞的 refine 请求仍应路由 spec-brainstorm
-description: |
-  第二轮对抗变体:refine-vs-generate 修复面——"细节都定了,变成计划"
-  是收敛非发散,应点名 spec-brainstorm。
+title: "R2 variant: Retain the refined request and still route it to spec-brainstorm"
+description: "Second-round variant: refine-vs-generate repair phase — \"All details are finalized, turning into a plan\" represents convergence over divergence; the spec-brainstorm must be explicitly named."
 
 input:
   prompt: |

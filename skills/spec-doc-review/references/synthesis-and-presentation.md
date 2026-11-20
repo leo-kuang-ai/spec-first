@@ -195,11 +195,11 @@ Limitations:
 Review complete
 ```
 
-Omit any finding bucket with zero items, but keep every scalar envelope field so callers can parse zero counts. `fixes_applied` is always `0` under `report-only`; `producer_fix_candidates` is `0` under ordinary `markdown-write`. Non-task-pack review renders `task_pack_outcome: not-applicable` in text and `task_pack_outcome: null` in JSON. Task-pack review follows `task-pack-review-lens.md`: invalid deterministic intake yields `incomplete` without persona dispatch；completed semantic review with unresolved P0/P1 or a task-pack/source-plan blocker yields `blocked`；only valid current intake plus complete coverage and no unresolved P0/P1 yields `passed`. Set `review_status: incomplete` when both always-on reviewers produced no valid coverage and no equivalent inline review completed; do not emit a clean verdict or execution-ready implication on an incomplete review. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
+Omit any finding bucket with zero items, but keep every scalar envelope field so callers can parse zero counts. `fixes_applied` is always `0` under `report-only`; `producer_fix_candidates` is `0` under ordinary `markdown-write`. Non-task-pack review renders `task_pack_outcome: not-applicable` in text and `task_pack_outcome: null` in JSON. Task-pack review follows `task-pack-review-lens.md`: invalid deterministic intake yields `incomplete` without persona dispatch; completed semantic review with unresolved P0/P1 or a task-pack/source-plan blocker yields `blocked`; only valid current intake plus complete coverage and no unresolved P0/P1 yields `passed`. Set `review_status: incomplete` when both always-on reviewers produced no valid coverage and no equivalent inline review completed; do not emit a clean verdict or execution-ready implication on an incomplete review. When a root has dependents, render the root at its normal position in the severity-sorted list and nest its dependents as an indented `Dependents (...)` sub-block immediately below. End with "Review complete" as the terminal signal.
 
 ### JSON Rendering
 
-当 `output_mode: json` 时，输出必须是一个可直接解析的 JSON object：不加 Markdown fence，不加对象前后的 prose，不把 enum、count 或 finding 压成一段自由文本。该单对象合同覆盖普通 text mode 的 cost-shape、reviewer announcement、进度公告和对象外 `Review complete` 终止文本；这些事实分别进入结构化 `coverage`、`limitations` 与 `terminal_signal`。复用上面的 envelope 语义，不创建新的 receipt、sealed input 或 authorization schema。
+When `output_mode: json`, the output must be a JSON object that can be directly parsed: no Markdown fence, no surrounding prose, and no conversion of enum, count, or finding into free-form text. This single-object contract covers the cost-shape, reviewer announcement, progress announcement, and external object `Review complete` termination text in standard text mode; these facts are respectively entered into the structured `coverage`, `limitations`, and `terminal_signal`. Reuse the envelope semantics defined above, without creating new receipt, sealed input, or authorization schema.
 
 ```json
 {
@@ -230,7 +230,7 @@ Omit any finding bucket with zero items, but keep every scalar envelope field so
 }
 ```
 
-`document_type: task-pack` 时，将 `task_pack_outcome: null` 替换为以下对象；这只是当前 review envelope 的一部分，不创建第二份 receipt、durable state 或 authorization schema：
+When `document_type: task-pack`, replace `task_pack_outcome: null` with the following object; this is only part of the current review envelope and does not create a second receipt, durable state, or authorization schema:
 
 ```json
 {
@@ -243,7 +243,7 @@ Omit any finding bucket with zero items, but keep every scalar envelope field so
 }
 ```
 
-JSON 中每个 finding 保留 severity、section、title、reviewer、confidence、why_it_matters、suggested_fix 与 dependency/root 信息（存在时）。`fixes_applied` 始终是本次实际应用数量，`applied_fixes` 保存与 text envelope 相同的 section/change/reviewer 摘要：`report-only` 下必须分别为 `0` 与 `[]`，普通 `markdown-write` + `output:json` 则报告实际 `N` 与对应明细。`coverage` 同时保留 selected/skipped personas、cost shape、isolation 与 reviewer outcomes；confidence-100 `safe_auto` 在 `report-only` 下只进入 `producer_fix_candidates`；不得因 JSON 输出而获得 producer write authority。普通 `output_mode: text` 继续使用现有 Markdown/text envelope，默认行为不变。
+In JSON, each finding retains severity, section, title, reviewer, confidence, why_it_matters, suggested_fix, and dependency/root information (if present). `fixes_applied` always represents the actual number of fixes applied; `applied_fixes` stores a summary of the same section/change/reviewer format as the text envelope: in `report-only` mode, both must be `0` and `[]` respectively; under normal `markdown-write` + `output:json` mode, it reports the actual count `N` along with the corresponding details. `coverage` retains selected/skipped personas, cost shape, isolation, and reviewer outcomes; confidence-100 `safe_auto` enters `producer_fix_candidates` only in `report-only` mode; no producer write authority is granted due to JSON output. Normal `output_mode: text` continues to use the existing Markdown/text envelope, retaining the default behavior.
 
 **Compact rendering for FYI observations, residual concerns, and deferred questions (high-count mode).** When the combined count of these three buckets is 5 or more, collapse each to a one-line count followed by a tight bullet list without per-item `Why` expansion.
 

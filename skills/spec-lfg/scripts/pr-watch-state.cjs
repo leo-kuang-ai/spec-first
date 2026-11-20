@@ -144,11 +144,11 @@ function normalize(input) {
     completed_at: identityText(check.completed_at),
     details_url: normalizePrUrl(check.details_url),
   })).sort((a, b) => a.key.localeCompare(b.key));
-  // review item 的 id 是不透明源身份(REST 数字或 GraphQL base64 节点 id,后者可含
-  // '+'/'='),仅用于等值/去重与回显输出,不进 shell。旧版静默过滤非法 id、把非法
-  // kind 改写为 comment,会让 open review 无声退出观测(lane finding DR-003);现在
-  // 对缺失/超长/含空白的 id 与缺失/非法 kind 一律拒绝快照,与 checks 的 fail-closed
-  // 风格对齐。空/未知输入不能证明没有反馈残留,宁可拒绝也不静默收窄 open 集。
+  // The review item's ID is a opaque source identity (REST numeric or GraphQL base64 node ID; the latter may contain)
+  // '+'/'='), used only for equality comparison, deduplication, and output echoing; does not enter shell. Old version silently filters illegal IDs, filters illegal
+  // Changing kind to comment will cause open review to silently exit observation (lane finding DR-003); currently
+  // Reject snapshots for missing/overlong/blank IDs and for missing/invalid kind, following fail-closed behavior as with checks
+  // Style alignment. Empty/unknown inputs cannot prove the absence of feedback residue; prefer rejection over silent narrowing of the open set.
   const reviewItems = (Array.isArray(input.review_items) ? input.review_items : [])
     .map((item) => {
       if (!item || typeof item !== 'object') fail('snapshot-invalid', ['review item must be an object']);
@@ -222,8 +222,8 @@ function readDecisionArtifact(ref) {
     inspectPrivateFile(ref.path);
     raw = fs.readFileSync(ref.path, 'utf8');
   } catch (error) {
-    // 引用工件被删除或不可读（private-scratch 清理、会话重启、tmp 清空）是可预期输入，
-    // 必须走结构化 decision 拒绝，而不是裸 ENOENT 堆栈使 watch 循环不可解析。
+    // Citation of workpiece being deleted or unreadable (private-scratch cleanup, session restart, tmp clearing) is an expected input scenario.
+    // Must use structured decision rejection instead of bare ENOENT stack to make the watch loop unparseable.
     decisionError(`decision artifact missing or unreadable: ${error.code || error.message}`);
   }
   if (sha256(raw) !== ref.sha256) decisionError('artifact hash mismatch');

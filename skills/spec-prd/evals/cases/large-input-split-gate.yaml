@@ -1,10 +1,6 @@
 id: large-input-split-gate
-title: 超大输入应停在拆分确认请求或 checkpoint,不得未经确认产出拆分产物或 final PRD
-description: |
-  验证 oversized 触发面:多模块、多来源、含冲突与重复的整包需求输入,
-  按 SKILL.md Intake split posture 与 assets/templates/70-large-requirement-index.md
-  前置条件,必须在当前执行对话用户确认拆分边界前停在确认请求或 checkpoint-prd
-  恢复形态;不得未经确认创建拆分总索引/子 PRD,不得声称 ready-for-planning。
+title: "Large inputs should be halted at split confirmation requests or checkpoint; no split products or final PRD should be produced without prior confirmation."
+description: "Verify oversized triggering faces: multi-module, multi-source, including conflicting and duplicate full-package requirement inputs. Following the SKILL.md Intake split posture and assets/templates/70-large-requirement-index.md prerequisites, a split boundary confirmation must be obtained from the currently executing dialog user prior to proceeding; no split master index/sub PRD shall be created without confirmation, and no claim of ready-for-planning shall be made."
 input:
   prompt: |
     （spec-prd skill 已安装，请按它工作。）

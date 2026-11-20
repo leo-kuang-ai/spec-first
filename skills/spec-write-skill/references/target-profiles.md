@@ -1,16 +1,16 @@
 # Target Profiles
 
-仅当目标宿主 metadata、invocation 或 packaging 会改变交付时读取。Target profile 是带来源和限制的条件事实，不是 portable contract。
+Read only when the target host's metadata, invocation, or packaging will change the delivery. Target profile is a conditional fact accompanied by source and constraints, not a portable contract.
 
 ## Open Agent Skills Portable Floor
 
-- Package root 包含 `SKILL.md`。
-- Frontmatter 至少有 `name` 和 `description`。
-- `name` 使用 kebab-case；description 表达触发意图和近邻边界。
-- Runtime 依赖只来自被明确引用的 package resources。
-- 未知 extension fields 默认保留并报告；没有 target evidence 时不擅自删除。
+- Package root contains `SKILL.md`.
+- Frontmatter must include at least `name` and `description`.
+- `name` uses kebab-case; description expresses the intended trigger and neighboring boundaries.
+- Runtime dependencies come only from package resources that are explicitly referenced.
+- Unknown extension fields are retained and reported by default; they are not deleted without target evidence.
 
-Portable validator 只能检查本 Skill 声明支持的 YAML subset。合法但未支持的 YAML 返回 `incomplete`，不能误报 invalid。
+The portable validator can only verify a subset of YAML supported by the current Skill's declaration. Legal but unsupported YAML returns `incomplete`, without falsely reporting as invalid.
 
 ## Codex Profile
 
@@ -21,38 +21,38 @@ Evidence record:
 - local_source: `skills/spec-write-skill/agents/openai.yaml`
 - checked_at: 2026-07-12
 - verification: `npx jest --runTestsByPath tests/unit/spec-write-skill-contracts.test.js tests/unit/plugin-modules.test.js tests/smoke/cli-smoke.test.js --runInBand`
-- limitations: 当前只确认 project package 的 Codex-facing sidecar 和 implicit invocation policy，不把该字段外推为其他宿主标准或 execution sandbox。
-- invalidation_condition: Codex 官方 metadata schema、sidecar path、policy key 或 runtime projection 行为变化时重新核对并降级旧事实。
+- limitations: Currently only confirms the Codex-facing sidecar and implicit invocation policy for project package; this field is not extended to other host standards or execution sandbox implementations.
+- invalidation_condition: Revalidate and downgrade previous facts when changes occur in Codex official metadata schema, sidecar path, policy key, or runtime projection behavior.
 
-Confirmed source 表明 project packages 可提供 `agents/openai.yaml` 作为 Codex-facing metadata。`spec-write-skill` 自身使用：
+Confirmed source indicates that project packages can provide `agents/openai.yaml` as Codex-facing metadata. `spec-write-skill` Self usage:
 
 ```yaml
 policy:
   allow_implicit_invocation: false
 ```
 
-该字段只限制 invocation，不等于 execution safety。涉及 shell、network、secret、外发或不可逆动作时，仍需在 Skill contract 中定义最小权限、允许范围、确认点和失败行为。
+This field only restricts invocation, not equal to execution safety. When involving shell, network, secret, outbound transmission, or irreversible actions, minimum privileges, allowed scopes, confirmation points, and failure behaviors must still be defined in the Skill contract.
 
 ## Other Targets
 
-Claude、Cursor、Kiro、Qoder 或其他宿主只有在当前项目 source、官方文档或实际 packaging 结果提供 direct evidence 时才增加 delta。没有 confirmed delta 时：
+Claude, Cursor, Kiro, Qoder, or other hosts will only add delta when direct evidence is provided in the current project source, official documentation, or the actual packaging result. When there is no confirmed delta:
 
-- 保持单一 portable package；
-- 报告 target readiness `degraded`；
-- 不把 Codex metadata 翻译或激活为其他宿主的等价配置；package 即使携带该 sidecar，非 Codex consumer 也只忽略它；
-- 不发明 adapter、projection engine 或目标专属 sidecar。
+- Maintain a single portable package;
+- Report target readiness as `degraded`;
+- Does not translate or activate Codex metadata into equivalent configurations for other hosts; the package is ignored by non-Codex consumers even if it carries the sidecar.
+- Do not invent adapter, projection engine, or target-specific sidecar.
 
 ## Profile Evidence
 
-新增 target rule 时记录：target、source URL/path、checked_at、影响字段/文件、验证命令、limitations、失效条件。过期或无法回源的事实降级为 advisory。
+Record the following when adding a target rule: target, source URL/path, checked_at, affected fields/files, verification command, limitations, and failure conditions. Expired or unresolvable sources are downgraded to advisory.
 
 ## Target Payload Smoke
 
-只在 direct target evidence 已命中且临时 payload 已由宿主/target staging owner 准备后，调用 bundled `inspect-context.cjs` 的 target payload smoke：
+Call the bundled `inspect-context.cjs` target payload smoke only after direct target evidence has matched and the temporary payload has been prepared by the host/target staging owner:
 
 ```bash
 node "$SKILL_DIR/scripts/inspect-context.cjs" --payload-smoke <temporary-payload-dir> \
   --runtime-file-set <run-local-runtime-file-set.json> --json
 ```
 
-它不创建、复制或执行 payload：run-local `runtime_file_set` 必须逐项声明 path、consumer 和 source-derived `expected_sha256`（`SKILL.md` reference、selected runtime script/asset、target sidecar 或 metadata），并与实际 payload 双向闭包。payload 缺声明 runtime reference、包含 `evals/`、`reports/`、repo-local docs 或 secret-like paths，或 metadata/runtime file drift 时 target readiness 为 `not-ready`；动态依赖无法静态声明时为 `degraded`。真实 invocation/init/publish 或 target-provided validator 仍需单独授权和 evidence，不能由 smoke 推断其他 host feature parity。
+It does not create, copy, or execute payload: the `runtime_file_set` must explicitly declare path, consumer, and source-derived `expected_sha256` (reference to `SKILL.md`, selected runtime script/asset, target sidecar, or metadata), and must maintain a bidirectional closure with the actual payload. target readiness is `not-ready` when payload lacks declaration of runtime reference, contains `evals/`, `reports/`, repository-local documentation, or secret-like paths, or when there is drift in metadata/runtime files; it is `degraded` when dynamic dependencies cannot be statically declared. True invocation/init/publish or target-provided validator still requires separate authorization and evidence; smoke cannot infer host feature parity on other hosts.

@@ -62,7 +62,7 @@ function verifiedNpmExecution({ context, repoRoot, identity = {}, command, args,
         || manifests[0].filename !== archives[0] || manifests[0].integrity !== integrity) {
         throw new Error('npm-archive-identity-mismatch');
       }
-      // 执行刚校验的归档，不能再次按名称解析另一份包。
+      // Execute the archived validation, and cannot perform name-based parsing of another package.
       const launched = executeInstall(command, args.map((arg) => arg === spec ? `file:${archive}` : arg), { cwd: repoRoot, timeoutMs: 120000 });
       operations.push(launched);
       result = {

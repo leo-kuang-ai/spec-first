@@ -152,8 +152,8 @@ function normalizeSpec(spec) {
     comparison,
     ladder: spec.ladder ?? stability.ladder ?? {},
     stability_mode: spec.stability_mode ?? stability.mode,
-    // aggregation 的唯一校验点：非法原始值在此显式拒绝（stability 已含 measurement.stability 链），
-    // configuredAggregation 只负责把缺省归一为 median，不再静默改写非法值。
+    // The only validation point for aggregation: explicitly reject invalid raw values (stability is already included in the measurement.stability chain)
+    // configuredAggregation is responsible only for defaulting to median, no longer silently rewriting invalid values.
     aggregation: (() => {
       const rawAggregation = spec.aggregation
         ?? spec.stability?.aggregation
@@ -602,7 +602,7 @@ function decide(input) {
     }
   }
 
-  // 复用同一比较 owner，holdout 不选择候选，也不放宽配对、gate 或噪声规则。
+  // Reuse the same comparison owner; do not select candidates, nor relax pairing, gate, or noise rules for holdout.
   const pair = input.holdout
   const count = spec.stability_mode === "ladder" || spec.ladder.enabled
     ? (spec.ladder.confirmation_repeats ?? spec.repeat_count ?? 5)

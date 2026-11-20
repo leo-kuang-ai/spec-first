@@ -13,18 +13,18 @@ assert.equal(regular('STRATEGY.md').toString(), original.replace('Old approach.'
     options: { allowNewDocs: true }, trace: true,
     body: `
 const report = finalObject();
-// state 枚举对齐 SKILL.md 合同词表：confirmed-value（原 'ok' 不在合同中）。
+// state enumeration aligns with SKILL.md contract dictionary: confirmed-value (originally 'ok' is not in the contract).
 assert.deepEqual(report.metrics.map(({name, source, state, value}) => ({name, source, state, value})), [
   { name: 'revenue', source: 'payments-export', state: 'confirmed-value', value: 1200 },
   { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
 ]);
 assert.ok(!report.metrics.some((m) => m.state === 'confirmed-zero'));
-// A21：模型在引擎临时根下可能上报绝对路径（报告落位本身正确）。合同要求
-// 的是报告存在于 docs/pulse-reports/，不是上报字符串形式；归一化到 fixture
-// 相对形式再比对。codex 二审 P2：path.resolve 是词法归一化，pivot/.. 或
-// /var→/private/var symlink 都会错配——原始串含 .. 一律拒绝；两侧 realpath
-// 对称解析后 containment 按真实路径判定（外部 symlink 解析后不落 fixture 内，
-// relative 产生 .. 前缀被 startsWith 拒绝）。
+// A21: The model may report absolute paths under the engine's temporary root (correctly reporting the actual location). Contract requirements
+// It is the report existing in docs/pulse-reports/, not a string-formatted report; normalized to fixture
+// Relative form comparison. codex round two review P2: path.resolve performs lexical normalization, e.g., pivot/.. or
+// /var → /private/var symlinks will both misbehave—reject any original path containing ".."; resolve both sides with realpath
+// After symmetric analysis, containment is determined by actual path (external symlink resolution does not land inside fixture).
+// relative generates .. prefix is rejected by startsWith).
 assert.ok(!report.artifact_path.includes('..'), 'artifact_path must not traverse directories');
 const artifactPath = path.relative(fs.realpathSync(process.cwd()), fs.realpathSync(path.resolve(report.artifact_path)));
 assert.ok(artifactPath.startsWith('docs/pulse-reports/'));
@@ -48,8 +48,8 @@ assert.ok(!fs.existsSync('.spec-first'), 'Local-only request created preference 
 rejectRecordedRemoteWrites();
 const trace = JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'));
 for (const entry of trace.filter((item) => item.role === 'tool_call')) {
-  // 只按调用意图判 attempt：工具名，或执行类工具（bash/exec/shell/run 等）的命令文本。
-  // 读取 skill 自带 references/scripts（路径含 spiral 等词）是合法尽调，不算 attempt。
+  // Only judge by invocation intent: tool name, or command text of executable tool (e.g., bash/exec/shell/run, etc.).
+  // Reading skill's built-in references/scripts (paths containing "spiral" etc.) constitutes due diligence and does not count as an attempt.
   const call = entry.tool_call || {};
   const isExecution = /bash|exec|shell|spawn|terminal|run[_-]?command|command/i.test(call.name || '');
   const intent = (call.name || '') + (isExecution ? ' ' + JSON.stringify(call.arguments || {}) : '');

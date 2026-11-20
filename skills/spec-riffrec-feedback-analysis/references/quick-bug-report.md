@@ -1,6 +1,6 @@
 # Quick bug report path
 
-Use this path when the input is a short recording (under ~60 seconds), the user describes a single specific issue, or the user explicitly asks for "quick", "small", or "simple". The goal is one concise bug report, not a multi-artifact requirements package. 用户只要逐字稿时返回入口的仅转写分支。
+Use this path when the input is a short recording (under ~60 seconds), the user describes a single specific issue, or the user explicitly asks for "quick", "small", or "simple". The goal is to provide a concise bug report, not a multi-part requirements package. When returning the transcript, only the entry-point transcription branch should be returned.
 
 ## Workflow
 

@@ -160,7 +160,7 @@ If the current classification is **Lightweight** and Phase 1 research found that
 - Shared types or interfaces imported by downstream consumers
 - Documentation referenced by external URLs or linked from other systems
 
-This ensures flow analysis (Phase 1.5) runs and the confidence check (Phase 5.3) applies critical-section bonuses. 简要说明重分类依据：“调整为 Standard——本次变更触及［公开 API／CLI 参数／CI 配置等已确认的契约面］。”消费者情况按现有证据记录；未知不等于不存在，不以已发现消费者作为公开契约变更的额外前提。
+This ensures that flow analysis (Phase 1.5) executes and the confidence check (Phase 5.3) applies critical-section bonuses. Brief rationale for reclassification: "Adjusted to Standard—this change impacts [public API/CLI parameters/CI configuration, etc., already confirmed contractual interfaces]."Consumer situation shall be recorded based on existing evidence; unknown does not imply non-existence, and the discovery of consumers shall not be regarded as an additional precondition for altering public contracts.
 
 #### 1.4c Trace Decision-Critical Existing Behavior
 

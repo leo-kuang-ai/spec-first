@@ -218,16 +218,16 @@ If agent outputs conflict:
 
 Skip this step in auto mode — proceed directly to 5.3.7.
 
-交互审阅按用户需要决定的问题组织，而不是按专家的返回顺序组织。对同一决定，把建议并列，写清可选做法、各自代价、依据和来源，以及采纳后哪段方案会改变。意见相反时保留分歧；不同建议分别可选，不把接受一项当作接受整组。
+The interaction review is organized by issues as needed by users, rather than by the order of expert responses. For the same decision, present recommendations in parallel, clearly specifying available options, associated costs, rationale, and sources, as well as which option would lead to a change in the final outcome. Disagree when opinions differ; keep options separate and do not consider accepting one as accepting the entire set.
 
-对每项需要用户裁决的建议使用 Interaction Method：
+For each recommendation requiring user approval, use Interaction Method:
    - **Accept** — integrate these findings into the plan
    - **Reject** — discard these findings entirely
    - **Discuss** — the user wants to talk through the findings before deciding
 
 If the user chooses "Discuss", engage in brief dialogue about the findings and then re-ask with only accept/reject (no discuss option on the second ask). The user makes a deliberate choice either way.
 
-仅将已接受的具体建议带入 5.3.7。
+Only bring the specifically recommended suggestions that have been accepted into 5.3.7.
 
 If the user accepted no findings, report "No findings accepted — plan unchanged." Then proceed directly to Phase 5.4 (skip document-review and synthesis — the plan was not modified). This interactive-mode-only skip does not apply in auto mode; auto mode always proceeds through 5.3.7 and 5.3.8. No explicit scratch cleanup needed — `$SCRATCH_DIR` is OS temp and will be cleaned up by the OS; leaving it in place preserves the rejected agent artifacts for debugging.
 

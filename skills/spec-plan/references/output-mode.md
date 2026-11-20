@@ -27,7 +27,7 @@ Resolution steps:
 - When `OUTPUT_FORMAT=md`, read `references/markdown-rendering.md` for format principles.
 - When `OUTPUT_FORMAT=html`, read `references/html-rendering.md` for format principles.
 
-当前用户明确授权自主完成规划、写入或续跑，且 WHAT 已闭合时，视为本轮跳过重复范围确认的自然语言指令；无需用户记住 `confirm:auto`。较新的逐阶段确认要求优先。该授权只涵盖任务执行，不授予未知产品决定的权威；真实产品阻塞仍返回其 owner，不得写成已确认事实。
+Current user explicitly authorizes autonomous planning, writing, or continuation, and WHAT has been closed; in this case, the natural language instruction to skip the range confirmation is considered naturally implied; no need for the user to remember `confirm:auto`. New stage-wise confirmations take precedence. This authorization covers only task execution and does not grant authority to make decisions on unknown products; actual product blocking remains assigned to its owner and must not be treated as a confirmed fact.
 
 **Resolve the scoping-confirmation setting.** Resolve immediate prompt and contextual signals first; defer configuration/defaults until the scoping gate actually needs them. Before that gate fires, determine `SKIP_SCOPING_CONFIRM` (boolean, default `false`). `references/intake.md` owns the skip's scope at Phase 0.7; `references/final-review.md` applies the same boundary at Phase 5.1.5. Product blockers remain blocking. Precedence mirrors output mode:
 

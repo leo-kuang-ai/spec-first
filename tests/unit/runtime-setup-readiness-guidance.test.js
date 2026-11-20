@@ -11,21 +11,21 @@ describe('Runtime Setup readiness handoff guidance', () => {
     const skill = fs.readFileSync(skillPath, 'utf8');
     const handoff = skill.split('### Readiness Handoff')[1] || '';
 
-    expect(handoff).toContain('请基于当前项目处理这个任务：<描述你的需求或问题>。');
+    expect(handoff).toContain('Give a localized, copy-ready equivalent');
     expect(handoff).toContain('Please handle this task based on the current project: <describe your requirement or problem>.');
-    expect(handoff).toContain('最多 3 行非空输出');
-    expect(handoff).toContain('only when the full setup outcome is ready');
+    expect(handoff).toContain("at most three nonblank lines in the user's language");
+    expect(handoff).toContain('only when setup, every required dependency, and the generated runtime manifest are ready');
   });
 
   test('keeps every non-ready outcome in the repair and rerun loop', () => {
     const skill = fs.readFileSync(skillPath, 'utf8');
     const handoff = skill.split('### Readiness Handoff')[1] || '';
 
-    expect(handoff).toContain('action-required、degraded、failed');
-    expect(handoff).toContain('不得展示上述首次任务模板');
-    expect(handoff).toContain('执行报告的 next action 后重新运行 `spec-runtime-setup`');
-    expect(handoff).toContain('direct source evidence fallback');
-    expect(handoff).toContain('不得把完整 setup 报告为 ready');
-    expect(handoff).toContain('不得把 `spec-first doctor` 或额外 `--verify-only` 作为正常 ready 路径的第二道验证');
+    expect(handoff).toContain('action-required, degraded, failed');
+    expect(handoff).toContain('Do not display the above initial task template');
+    expect(handoff).toContain('rerun `spec-runtime-setup` after performing the next action in the report');
+    expect(handoff).toContain('Direct source evidence fallback');
+    expect(handoff).toContain('nor does it permit the complete setup to be reported as ready');
+    expect(handoff).toContain('Do not use `spec-first doctor` or additional `--verify-only` as the second verification in a normal ready path');
   });
 });

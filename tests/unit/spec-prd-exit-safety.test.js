@@ -188,19 +188,21 @@ describe('spec-prd Phase 1 exit safety', () => {
     expect(receipt.blocking_reason_codes).toContain('requirement_acceptance_trace_missing');
   });
 
-  test('localized core heading remains legal when it carries the canonical section id', () => {
-    const text = readyIntentPrd().replace(
-      '## Summary',
-      '<!-- prd:section=summary -->\n## 需求概述',
-    );
-    const receipt = buildFinalizeReceipt(
+  test('中文首屏摘要保留章节身份；漏写身份仍不能签收', () => {
+    const template = fs.readFileSync('skills/spec-prd/assets/templates/00-generic.md', 'utf8');
+    const firstSection = template.match(/^<!-- prd:section=summary -->\n## ([^\n]+?) \[core\]$/m);
+    expect(firstSection?.[1]).toBe('Summary');
+    expect(template.indexOf('\n## ')).toBe(template.indexOf(`\n## ${firstSection[1]}`));
+    const checkHeading = (heading) => buildFinalizeReceipt(
       'docs/brainstorms/phase1-exit-safety-requirements.md',
-      text,
+      readyIntentPrd().replace('## Summary', heading),
       [],
       { checkOnly: true },
     );
-
-    expect(receipt.blocking_reason_codes).not.toContain('core_section_missing');
+    const localized = '## 需求概述';
+    expect(checkHeading(`<!-- prd:section=summary -->\n${localized}`).blocking_reason_codes)
+      .toEqual(checkHeading('## Summary').blocking_reason_codes);
+    expect(checkHeading(localized).blocking_reason_codes).toContain('core_section_missing');
   });
 
   test('validate contract is report-only and never falls through to rewritten PRD output', () => {

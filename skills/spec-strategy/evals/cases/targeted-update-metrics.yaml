@@ -1,9 +1,6 @@
 id: targeted-update-metrics
-title: 指定 section 应定向重访该 section 并保留其余
-description: |
-  验证 Phase 0 第二分支 + Phase 2:参数命名 metrics 时跳到该 section 重新面试
-  (带 pushback),其他 section 不动;单轮正确形态是宣告 found + 定向提问。
-  section 名允许中英变体(指标/metrics),定向性由 transcript 核验。
+title: "The specified section shall be revisited specifically for that section and the rest shall be retained."
+description: "Verify Phase 0 Branch 2 + Phase 2: parameter naming metrics by redirecting to this section for re-interview (with pushback); leave other sections unchanged; the correct single-round flow is to announce \"found\" + follow-up targeted questions. Section names allow Chinese-English variants (e.g., metrics/indicators); targeting is validated by transcript."
 
 input:
   prompt: |

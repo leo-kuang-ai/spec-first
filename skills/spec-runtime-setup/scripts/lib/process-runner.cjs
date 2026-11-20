@@ -183,7 +183,7 @@ function terminateProcessTree(child, options = {}) {
       try {
         child.kill('SIGKILL');
       } catch (_ignored) {
-        // 进程可能已经退出。
+        // The process may have already exited.
       }
     }
     return withTerminationCompletion(facts, Promise.resolve());
@@ -214,7 +214,7 @@ function terminateProcessTree(child, options = {}) {
         try {
           child.kill('SIGKILL');
         } catch (_ignored) {
-          // 进程可能已经退出。
+          // The process may have already exited.
         }
       }
 
@@ -400,7 +400,7 @@ function runProcessSync(options = {}) {
     try {
       return JSON.parse(worker.stdout);
     } catch (_error) {
-      // 继续落入结构化 runner failure。
+      // Continues to fall into structured runner failure.
     }
   }
   const envOverlay = options.env && typeof options.env === 'object' ? options.env : {};

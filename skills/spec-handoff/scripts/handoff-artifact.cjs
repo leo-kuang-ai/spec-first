@@ -264,8 +264,8 @@ function discoverArtifacts({ targetRepo, workspaceSlug, sourceDir, keywords, lim
     : path.join(root, '.spec-first', 'workflows', 'spec-handoff', slugify(workspaceSlug || path.basename(root), 'workspace'));
   const containmentRoot = sourceDir ? outputRoot : root;
   if (sourceDir) {
-    // 不存在的 --source-dir（拼写错误/已被清理）与 symlink/非目录一样按
-    // source-directory-structured 拒绝，而不是裸 ENOENT 被兜底 catch 掩盖为通用错误。
+    // Non-existent --source-dir (spelling error/already cleaned) behaves like a symlink/non-directory
+    // source-directory-structured rejects ENOENT instead of swallowing it, and does not catch it as a generic error.
     let stat = null;
     try {
       stat = fs.lstatSync(outputRoot);

@@ -11,7 +11,7 @@ const skill = fs.readFileSync(
 describe('spec-debug current safety contracts', () => {
   test('按运行时栈格式定位抛出位置，不假设栈底就是症状', () => {
     const trace = skill.split('#### 1.3 Trace the code path')[1].split('#### 1.4')[0];
-    expect(trace).toMatch(/运行时.*抛出位置/);
+    expect(trace).toMatch(/runtime.*throw site/);
     expect(trace).not.toContain('The bottom frame is the symptom');
   });
 

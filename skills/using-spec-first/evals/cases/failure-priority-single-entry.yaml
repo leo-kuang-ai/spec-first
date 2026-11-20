@@ -1,9 +1,6 @@
 id: failure-priority-single-entry
-title: 复合意图按失败优先且只选一个入口
-description: |
-  验证路由优先级规则：请求同时包含失败信号（崩溃）与后续质量诉求（简化）时，
-  按 readiness/failure/review 优先选择 spec-debug，且不自动链式选择简化 workflow。
-  沙箱允许 recommend-and-wait 降级；断言锚定入口名与排除项，宣告格式中英变体均合法。
+title: "Composite intent selects one entry only, with failure prioritized."
+description: "Validate routing priority rules: when a request simultaneously contains a failure signal (crash) and a subsequent quality request (simplification), prefer spec-debug based on readiness/failure/review order, and do not automatically chain-select the simplification workflow. Sandbox allows degradation to recommend-and-wait; assert entry name anchoring and exclusion items, declaring both English and Chinese variants of the announcement format as valid."
 
 input:
   prompt: |

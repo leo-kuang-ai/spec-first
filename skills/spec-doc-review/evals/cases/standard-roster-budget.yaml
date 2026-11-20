@@ -1,9 +1,6 @@
 id: standard-roster-budget
-title: standard 预算 ≤3 且 security 信号优先选中 security-lens
-description: |
-  验证 roster 预算合同:默认 standard(coherence + feasibility + ≤1 conditional);
-  文档含 token/credential 信号时唯一 conditional 应为 security-lens(第一优先),
-  并输出 advisory cost-shape 行(profile=standard)。
+title: "standard budget ≤ 3 and security signal prioritized if selected: security-lens"
+description: "Verify roster budget contract: default standard (coherence + feasibility + ≤1 conditional); when document contains token/credential signals, the sole conditional must be security-lens (highest priority), and output advisory cost-shape entry (profile=standard)."
 
 input:
   prompt: |

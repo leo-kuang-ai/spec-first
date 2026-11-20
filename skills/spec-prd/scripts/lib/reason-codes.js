@@ -1,19 +1,19 @@
 'use strict';
 
-// spec-prd readiness 阻断分类法的单一真相源。
-// check-prd-artifact.js 与 finalize-prd-artifact.js 共同消费本模块,
-// 消除"什么是 blocker / receipt-only / checkpoint-exempt"语义横跨两模块的双归属
-// 与 closure-blocker 子集内联数组的漂移风险。
+// spec-prd readiness single truth source for blocking classification.
+// check-prd-artifact.js and finalize-prd-artifact.js both consume this module.
+// Eliminate the semantic cross-module ownership of "what is a blocker / receipt-only / checkpoint-exempt"
+// Drift risk of inlined array within the closure-blocker subset.
 //
-// 边界:本模块只管 reason-code 的分类(哪些码属于哪个子集),不管谁 emit。
-// finalize_required 属于 BLOCKING 但只由 finalize emit(ready-intent 缺失类),
-// 不属于任何功能子集;LEGAL_DISPOSITIONS 等 closure-disposition 词分类是 OQ 剃刀概念,
-// 不属本模块,保留在 check-prd-artifact.js。
+// Boundary: This module only handles classification of reason-code (which codes belong to which subset), and does not concern itself with who emits them.
+// finalize_required belongs to BLOCKING but is only triggered by finalize emit (when ready-intent is missing).
+// Not part of any functional subset; LEGAL_DISPOSITIONS and similar closure-disposition terms belong to the OQ Razor concept.
+// Not within this module; retained in check-prd-artifact.js.
 
-// 全部阻断码(可执行真相)。prose 复述由 spec-prd-reason-code-parity 闸锁定 missing 方向;
-// 整集 freeze 由 spec-prd-finalize.test.js 锁定。增删码须同步 prose 与 freeze 测试。
+// All block codes (executable truth). Prose reiterates the missing direction locked by the spec-prd-reason-code-parity gate;
+// The entire set of freeze is locked by spec-prd-finalize.test.js. Addition and deletion of codes must be synchronized with prose and freeze testing.
 const BLOCKING_REASON_CODES = new Set([
-  // 基础结构 / 声明类
+  // Base Structure / Declaration Class
   'machine_section_identity_missing',
   'core_section_missing',
   'requirements_row_missing',
@@ -39,7 +39,7 @@ const BLOCKING_REASON_CODES = new Set([
   'ready_receipt_absent',
   'ready_receipt_stale',
   'finalize_required',
-  // 004 closure-contract:剃刀与 closure 矛盾类 blocker(只在 artifact 自称 ready/final 时生效)
+  // 004 closure-contract: Razor and closure contradiction class blocker (effective only when artifact declares itself ready/final)
   'outstanding_question_closure_undeclared',
   'blocking_outstanding_question_present',
   'planning_invention_question_present',
@@ -53,11 +53,11 @@ const BLOCKING_REASON_CODES = new Set([
   'checkpoint_claims_ready',
 ]);
 
-// closure 矛盾类子集:用于检测 preflight_sweep_closure=closed 却仍有 closure blocker
-// 的自相矛盾(触发 preflight_closure_contradicted)。这是 BLOCKING 的明确子集,
-// 取代 check-prd-artifact.js 原 :1057-1062 的内联 8 码数组。
-// 注意:不含 preflight_closure_contradicted 自身、outstanding_question_closure_undeclared
-// (declaration 类)与 checkpoint_claims_ready(矛盾信号类),与前述内联数组行为一致。
+// closure contradiction subset: used to detect preflight_sweep_closure=closed yet still having a closure blocker
+// self-contradictory (triggers preflight_closure_contradicted)This is a clear subset of BLOCKING.
+// Replace the inline 8-byte array at original:1057-1062 in check-prd-artifact.js.
+// Note: Excludes preflight_closure_contradicted itself, outstanding_question_closure_undeclared
+// (declaration class) and checkpoint_claims_ready (contradiction signal class) behave consistently with the aforementioned inline array behavior.
 const CLOSURE_BLOCKER_REASON_CODES = new Set([
   'open_oq_without_owner_closure',
   'how_pushdown_touches_what',
@@ -69,15 +69,15 @@ const CLOSURE_BLOCKER_REASON_CODES = new Set([
   'design_partial_coverage_unaccepted',
 ]);
 
-// receipt-only 子集:ready_receipt_absent / ready_receipt_stale 只在 artifact 自称 ready
-// 时才需确证;一个还没 ready 的 checkpoint 允许这两码存在而不阻断 closeout。
+// receipt-only subset: ready_receipt_absent / ready_receipt_stale — artifact claims only that it is ready
+// Only when ready should it be verified; a checkpoint that is not yet ready allows these two codes to coexist without blocking closeout.
 const RECEIPT_ONLY_REASONS = new Set([
   'ready_receipt_absent',
   'ready_receipt_stale',
 ]);
 
-// checkpoint closeout 额外豁免:input-side 核算信号只在 PRD 自称 ready 时才需确证;
-// 一个还没 ready 的 checkpoint 允许 input 扫描降级(仍在 grill 未读全 inputs)。
+// checkpoint closeout additional exemption: input-side accounting signal needs confirmation only when PRD declares ready;
+// A checkpoint that is not yet ready allows input scan downgrade (still not having read all inputs in grill).
 const CHECKPOINT_INPUT_SCAN_EXEMPT = new Set([
   'input_scan_degraded',
   'input_refs_unavailable',

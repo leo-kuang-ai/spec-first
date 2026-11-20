@@ -103,9 +103,9 @@ Committed: `fix(review): cover empty-format branch + tighten export perms` (`com
 
 > **Verdict:** Not ready
 >
-> **当前不能合并。** P0 #1 `orders_controller.rb:42` 缺少归属检查。先修复，再验证能导出自己的订单、不能导出其他账户的订单。
+> **Merge cannot be performed.**** P0 #1 Missing ownership check in `orders_controller.rb:42`First fix the issue, then verify that it can export orders from your own account, but cannot export orders from other accounts.
 >
-> **下一项决定：** P1 #3 `export_service.rb:91` 先确定分页合同，再核对 #2 的内存上限。
+> **Next decision:** P1 #3 `export_service.rb:91` First verify the pagination contract, then check #2's memory limit.
 ```
 
 ## Anti-patterns
@@ -145,7 +145,7 @@ This fails because of the **box-drawing `────` separators between items*
 - **Triage Groups section (when groups exist)** -- pipe table `| Group | Findings | Context | Preferred Resolution | Why |` rendered after Applied and before the severity tables. The `Findings` cell lists stable `#`s (e.g. `#2, #3`); every referenced `#` must appear in a severity table below. Groups are a triage lens over the findings -- they never replace the severity tables, merge findings, or renumber them. Omit when `grouping:off` is active or no groups survived Stage 5b/5c pruning.
 - **Applied section (explicit apply only)** -- render only when default mode resolved `mutation_policy: apply-fixes` and Stage 5c actually applied fixes. List them first, before the severity tables, as `# | File | Fix | Reviewer`, followed by validation and the separate commit authorization/status. Without `commit_authorization`, say `verified, left uncommitted`; a clean tree alone never licenses a commit. A fix spanning multiple files is one row with one stable `#`. Flag green-but-unverifiable edits (auth/contract/concurrency) inline. Omit for ordinary report-only review, `mode:agent`, degraded inline fallback, and no applied fixes.
 - **Actionable Findings section** -- include when the actionable queue is non-empty (findings for the caller to handle)
-- **Pre-existing section** -- separate table, no confidence column (these are informational). 历史问题使用独立展示编号，如 `H1`；行动表和分组仍沿用本次发现的原始 `#`，不改变 JSON 标识。
+- **Pre-existing section** -- separate table, no confidence column (these are informational). Historical issues use independent display numbers, e.g., `H1`; the action table and grouping retain the original `#` from current findings, without changing JSON identifiers.
 - **Learnings & Past Solutions section** -- results from the `learnings-researcher` local prompt asset, with links to docs/solutions/ files
 - **Agent-Native Gaps section** -- results from the `agent-native-reviewer` local prompt asset. Omit if no gaps found.
 - **Deployment Notes section** -- key checklist items from the `deployment-verification-agent` local prompt asset. Omit if the prompt did not run. Schema drift surfaces as `data-migration` findings — no separate section.
@@ -155,7 +155,7 @@ This fails because of the **box-drawing `────` separators between items*
 - **Horizontal rule** (`---`) separates findings from verdict
 - **`###` headers** for each section -- never plain text headers
 
-三态验证结果按 `finish-review.md` 展示计数与理由；`unresolved` 明确为缺失证据的验证项，保留原 severity/confidence，排除修复队列。保护 artifact 的唯一范围见 `action-class-rubric.md`，包含嵌套分类。
+Three-state verification results are displayed with counts and reasons in `finish-review.md`; `unresolved` items explicitly lacking evidence are retained with original severity/confidence and excluded from the fix queue. The exclusive scope for protecting an artifact is seen in `action-class-rubric.md`, including nested categories.
 
 ## Agent mode (JSON)
 

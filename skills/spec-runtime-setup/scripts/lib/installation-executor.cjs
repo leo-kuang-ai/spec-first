@@ -213,7 +213,7 @@ function helperProbe(entry, status, reasonCode, details = {}) {
 function installBaselineTools(context, repoRoot, selectedIds = []) {
   const results = new Map();
   for (const entry of context.effectiveRegistry.tools || []) {
-    // Provider 的安装与复核归其 adapter 所有，避免 baseline 提前绕过校验。
+    // The installation and verification of a Provider are the responsibility of its corresponding adapter, to prevent baseline validation from being bypassed prematurely.
     if (providerOwnsInstallation(context.effectiveRegistry, entry.id)) continue;
     if (entry.required === false) continue;
     if (entry.setup_required === true && !selectedIds.includes(entry.id)) continue;
@@ -337,12 +337,12 @@ function writeWarmupCache(context, repoRoot, entry, command, args, result) {
     assertContainedPath(repoRoot, temp, { reasonCode: 'warmup-cache-symlink-escape' });
     fs.renameSync(temp, cachePath);
   } catch (_error) {
-    // Cache 失败仅为 advisory；已确认的命令结果仍是权威证据。
+    // Cache failure is merely advisory; the confirmed command result remains the authoritative evidence.
   } finally {
     try {
       if (temp && fs.existsSync(temp)) fs.rmSync(temp, { force: true });
     } catch (_error) {
-      // Cache 清理仍是 advisory。
+      // Cache cleanup remains advisory.
     }
   }
 }
@@ -353,7 +353,7 @@ function warmupCachePath(context, repoRoot, toolId) {
 
 function warmupDependencyHash(entry) {
   const dependency = entry.resolved_dependency || {};
-  // 绑定 registry 声明的身份；该摘要不是下载字节校验结果。
+  // Bind the identity declared in the registry; this summary is not the download byte verification result.
   return crypto.createHash('sha256').update(JSON.stringify([
     dependency.package || entry.package || null,
     dependency.version || entry.version || null,

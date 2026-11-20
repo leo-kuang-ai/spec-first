@@ -1,88 +1,88 @@
-# App / 客户端 Surface 模板
+# App / Client Surface Template
 
-> 与 `00-generic.md` 组合使用，只补 App surface 会改变 WHAT、验收或发布边界的内容。Frontmatter、machine-owned section 和 readiness receipt 由 `references/prd-output-template.md` 提供。
+> When used in combination with `00-generic.md`, only patching the App surface will alter the WHAT, acceptance, or release boundaries. Frontmatter, machine-owned section, and readiness receipt are provided by `references/prd-output-template.md`.
 >
-> 所有人类问题只询问当前执行对话的用户。没有证券/交易信号时，不读取 `../overlays/securities.md`。
+> All human-related questions are only directed to the currently executing conversation user. Do not read `../overlays/securities.md` when there are no securities/trading signals.
 
-## App 属性确认
+## App property confirmation
 
-| 维度 | 内容 |
+| Dimension | content |
 | --- | --- |
-| 平台 | iOS / Android / KMP / Desktop / 其它 |
-| 目标用户 | |
-| 最低支持版本 / 系统 | |
-| 登录与权限前提 | |
-| 入口 | Tab / 首页 / 列表 / 详情 / Deeplink / Push / 其它 |
-| 发布方式 | 全量 / 灰度 / feature flag / 版本强依赖 |
-| 设计证据 | Figma / 截图 / 交互稿 / 无；标注 read/unread/degraded |
+| Platform | iOS / Android / KMP / Desktop / Others |
+| Target users | |
+| Minimum supported version / System | |
+| Login and Permission Prerequisites | |
+| Entry point | Tab / Home / List / Details / Deeplink / Push / Other |
+| Deployment method | Full-scale / Gray release / Feature flag / Version strong dependency |
+| Design evidence | Figma / Screenshot / Interaction Design / None; Annotation: read/unread/degraded |
 
-## 入口、导航与返回行为
+## Entry, navigation, and return behavior
 
-| 场景 | 当前行为 | 目标行为 | 返回 / 关闭结果 | 证据 |
+| Scenario | Current behavior | Target behavior | Return / Close results | evidence |
 | --- | --- | --- | --- | --- |
-| 首次进入 | | | | |
-| 二次进入 | | | | |
-| Deeplink / Push 进入 | | | | |
-| 登录过期后恢复 | | | | |
+| First time entering | | | | |
+| Secondary entry | | | | |
+| Deeplink / Push entry | | | | |
+| After login expiration, recovery | | | | |
 
-明确页面层级、Tab 状态、返回栈、弹窗关闭、外部链接跳转和中断后恢复。不得用“沿用现有交互”替代差异说明。
+Clarify page hierarchy, Tab state, return stack, popup closure, external link navigation, and recovery after interruption. Do not replace difference explanation with "continue using existing interaction".
 
-## 页面与组件状态
+## Page and component state
 
-| 页面 / 组件 | 默认态 | 加载态 | 空态 | 错误态 | 无权限态 | 成功反馈 |
+| Page / Component | Default state | Loading state | Empty state | Error state | Privilege level 0 | Success feedback |
 | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | |
 
-对按钮、输入框、列表项、浮层和确认框写清：出现条件、可操作条件、禁用原因、重复点击、取消后结果和状态刷新时机。
+Clarify for buttons, input boxes, list items, floating layers, and confirmation boxes: appearance conditions, operable conditions, disable reasons, repeat click behavior, results after cancellation, and timing of status refresh.
 
-## 输入、确认与高风险操作
+## Input, Confirmation, and High-Risk Operations
 
-| 操作 | 输入 / 约束 | 确认步骤 | 取消结果 | 重复提交 | 留痕 / 用户可见凭证 |
+| Operation | Input / Constraints | Confirm steps | Cancel result | Resubmitting | Tracing / User-visible credential |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-付费、隐私授权、不可逆操作、敏感资料提交或权限提升命中时，必须补正向、取消、超时、失败和重复提交验收。
+Payment, privacy authorization, irreversible operations, or sensitive data submission or permission escalation triggering must have corrective actions, cancellation, timeout, failure, and duplicate submission verification.
 
-## 弱网、离线与生命周期
+## Poor network, offline, and lifecycle
 
-| 场景 | 产品行为 | 用户提示 | 恢复方式 | 数据一致性要求 |
+| Scenario | Product behavior | User prompt | Recovery method | Data consistency requirements |
 | --- | --- | --- | --- | --- |
-| 请求超时 | | | | |
-| 断网 / 恢复 | | | | |
-| App 切后台 / 恢复 | | | | |
-| 页面被系统回收 | | | | |
-| 部分成功 | | | | |
+| Request timeout | | | | |
+| Offline / Online | | | | |
+| App go to background / resume | | | | |
+| The page has been recycled by the system | | | | |
+| Partial success | | | | |
 
-## 权限、隐私与安全
+## Permissions, Privacy & Security
 
-列出相机、相册、定位、通知、生物识别、剪贴板或本地文件权限的触发时机、拒绝路径、再次授权入口和最小化原则。涉及个人信息时写明展示、脱敏、导出、删除和日志边界。
+List the trigger timing, rejection paths, reauthorization entry points, and minimization principles for camera, photo album, location, notification, biometric recognition, clipboard, or local file permissions. When involving personal information, specify the boundaries for display, de-identification, export, deletion, and logging.
 
-## 可访问性、国际化与显示适配
+## Accessibility, internationalization, and display adaptation
 
-- 大字号、屏幕阅读、颜色对比、触控区域和动态内容公告。
-- 多语言文案、复数/性别规则、日期时间、数字和币种格式。
-- 小屏、横竖屏、深色模式、折叠屏或 Desktop 尺寸，按实际支持范围填写。
+- Large text, screen reader, color contrast, touch target area, and dynamic content announcements.
+- Multilingual copy, plural/sex rules, date/time, number, and currency formatting.
+- Small screen, landscape and portrait orientation, dark mode, foldable screen, or desktop size; fill in according to actual supported ranges.
 
-## Analytics / 产品证据
+## Analytics / Product Evidence
 
-只定义产品需要观察的事件、触发条件、成功/失败结果和验收口径；不规定 SDK 或代码埋点实现。
+Define only the events to be observed, trigger conditions, success/failure outcomes, and acceptance criteria for products; do not specify SDK or code-based implementation.
 
-| 事件 / 指标 | 触发条件 | 必要属性（产品含义） | 验收用途 |
+| Event / Metric | Trigger condition | Required attributes (product meaning) | Acceptance purpose |
 | --- | --- | --- | --- |
 | | | | |
 
-## 兼容、灰度与回退
+## Compatibility, Gradual Rollout, and Rollback
 
-写清旧版本、旧数据、远端配置、灰度用户、服务端先后顺序和回退后的用户体验。不可把“技术可回滚”直接等同于“产品无影响”。
+Clarify the old version, old data, remote configuration, gray-scale users, server execution order, and user experience after rollback. It is not appropriate to equate "technical rollback capability" directly with "no product impact."
 
-## App 补充验收
+## App Supplementary Acceptance Test
 
-- 首次进入、二次进入、返回栈与中断恢复。
-- 加载、空、错误、无权限和弱网状态。
-- 重复点击、重复提交、取消和部分成功。
-- 最低支持版本、旧客户端和灰度边界。
-- 命中设计证据时，read/unread/degraded 与 readiness consequence 已记录。
+- First entry, second entry, return from stack, and interrupt recovery.
+- Load, empty, error, no permission, and poor network status.
+- Repeated clicks, repeated submissions, cancellation, and partial success.
+- Minimum supported version, old client, and gradual rollout boundaries.
+- When design evidence is met, read/unread/degraded and readiness consequence have been documented.
 
-## App 待闭合问题候选
+## App pending closure issue candidates
 
-这里只提示候选缺口，不生成第二套 OQ schema。只把会改变 App WHAT、验收、范围、权限、fallback、analytics 或发布行为的问题移入 output contract 的 canonical `Outstanding Questions`；纯组件实现和架构选择进入 `spec-plan`。
+Here it only prompts candidate gaps and does not generate a second set of OQ schema. Only move issues that change the App's WHAT, acceptance, scope, permissions, fallback, or analytics/publishing behavior into the output contract's canonical `Outstanding Questions`; pure component implementations and architectural decisions go into `spec-plan`.

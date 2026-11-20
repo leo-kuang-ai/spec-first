@@ -285,7 +285,7 @@ function atomicWriteContained(root, filePath, contents, reasonCode) {
     fs.renameSync(tempPath, target);
     fs.chmodSync(target, existingMode);
   } catch (error) {
-    try { fs.rmSync(tempPath, { force: true }); } catch (_cleanupError) { /* 保留主错误 */ }
+    try { fs.rmSync(tempPath, { force: true }); } catch (_cleanupError) { /* Preserve the original error. */ }
     throw error;
   }
 }

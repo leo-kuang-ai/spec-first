@@ -610,7 +610,7 @@
             "installation": {
               "type": "object",
               "additionalProperties": true,
-              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
               "anyOf": [
                 {
                   "required": [
@@ -646,7 +646,7 @@
             "installation": {
               "type": "object",
               "additionalProperties": true,
-              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
               "anyOf": [
                 {
                   "required": [
@@ -682,7 +682,7 @@
             "installation": {
               "type": "object",
               "additionalProperties": true,
-              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
               "anyOf": [
                 {
                   "required": [
@@ -718,7 +718,7 @@
             "installation": {
               "type": "object",
               "additionalProperties": true,
-              "description": "平台安装面:registry 拥有的执行定义用 command(+operations 形状锁定);Provider 自有代码拥有的执行面用 command_display 散文契约(如 graphify)。二者必居其一。",
+              "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
               "anyOf": [
                 {
                   "required": [
@@ -945,7 +945,7 @@
     "installationSpec": {
       "type": "object",
       "additionalProperties": true,
-      "description": "顶层 installation 为声明性元数据;实际执行面在 platform_overrides.<platform>.installation。至少声明 kind(tools/providers)或 strategy(helpers)之一(lane finding DR-021:schema 不再对安装元数据面失明)。",
+      "description": "The top-level installation consists of declarative metadata; actual execution is defined in platform_overrides.<platform>.installation. Declare at least one of kind (tools/providers) or strategy (helpers) (lane finding DR-021: schema no longer blind to installation metadata).",
       "anyOf": [
         {
           "required": [

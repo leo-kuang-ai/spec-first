@@ -37,10 +37,10 @@ function sectionBetween(source, start, end) {
 describe('spec-plan current contracts', () => {
   test('评审后的实施判定覆盖两种格式和两种执行入口', () => {
     const checks = sectionBetween(handoff, '## 5.3.9 Final Checks', '## 5.4 Post-Generation');
-    expect(checks).toContain('Markdown 与 HTML');
-    expect(checks).toContain('暂停 `spec-work` 和原生 goal');
+    expect(checks).toContain('Markdown and HTML');
+    expect(checks).toContain('pause `spec-work` and the native goal');
     expect(checks).toContain('requirements-only');
-    expect(checks).toContain('非阻塞建议不影响实施资格');
+    expect(checks).toContain('Non-blocking recommendations do not affect implementation eligibility');
   });
 
   test('continues historical plans through an evidence-scoped successor without resetting history', () => {
@@ -53,7 +53,7 @@ describe('spec-plan current contracts', () => {
     expect(resume).toContain('no reusable successor exists and unfinished scope is confirmed');
     expect(resume).toContain('normal planning, readiness, and review');
     expect(resume).toContain('If no remaining scope exists');
-    expect(sections).toContain('只读审阅不触发新计划生产');
+    expect(sections).toContain('Read-only review does not trigger new production plans; historical completion declarations do not supersede current validations.');
   });
 
   test('enriches requirements-only unified plans in place', () => {

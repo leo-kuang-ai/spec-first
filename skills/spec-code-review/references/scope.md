@@ -6,7 +6,7 @@ Read before Stage 1. This file owns local, remote, and task scope, snapshot vali
 
 Compute the diff range, file list, and diff. Minimize permission prompts by combining into as few commands as possible.
 
-**无提交仓库：** 普通本地审查先用 `git rev-parse --verify HEAD` 核实是否有提交。若没有提交且未提供可解析的 `base:`，返回 `status: failed`、`reason: review-base-unresolved`、`required_gate_eligible: false`，列出 staged 与 untracked 路径及未审查范围；不能将失败当空 diff 或审查通过。恢复时明确指定本地可访问、与本次审查意图一致的 commit 作为 `base:<ref>`；仅暂存文件不能补出基线。不要虚构 HEAD、默认分支或空树 commit。普通模式的未跟踪文件仍被排除：提示 owner 在另行获授权的准备步骤中暂存精确路径，或由调用方提供已验证的 task-owned bundle；本次 report-only 审查不执行暂存、创建初始提交或 fetch。有效 `base:` 下仍按下方规则冻结和复验范围。
+**No source repository:** For regular local review, first verify the presence of commits using `git rev-parse --verify HEAD`. If neither a submission is made nor a resolvable `base:` is provided, return `status: failed`, `reason: review-base-unresolved`, `required_gate_eligible: false`, listing the staged and untracked paths along with the unreviewed scope; do not treat the failure as an empty diff or as approved review. When recovering, explicitly specify a local, accessible commit consistent with the current review intent as `base:<ref>`; only staged files can establish a baseline. Do not fabricate HEAD, default branch, or empty tree commit. Untracked files in regular mode are still excluded: prompt owner to temporarily store the exact path during a separately authorized preparation step, or provide a verified task-owned bundle from the caller; this report-only review does not perform caching, create an initial commit, or fetch. The range remains frozen and revalidated according to the rules below, even when a `base:` is specified.
 
 #### Task-scoped `mode:agent` intake
 
@@ -119,14 +119,14 @@ Set `BASE:` to `pr:<number-or-url>` (logical marker — not a git SHA). Set `UNT
 
 1. `git rev-parse --abbrev-ref HEAD` equals `headRefName`.
 2. The PR is **not** cross-repository (`isCrossRepository` is false).
-3. `git rev-parse HEAD` 与本次取得的 `headRefOid` 完全相同，`git status --porcelain=v1 --untracked-files=all` 成功且输出为空，且本地可以解析本次取得的 `baseRefOid`。仅有祖先关系、索引或工作树有改动、身份不可核实，均走 `pr-remote`。本地未推送的修复可另列说明，不能关闭远端 finding。
+3. `git rev-parse HEAD` matches exactly with the obtained `headRefOid`, `git status --porcelain=v1 --untracked-files=all` succeeds and outputs nothing, and the local repository can resolve the obtained `baseRefOid`. Only when there are changes in ancestor relationships, indices, or the working tree, or when identity verification fails, does it proceed with `pr-remote`. Local fixes not pushed can be separately noted, but the remote finding cannot be closed.
 
 - **`local-aligned`** — all three checks pass. Local Read/Grep/git blame against workspace files are valid for PR changed paths.
 - **`pr-remote`** — any check fails. The working tree is **not** the PR head; workspace file contents for changed paths may be stale or unrelated.
 
 **Diff by scope mode** (do not mix remote and local diffs — contradictory hunks cause false positives):
 
-- **`local-aligned`:** 以 `git merge-base <baseRefOid> <headRefOid>` 为 `BASE`；文件清单与补丁均比较 `BASE` 到 `headRefOid` 两个不可变提交，不使用移动分支名或工作树作为差异终点。无法求得共同祖先时走 `pr-remote`。两种 PR 模式的报告都标明实际审查的 base/head OID。开始验证或本地修复前复核本地对齐；对齐已失效则停止依赖工作树的动作。出具当前 PR 结论前复核远端两端身份，发生变化则重新取证；未经推送的本地修复不改变原 PR 结论。
+- **`local-aligned`:** Uses `git merge-base <baseRefOid> <headRefOid>` as the `BASE`; compares the file list and patch from `BASE` to `headRefOid`, using two immutable commits, without employing branch names or worktree as the difference endpoint. Fails to find common ancestor, then falls back to `pr-remote`. Both PR mode reports indicate the actual base/head OID reviewed. Begin verification or local repair only after confirming local alignment; halt any actions on the working tree if alignment has failed. Verify the identities of both remote ends before drawing the current PR conclusion; if changes are detected, re-collect evidence; local fixes not pushed do not alter the original PR conclusion.
 - **`pr-remote`:** Set `FILES:` from the PR `files` array. Set `DIFF:` from `gh pr diff <number-or-url> --color=never`. If `gh pr diff` fails, stop with an actionable error — do not fall back to checkout.
 
 When **`pr-remote`**, before Stage 4:
@@ -198,7 +198,7 @@ DIFF_A="$BASE"
 DIFF_B=""
 SCOPE_ARGS=(--base "$DIFF_A" --snapshot-out "$SCOPE_SNAPSHOT")
 [ -n "${DIFF_B:-}" ] && SCOPE_ARGS+=(--head "$DIFF_B")
-# 仅填入已验证的任务所属路径；普通审查保持该数组为空。
+# Only fill in the path belonging to verified tasks; regular review keeps this array empty.
 for owned_path in "${TASK_OWNED_UNTRACKED_FILES[@]}"; do
   SCOPE_ARGS+=(--include-untracked "$owned_path")
 done
@@ -209,7 +209,7 @@ The returned `changed_files`, `files_changed`, and `diff_sha256` are immutable s
 
 If the helper, snapshot write, or artifact root is unavailable, keep `source_mutation_gate: closed`, record `mutation_guard_unavailable`, and do not emit a successful/complete machine handoff. Do not replace the deterministic snapshot with remembered prose or a later `git diff`.
 
-**空 diff 提前返回（仅普通本地变更审查）。** standalone / `base:` 已成功解析并冻结范围，确定性结果为 `status=complete`、`files_changed=0`，且调用方没有要求计划/任务完成度审查时，无需选择或 dispatch reviewer。先复验冻结 snapshot 未漂移，再返回 `status=skipped`、`reason=no-changes-to-review`、空 findings/reviewers，并在 Coverage 列出被排除的 untracked 文件；`required_gate_eligible=false`，不能声明独立审查通过或 Ready to merge。任务上下文、显式 plan 或完成度审查仍走对应语义检查；解析失败、未知计数、丢失 diff 和失效快照绝不能按空变更处理。
+**Empty diff early return (only for regular local change reviews).** standalone / `base:` successfully parsed and frozen scope; deterministic result is `status=complete`, `files_changed=0`; no reviewer selection or dispatch is required if the caller does not request a plan/task completion review. First verify that the frozen snapshot has not drifted, then return `status=skipped`, `reason=no-changes-to-review`, empty findings/reviewers, and list the excluded untracked files in the Coverage column; `required_gate_eligible=false`, and no independent review approval or "Ready to merge" status can be declared. Task context, explicit plan, or completion degree review shall still undergo the corresponding semantic checks; parse failures, unknown counts, lost diffs, and invalid snapshots must never be treated as empty changes.
 
 ### Stage 1b: Compute scope signals (cheap, deterministic)
 
@@ -230,7 +230,7 @@ bash "$SKILL_DIR/scripts/run-python.sh" "$SKILL_DIR/scripts/review-scope.py" "${
 
 Consume only its JSON facts (`status`, endpoints, `exec_lines`, `uncounted_files`, `changed_files`, path `signals`, test/agent-surface flags, fixed `docs/solutions` corpus presence, and `lite_eligible`). The helper does not select personas or decide semantic risk. A non-`complete` status, malformed output, invocation failure, or changed-file mismatch becomes `EXEC_LINES:UNKNOWN` plus `UNCOUNTED_FILES:1`; never reconstruct a favorable zero. Task-scoped mode continues to compute from its attributed bundle and uses the same fail-closed fields because the helper intentionally has no authority to reinterpret caller-owned task attribution.
 
-路径事实使用 Git 的 NUL 分隔输出，保留中文、制表符、换行与 rename 目标的真实路径，禁止从展示转义或花括号 rename 文本猜路径。`deleted_files` 是同一 diff 范围内的整文件删除列表，供 `diff-scope.md` 的存活 consumer 检查使用；列表存在不证明删除安全。二进制或缺失行数即使具有代码扩展名也计入 `uncounted_files`，不得以零行绕过完整审查。快照仍使用现有 v2 合同，任务归属与未跟踪文件授权边界不变。
+Path facts use Git's NUL-separated output, preserving Chinese characters, tabs, newlines, and the real path of rename targets, and forbidding inference of paths from displayed escaped or curly-brace-wrapped rename text. `deleted_files` is a list of entire file deletions within the same diff scope, provided for use by consumers of `diff-scope.md` to verify survival; the existence of this list does not guarantee deletion safety. Binary or missing line counts are included in `uncounted_files` even if a code extension is present, and zero lines cannot be used to bypass complete review. Snapshots continue to use the existing v2 contracts, with task ownership and untracked file authorization boundaries remaining unchanged.
 
 `EXEC_LINES` counts changed executable lines (added + removed, counted code extensions only — so a modified line counts as 2; the Stage 3c `<40` threshold is in add+delete units). `EXEC_LINES:UNKNOWN` means the base was unresolved — treat as non-trivial. `UNCOUNTED_FILES` is the count of changed files outside the code set (skill `.md`, JSON schemas, `.sh`, config, CI, lockfiles, unknown extensions) — **spec-first's own product surface is mostly uncounted, which is exactly why Stage 3c must fail closed on it.** The `SIGNALS` list is **path heuristics, not selection decisions**: Stage 3 still applies judgment and adds the matching conditional persona only when the runtime concern is real. Content-based risk (auth, payments, data mutation) is **not** path-derivable — read it from the diff in Stage 3 as before; it also disqualifies the Stage 3c fast path regardless of line count.
 
@@ -250,6 +250,6 @@ Inline fallback output contract:
 3. Set `reviewers: ["inline-fallback"]`, `coverage.dispatch_reason_code` to the concrete fallback reason, and record independent/validator/cross-model coverage as not run. When no targeted command ran, use the Stage 5d `no-targeted-command-executed` evidence shape.
 4. Return `status: degraded` and `verdict: Not ready` even when no issue is found; single-model bounded coverage cannot close merge readiness. In task mode also set `required_gate_eligible: false`.
 
-**已授权的串行修复交接。** 先按 Stage 5e 冻结并复核只读报告，保留其 `degraded` 和未执行独立验证的事实。仅在普通模式、用户明确要求本地修复、当前范围是可核实的本地树、且未发现范围漂移时，交回已有执行 caller，或在同一会话实际进入 `spec-debug` 继续已授权的定位、局部修复与验证。交接须携带已审版本、范围、finding、直接证据与限制；执行者先复核当前文件和 dirty overlap。只交接可用直接证据独立核实的机械 P2/P3；需独立验证、涉及权限或公共契约、证据不足的项仍具名阻塞。`mode:agent`、只读请求和远端范围不触发修复。修复发生在审查之后，不倒改报告、不声称独立验证，不自动提交或发布。无法进入执行 owner 时保留报告并说明修复尚未开始。
+Authorized serial repair handover. First, freeze and review the read-only report according to Stage 5e, retaining the facts of `degraded` status and the fact that independent validation was not performed. Only when in normal mode, the user explicitly requests local repair, the current scope is a verifiable local tree, and no scope drift is detected, shall the caller be returned with existing execution, or when entering `spec-debug` within the same session to continue authorized localization, local repair, and validation. Handover must include the approved version, scope, finding, direct evidence, and limitations; the executor shall first verify the current document and dirty overlap. Only transfer directly verifiable mechanical P2/P3 evidence independently validated; items requiring independent verification, involving permissions or public contracts, or with insufficient evidence remain blocked. `mode:agent`, read-only requests, and remote scope do not trigger repair. Fixes are addressed after review, without reversing reports, without claiming independent verification, and without automatic submission or release. Unable to proceed with execution when owner is retained and report explanation has not yet started.
 
 The explicit Quick Review Short-Circuit is separate: when the user asked for a quick/light review and the harness has a built-in report-only reviewer, use that path as requested rather than labelling it a failed multi-agent run.

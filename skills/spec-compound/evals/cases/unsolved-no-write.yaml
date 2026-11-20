@@ -1,8 +1,6 @@
 id: unsolved-no-write
-title: 未解决问题不得写入 durable knowledge
-description: |
-  验证硬出口:"问题尚未解决、验证证据不足"时不得写 docs/solutions。
-  用户明确说问题还没解决——应拒绝沉淀(可建议先解决)。
+title: "Unresolved issues must not be written into durable knowledge"
+description: "Verify hard exports: Do not write to docs/solutions when \"the issue remains unresolved and verification evidence is insufficient.\" If the user explicitly states the issue is still unresolved—reject knowledge accumulation (suggest resolving it first)."
 
 input:
   prompt: |

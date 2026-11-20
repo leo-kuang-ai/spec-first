@@ -1,10 +1,8 @@
 # id：保留历史用例身份；本次修订了运行边界，不能与旧零改动分数直接相加。
 id: implementation-routes-work
 # title：合法交接正例限于规划产出者返回，不包含 caller 后续实施。
-title: 已授权完整任务中的规划产出者返回已有执行 caller
-description: |
-  这是模拟已有 spec-work caller 的有界规划子任务，不是假定宿主没有执行能力。
-  本轮只评价返回前的状态、工具尝试和交付结构；后续实施与规划语义另行审查。
+title: "The planner of the fully authorized task returns the existing execution caller."
+description: "This is a bounded planning subtask simulating the existing spec-work caller, not assuming the host lacks execution capability. This round only evaluates the state prior to return, tool attempts, and delivery structure; subsequent implementation and planning semantics will be reviewed separately."
 input:
   # prompt：明确 planner-return 边界及便于机械审计的用例级工具协议。
   prompt: |

@@ -148,7 +148,7 @@ def capture_owned_files(paths: list[str]) -> dict[str, object]:
                 raise ValueError("included path changed file type")
             digest = hashlib.sha256(handle.read()).hexdigest()
             after = os.fstat(handle.fileno())
-        # 检查打开对象和当前路径，避免把读取中的变化当成稳定快照。
+        # Check the opened object and current path to avoid treating changes during reading as stable snapshots.
         signature = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns, s.st_mode)
         if not (signature(before) == signature(opened) == signature(after) == signature(target.lstat())):
             raise ValueError("included file changed during capture")
@@ -310,7 +310,7 @@ def numstat_entries(output: str) -> dict[str, tuple[str, str]]:
             continue
         added, deleted, name = entry.split("\t", 2)
         if not name:
-            # -z 的 rename 记录以空路径后接旧、新路径，不解析展示用的花括号语法。
+            # -z's rename record uses an empty path followed by the old and new paths, without parsing the bracketed syntax used for display.
             next(parts)
             name = next(parts)
         if not name or name in entries:

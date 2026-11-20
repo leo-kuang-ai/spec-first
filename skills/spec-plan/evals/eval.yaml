@@ -13,6 +13,7 @@ engine:
 cases:
   files:
     - evals/cases/enriches-product-contract-in-place.yaml
+    - evals/cases/writes-design-for-team-review.yaml
     - evals/cases/planning-only-rejects-implementation.yaml
     - evals/cases/product-blocker-prevents-readiness.yaml
     - evals/cases/always-plan-unclear-input.yaml

@@ -1,8 +1,6 @@
 id: no-metric-goal-gated
-title: 无度量目标的模糊优化请求应被指标 gate 拦下
-description: |
-  验证 Failure Modes 合同(Missing metric):"优化一下让它更好"无可测指标,
-  应要求先定义 metric/度量方式,不进入实验循环。
+title: "Fuzzy optimization requests without clear objectives should be blocked by the metric gate."
+description: "Verification of Failure Modes Contract (Missing metric): \"Optimize it to be better\" has no measurable metric; a metric/quantification method must be defined beforehand, otherwise entry into the experiment loop is prohibited."
 
 input:
   prompt: |

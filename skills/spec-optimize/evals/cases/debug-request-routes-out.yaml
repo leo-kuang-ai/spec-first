@@ -1,8 +1,6 @@
 id: debug-request-routes-out
-title: 无反馈循环的调试请求应指出不适配并指向 spec-debug
-description: |
-  验证 Not To Use 合同:debugging without a feedback loop 不属本 skill,
-  应点名 spec-debug 路由。
+title: "Debug requests without feedback loops should indicate misfit and point to spec-debug"
+description: "Verify Not To Use contract: debugging without a feedback loop is outside the scope of this skill; explicitly route to spec-debug."
 
 input:
   prompt: |

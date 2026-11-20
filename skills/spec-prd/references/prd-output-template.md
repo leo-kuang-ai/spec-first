@@ -68,7 +68,7 @@ Every PRD artifact includes the standard core sections unless it is a route-out/
 
 Compact PRDs may omit non-load-bearing conditional detail, but they still need enough evidence, acceptance, and scope boundary for planning. Bypass output writes no PRD artifact.
 
-Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Draft/checkpoint core-section gaps remain advisory `template_structure_hint` findings. A final/ready claim fails closed with `core_section_missing`, `requirements_row_missing`, `acceptance_example_row_missing`, or `requirement_acceptance_trace_missing` when a core section is absent, Requirements/Acceptance Examples have no valid row, or an R item has no AE trace. Final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must also be locatable or the checker blocks with `machine_section_identity_missing`.
+Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## Requirement overview`. Draft/checkpoint core-section gaps remain advisory `template_structure_hint` findings. A final/ready claim fails closed with `core_section_missing`, `requirements_row_missing`, `acceptance_example_row_missing`, or `requirement_acceptance_trace_missing` when a core section is absent, Requirements/Acceptance Examples have no valid row, or an R item has no AE trace. Final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must also be locatable or the checker blocks with `machine_section_identity_missing`.
 
 ## Clarification Checklist Display Protocol
 
@@ -216,7 +216,7 @@ Compose the durable PRD in this order:
 | id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-Closure-disposition razor: see SKILL.md `Closure-disposition razor` for the legal disposition set (single source of truth). For this template's evidence shape: a `source-resolved` / `source-backed-non-WHAT-assumption` cell needs a checkable ref (path/URL/`file:line`/anchor), an `owner-answered` / `owner-capped` / `owner-accepted-assumption` row needs a matching Owner Decision Trace row below, and `implementation-only-how-pushdown` needs `planning_would_invent_what=no` (touching interface/permission/scope/source-of-truth/fallback/analytics is a blocking contradiction in a ready PRD). "I judged it a parallel planning-time item" is not a disposition; without a legal disposition the only path is to keep grilling or `checkpoint-prd`. 来源类证据引用优先写入 `recommended_default/deferred_reason`；`PRD write target` 保留需求写入目标。checker 已识别本模板的合并列名，并继续兼容 `PRD write target` 中形似引用的内容；只检查引用形态，不验证来源内容真实性。
+Closure-disposition razor: see SKILL.md `Closure-disposition razor` for the legal disposition set (single source of truth). For this template's evidence shape: a `source-resolved` / `source-backed-non-WHAT-assumption` cell requires a checkable reference (path/URL/`file:line`/anchor), an `owner-answered` / `owner-capped` / `owner-accepted-assumption` row must have a matching Owner Decision Trace row below, and `implementation-only-how-pushdown` requires `planning_would_invent_what=no` (any touch on interface/permission/scope/source-of-truth/fallback/analytics constitutes a blocking contradiction in a ready PRD). "I judged it a parallel planning-time item" is not a disposition; without a legal disposition, the only path is to continue grilling or `checkpoint-prd`. Source-based evidence references should be prioritized in `recommended_default/deferred_reason`; `PRD write target` retains the requirement to document requirements in the target. checker has identified the merged column names in this template and continues to support content resembling references in the `PRD write target`; it only validates the reference structure and does not verify the authenticity of the source content.
 
 Vocabulary boundary: `closure_disposition` says why an OQ can be non-blocking; `closure_state` says what remains for handoff. Legal `closure_state` values are `open`, `closed`, `deferred`, or `blocked`. Do not put `owner-accepted-assumption`, `owner-capped`, `source-resolved`, or `implementation-only-how-pushdown` in `closure_state`.
 
@@ -224,7 +224,7 @@ Design/source authority razor: a design-source fact can be `source-resolved` onl
 
 ## Owner Decision Trace
 
-Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answered|capped`, or closure depends on an owner answer. Each row records the owner's actual decision; the checker verifies the row is structurally present (it cannot verify the answer is genuine — that stays owner-owned). Header alias: `check-prd-artifact.js` `TRACE_HEADER_ALIASES` also accepts `decision` / `决策` as the `question` column header.
+Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answered|capped`, or closure depends on an owner answer. Each row records the owner's actual decision; the checker verifies the row is structurally present (it cannot verify the answer is genuine — that stays owner-owned). Header alias: `check-prd-artifact.js` The `TRACE_HEADER_ALIASES` also accepts `decision` and its supported localized alias as the `question` column header.
 
 | question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |
 | --- | --- | --- | --- | --- | --- |
@@ -278,9 +278,9 @@ why_not:
 
 `preflight_sweep_closure` is the compatibility field for Requirement Analysis Gate closure. It must summarize whether the run-local map from materials to requirement understanding, uncertainty/contradiction points, product/design/technical grill decisions, and PRD write targets is closed, degraded, blocked, or missing. Do not add a second persistent analysis schema to the PRD.
 
-`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). `decision_card_next_action` 必须与其完全一致；两个有效声明互相冲突时，checker 报告 `decision_card_path_mismatch`。The three `decision_card_*` fields are required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` 在仍处于 grill 时只豁免完整性，不豁免显式路径矛盾。
+`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). `decision_card_next_action` must be identical; when two valid declarations conflict, the checker reports `decision_card_path_mismatch`. The three `decision_card_*` fields are required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` exempts only from integrity checks when still in grill state, and does not exempt from explicit path contradictions.
 
-`write_mode: final-prd` plus `can_enter_spec_plan: yes` is LLM-owned final intent, not a receipt. Persist that pair only after semantic closure while frontmatter remains `status: draft`. The `status: ready-for-planning` and `readiness_verified_*` fields are producer-local machine receipt fields: never fill or invent them manually; `skills/spec-prd/scripts/finalize-prd-artifact.js` writes them atomically after `check-prd-artifact.js` reports no producer blocking reasons。缺少或 stale receipt 时，check-only 必须阻断 ready closeout claim，但不得仅因 draft 已合法持久化 final intent 就把该 intent 判为非法；write mode 可以生成第一份 receipt。If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
+`write_mode: final-prd` plus `can_enter_spec_plan: yes` is LLM-owned final intent, not a receipt. Persist that pair only after semantic closure while frontmatter remains `status: draft`. The `status: ready-for-planning` and `readiness_verified_*` fields are producer-local machine receipt fields: never fill or invent them manually; `skills/spec-prd/scripts/finalize-prd-artifact.js` writes them atomically after `check-prd-artifact.js` reports no producer blocking reasons. When a receipt is missing or stale, a check-only transaction must block a ready closeout claim; however, the final intent shall not be deemed invalid solely because the draft has been legally and permanently finalized; the write mode may generate the first receipt. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 
 Use the selected packaged template asset and project-local overlay to add only the conditional sections the increment needs.
 
@@ -289,7 +289,7 @@ Use the selected packaged template asset and project-local overlay to add only t
 Use brownfield increment examples, not 0-1 expansion examples:
 
 - vague original -> improved concrete wording -> reason
-- replace "等", "相关", "合适的", "更好", and "优化体验" with observable scope, state, quantity, trigger, or acceptance
+- replace "and so on," "related," "appropriate," "better," and "improve the experience" with observable scope, state, quantity, trigger, or acceptance
 - product constraints are allowed; implementation units, schemas, exact API fields, database tables, and task breakdown are not
 - run the Framing Gate and Evidence Plan from `evidence-and-topology.md` when the input signals removal, migration, workflow/contract change, source-of-truth movement, generated/runtime mirrors, package/docs/test cleanup, or cross-surface scope
 - do not print the run-local Framing Gate by default; promote only the parts that reduce planning invention into Current System Snapshot, Change Topology, Surface Map, Producer / Artifact / Consumer, Source-Of-Truth Resolution, Negative Acceptance, Evidence And Assumptions, or Outstanding Questions
@@ -429,7 +429,7 @@ Supporting evidence refs should be indexed when the PRD has more than a few sour
 
 The handoff context slice is a compact downstream reading map:
 
-对于 long、mixed 或 high-risk PRD，加入最多三个 load-bearing Requirement / Acceptance Example 引用，以及 planning 必须保留的 behaviors。这些内容只是现有 PRD 的阅读指针，不复制完整 requirements，也不包含 implementation instructions。
+For long, mixed, or high-risk PRDs, include up to three load-bearing Requirement / Acceptance Example references, as well as planning-mandated behaviors. These contents serve only as reading pointers for the existing PRD, do not replicate complete requirements, and do not include implementation instructions.
 
 ```text
 handoff_context_slice:

@@ -108,7 +108,7 @@ Traceability Matrix makes requirement / source unit / task / validation coverage
 ```md
 | Source | Requirement / Acceptance | Task(s) | Validation |
 | --- | --- | --- | --- |
-| U1 | R1 | T001 | 验证当前任务包可用、过期任务包被拒绝 |
+| U1 | R1 | T001 | Verify current task package is available; expired task packages are rejected |
 ```
 
 Rules:
@@ -154,15 +154,15 @@ Executable task packs must include exactly one fenced JSON block under `## Task 
       "task_id": "T001",
       "source_unit": "U1",
       "requirement_refs": ["R1"],
-      "goal": "校验任务包的来源、版本和结构。",
+      "goal": "Validate the source, version, and structure of the task pack.",
       "dependencies": [],
       "files": ["src/cli/task-pack.js", "tests/unit/task-pack-command.test.js"],
-      "test_focus": "分别验证当前任务包和源方案已变更的旧任务包。",
-      "done_signal": "当前任务包通过校验；旧任务包被拒绝执行。",
+      "test_focus": "Check a current task pack and a stale pack whose source plan has changed.",
+      "done_signal": "The current pack passes validation; the stale pack is rejected for execution.",
       "wave": 1,
       "review_gate": "required",
-      "review_focus": "检查新校验是否仍接受合法任务包。",
-      "stop_if": "需要改变源方案范围或由校验器判断任务拆分质量时停止。"
+      "review_focus": "Check that valid task packs still pass the new validation.",
+      "stop_if": "Stop if the source plan's scope must change or the validator would have to judge task decomposition."
     }
   ]
 }
@@ -212,22 +212,22 @@ These fields should be added when useful for context compression, review, or wor
 
 ### Recommended Human-Readable Task Card Example
 
-写卡片时从对应 JSON 任务提取范围、验收、评审与停止条件。交接前对照两种视图；任何差异若会改变执行者的行动，先修正卡片再交接。CLI 不校验自由文本。
+When writing cards, extract the scope, acceptance, review, and stop conditions from the corresponding JSON task. Before handover, compare the two views; if any differences would alter the executor's actions, correct the card first before handing over. CLI does not validate free text.
 
 ```yaml
 task_id: T001
 source_unit: U1
 requirement_refs: [R1]
-goal: 校验任务包的来源、版本和结构。
+goal: Validate the source, version, and structure of the task pack.
 dependencies: []
 files:
   - src/cli/task-pack.js
   - tests/unit/task-pack-command.test.js
-test_focus: 分别验证当前任务包和源方案已变更的旧任务包。
-done_signal: 当前任务包通过校验；旧任务包被拒绝执行。
+test_focus: Check a current task pack and a stale pack whose source plan has changed.
+done_signal: The current pack passes validation; the stale pack is rejected for execution.
 review_gate: required
-review_focus: 检查新校验是否仍接受合法任务包。
-stop_if: 需要改变源方案范围或由校验器判断任务拆分质量时停止。
+review_focus: Check that valid task packs still pass the new validation.
+stop_if: Stop if the source plan's scope must change or the validator would have to judge task decomposition.
 wave: 1
 ```
 

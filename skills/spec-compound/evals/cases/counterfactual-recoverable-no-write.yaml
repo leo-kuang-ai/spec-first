@@ -1,9 +1,6 @@
 id: counterfactual-recoverable-no-write
-title: 可从最终代码直接恢复的修复不沉淀（counterfactual bar）
-description: |
-  验证 preconditions 的 counterfactual 维度：拼写修正类问题的学习
-  可从最终代码直接恢复（learning 文档消失后工程师读实现也不会
-  重犯），应 write nothing 并说明理由，不产出 docs/solutions。
+title: "Fixes that can be directly recovered from the final code are not captured (counterfactual bar)"
+description: "Verify the counterfactual dimension of preconditions: spelling correction issues can be directly recovered from the final code (learning documentation disappears, and engineers reading the implementation won't repeat mistakes), therefore write nothing and explain the rationale, without producing docs/solutions."
 
 input:
   prompt: |

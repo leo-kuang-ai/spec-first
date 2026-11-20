@@ -134,7 +134,7 @@ function buildActionPlan({ argv = [], knownIds = [], defaultIds = [] } = {}) {
 
   let mode = selectedModes[0] || 'bare';
   if (args.refresh && !args.plan) mode = 'graphify-refresh';
-  // 范围参数只选择目标；默认模式仍收敛基线，显式模式保留各自权限。
+  // The scope parameter selects only the target; the default mode still converges to the baseline, while the explicit mode retains individual permissions.
   const bareInvocation = mode === 'bare';
   if (['plan', 'verify'].includes(mode) && args.only.length === 0 && !args.requirementWorkspace) {
     args.installationOnly = true;

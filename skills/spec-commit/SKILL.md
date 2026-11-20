@@ -10,7 +10,7 @@ Create scoped logical commit(s) that explain the outcome of the authorized chang
 
 ## Invocation And Authorization Boundary
 
-**暂存前分支门禁：** 先读取当前分支及默认分支事实；当前为`main`、`master`或已解析的默认分支时，不得先`git add`再处理分支。只有已获授权并成功创建/切换到确认的非默认分支后，才能进入暂存与提交；分支授权缺失或探针失败时保留index/worktree并返回阻塞。Step 4仍负责具体分支操作。提交信息使用`-F`文件，每个Git动作分别执行并检查结果，不能用串联命令掩盖失败。
+**Branch Lock Before Staging:** Read the current branch and default branch facts first; if the current branch is `main`, `master`, or the resolved default branch, do not perform a `git add` operation before handling the branch. Only after being authorized and successfully creating or switching to a non-default branch that has been confirmed can you proceed to stage and commit. If branch authorization is missing or the probe fails, the index and worktree are retained and a blocking error is returned. Step 4 is still responsible for specific branch operations. Submit information using the `-F` file; each Git operation is executed separately and its result is checked, and failures cannot be masked by chaining commands.
 
 This is an internal-only helper. A public workflow may delegate here only after the current user or a visible upstream handoff has established `commit_authorization: authorized` for the intended run-owned paths. Record branch authority separately:
 
@@ -105,7 +105,7 @@ Use the confirmed branch name for the rest of the workflow. If the branch alread
 
 Write the commit message:
 
-保留分支上他人已有提交的 author 与 trailers，不通过 squash 或重写把其贡献归为本次提交。若本次提交移植他人分支、PR 或 patch 的工作，且该工作不会另以原作者名义落地，则从原提交/patch 精确复制 author 和已有 `Co-authored-by` 身份，并为每人添加 `Co-authored-by: Name <email>` trailer；没有邮箱时在 body 署名，不猜测身份。语义参考、独立改写与直接移植须按实际来源区分，不因读过上游文件就伪造共同作者。此规则不授予历史重写权限。
+Preserve the authors and trailers on existing commits. If you port a branch, PR, or patch without landing it under its original author, copy the source author and existing co-author identities into `Co-authored-by: Name <email>` trailers. If an email is unavailable, credit the name in the body without guessing. Distinguish a direct port from a reference or independent rewriting; reading upstream material does not establish co-authorship. This rule does not authorize rewriting history.
 
 - **Subject line**: Concise, imperative mood, focused on *why* not *what*. Follow the convention determined in Step 2.
 - **Body** (when needed): Add a body separated by a blank line for non-trivial changes. Explain motivation, trade-offs, or anything a future reader would need. Omit the body for obvious single-purpose changes.
@@ -121,7 +121,7 @@ git commit -F <message-file> -- file1 file2 file3
 
 Git's normal message cleanup still applies. Read back the actual commit message and included paths, then remove only this run's temporary file after success or preservation of necessary failure evidence. Never silently stage an excluded path or turn mixed-hunk ownership into a whole-file commit.
 
-提交前核对 owned paths 与已暂存内容。显式路径提交保留其他文件的暂存状态，但会提交这些路径的工作树内容，不保留文件内的 hunk 选择。若同一文件混有其他任务或用户修改，必须使用调用方已验证的 hunk/index 隔离方案，或停止该组提交。不得 reset/stash 用户暂存区；遵循 `spec-commit-push-pr` 共享 reference（从当前已安装的 `spec-commit-push-pr` Skill 目录解析 `references/commit-and-push.md`）的同一边界，消费范围同 Step 2 所述（precommit/recovery 边界，不含其 branch-creation 流程）。
+Verify owned paths against the staged content before submission. An explicit path commit preserves the staging status of other files but commits the working tree content of the specified paths, without retaining hunk selections within the files. If the same file has been modified by other tasks or users, a hunk/index isolation scheme verified by the calling party must be used, or the group submission must be aborted. Do not reset or stash the user's staged area; adhere to the shared reference defined by `spec-commit-push-pr` (parse `references/commit-and-push.md` from the currently installed `spec-commit-push-pr` skill directory), maintaining the same boundary as described in Step 2 (precommit/recovery boundary, excluding the branch-creation workflow).
 
 ### Step 5: Confirm
 

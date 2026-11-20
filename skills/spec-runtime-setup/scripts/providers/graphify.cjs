@@ -31,12 +31,12 @@ const HOOK_ARTIFACT_BLOCK_END = '# spec-first graphify artifact env end';
 const HOOK_CREDENTIAL_BLOCK_START = '# spec-first graphify credential isolation start';
 const HOOK_CREDENTIAL_BLOCK_END = '# spec-first graphify credential isolation end';
 const GRAPHIFY_HOOK_MARKER = 'Installed by: graphify hook install';
-// Graphify 0.9.57 无 zcode 平台，zcode 映射 Provider 原生 agents 平台；pi 虽有原生
-// 平台但它写 .pi/agent/skills/——不在 Pi 官方项目级发现路径（.pi/skills、.agents/skills）
-// 内，故同样映射 agents 平台写入共享 .agents/skills/ 投影根。
+// Graphify 0.9.57: no zcode platform; zcode mapping provider for native agents platform; pi has native support
+// The platform, but it's written at .pi/agent/skills/ — not found in Pi's official project-level discovery paths (.pi/skills, .agents/skills)
+// Therefore, it also maps the agents platform writing to the shared .agents/skills/ projection root.
 const GRAPHIFY_PROJECT_PLATFORM_BY_HOST = Object.freeze({ zcode: 'agents', pi: 'agents' });
-// 各宿主 Python Provider project integration 的 required surface 清单，
-// 被 verify/configured/mutation-guard 三处共用；新增宿主时必须三处一致。
+// List of required surface items for integrating with host Python Provider projects
+// Shared by verify/configured/mutation-guard; must be consistent across all three when adding a host.
 const GRAPHIFY_PYTHON_HOST_SURFACES = Object.freeze({
   claude: ['.claude/skills/graphify/SKILL.md', '.claude/CLAUDE.md', 'CLAUDE.md', '.claude/settings.json'],
   codex: ['.codex/skills/graphify/SKILL.md', 'AGENTS.md', '.codex/hooks.json'],
@@ -323,7 +323,7 @@ function verify(context = {}) {
   else if (rootConflict) nextActions.push('同时存在 .graphify/ 与 graphify-out/；先由 owner 解析 artifact root 冲突，setup 不会静默选择。');
   else if (legacyRootExists && !hasCurrent) nextActions.push('运行 spec-runtime-setup --only graphify，将旧 .graphify/ 原子迁移为 provider-native graphify-out/。');
   if (installed && hasCurrent && !queryVerified) nextActions.push('依赖 graph candidate 前，先运行真实的 Graphify query probe。');
-  // KTD5a consume-side：仅当 spec-first 基线存在且 HEAD 已移动（图落后）时给 advisory；只读，不触发重建。
+  // KTD5a consumption-side: Provides advisory only when the spec-first baseline exists and HEAD has moved (graph lagged); read-only, does not trigger reconstruction.
   if (hasCurrent && context.targetKind !== 'non-git-folder'
     && readSingleRepoGraphFreshness(repoRoot, resolved.artifact_root).state === 'head-moved') {
     nextActions.push('Graphify 图基线落后当前 HEAD：如需消费前的当轮 currentness，运行 spec-runtime-setup --only graphify --refresh；项目内/已验证的 commit-time hook 若在位会自动刷新。');
@@ -610,7 +610,7 @@ function apply(context = {}, actionPlan = plan(context)) {
   const generatedThisRun = !mutationFailure && (actionPlan.actions || []).some(
     (action) => ['first-generation', 'refresh'].includes(action.kind),
   );
-  // KTD5a：spec-first 自己生成图时写单仓基线快照，供消费侧只读比对当前 HEAD。
+  // KTD5a: spec-first; when generating diagrams, create a single-repository baseline snapshot for consumption side read-only comparison against current HEAD.
   if (generatedThisRun && hasArtifact && context.targetKind !== 'non-git-folder') {
     writeSingleRepoGraphBaseline(repoRoot, path.join(repoRoot, CURRENT_ARTIFACT_ROOT));
   }
@@ -626,7 +626,7 @@ function apply(context = {}, actionPlan = plan(context)) {
     if (!incumbentCleanup.ok) mutationFailure = incumbentCleanup.reason_code;
     else runtimeContext = { ...runtimeContext, graphifyCollisionState: 'none', graphifyOriginalPathCommand: null };
   }
-  // 发布前核对实际执行环境，不能把 plan 的历史 pin 当作当前安装身份。
+  // Verify the actual execution environment prior to release; do not treat the historical pin of a plan as the current installation identity.
   const finalIdentity = runtimeContext.graphifyCommand
     ? probePythonDistributionIdentity(runtimeContext, repoRoot, runtimeContext.graphifyCommand,
       context.dependency, runtimeContext.graphifyInterpreter) : null;
@@ -749,7 +749,7 @@ function resolveGraphifyHookTarget(repoRoot, targetKind = '') {
     return {
       classification: 'external',
       reason_code: 'graphify-hook-path-outside-project',
-      // 仅供 external 只读 marker 验证（R3/KTD2）；publicGraphifyHookTarget 不暴露此绝对路径。
+      // For external read-only marker validation (R3/KTD2); publicGraphifyHookTarget does not expose this absolute path.
       absolute: resolved.absolute,
     };
   }
@@ -815,18 +815,18 @@ function defaultGraphifyHookOutcome(target) {
 }
 
 function probeExternalGraphifyHookMarker(hooksRoot) {
-  // 只读验证（R3/KTD2）：仅读取有效 hooks root 下的 post-commit / post-checkout 两个文件，
-  // 检测 Graphify managed marker 与会重新生成 legacy root 的 GRAPHIFY_OUT override。绝不 execute、write、`graphify hook status`，
-  // 不读其他文件；非普通文件（symlink/目录）无法证明 project-owned，按未命中处理，避免 follow-out。
+  // Read-only verification (R3/KTD2): Reads only the hooks in the root directory, specifically the post-commit and post-checkout files.
+  // Detects Graphify managed marker and will re-generate the GRAPHIFY_OUT override for legacy root. Absolutely no execute, write, `graphify hook status`
+  // Do not read other files; if the file is not a regular file (e.g., symlink or directory), it cannot be proven as project-owned and is handled as a miss; avoid following references.
   const detected = { post_commit: false, post_checkout: false, legacy_artifact_override: false };
   for (const name of GRAPHIFY_HOOK_NAMES) {
     const file = path.join(hooksRoot, name);
     try {
       const stat = fs.lstatSync(file);
       if (!stat.isFile()) continue;
-      // 外部 hooks root 不在本仓 containment 内,不能用 readBoundedScopeFile;此处以
-      // O_NOFOLLOW + 1MiB 前缀读取封顶(lane finding DR-005:旧版无上限读入用户可控
-      // hook 文件)。超限文件仅在前缀内探测 marker——探测是 advisory 检测,不证明全文。
+      // External hooks root is not within the containment of this repository; readBoundedScopeFile cannot be used; here we use
+      // O_NOFOLLOW + 1MiB prefix read capitation (lane finding DR-005: old version had no read limit, user-controlled)
+      // (hook file)Excessive file detection occurs only within the prefix containing the marker—detection is advisory and does not prove the entire document.
       const contents = readHookFilePrefix(file, 1024 * 1024);
       if (contents == null) continue;
       if (contents.includes(GRAPHIFY_HOOK_MARKER)) {
@@ -835,7 +835,7 @@ function probeExternalGraphifyHookMarker(hooksRoot) {
       }
       if (usesLegacyGraphifyArtifactOverride(contents)) detected.legacy_artifact_override = true;
     } catch (_error) {
-      // 文件缺失或不可读 → 未命中；只读探测绝不抛到外部。
+      // File missing or unreadable → no match; read-only probing never throws externally.
     }
   }
   return detected;
@@ -883,9 +883,9 @@ function externalGraphifyHookOutcome(target) {
     };
   }
   if (marker.post_commit) {
-    // 只读确认有效 hooks root（项目外）存在 Graphify commit hook。
-    // KTD3：verified-external ≠ project-owned verified；hook_installed/hook_verified 保持 false，
-    // external hook execution 由 Git 负责、未经 spec-first 结构验证。
+    // Read-only confirmation valid hooks root (external project) exists Graphify commit hook.
+    // KTD3: verified-external ≠ project-owned verified; hook_installed/hook_verified remains false
+    // External hook execution is handled by Git and is not validated by the spec-first structure.
     return {
       installed: false,
       verified: false,
@@ -949,8 +949,8 @@ function failedGraphifyHookOutcome(reasonCode, installed = false) {
 }
 
 function verifyGraphifyHookCapability(repoRoot, runtimeContext, target, installed, pythonProvider) {
-  // 项目外有效 hooks root：只读验证 commit hook 是否携带 Graphify marker（R3），
-  // 无论 provider 是否安装都可报告 verified-external / blocked；绝不 execute/write/status。
+  // Project external effective hooks root: Read-only verification of whether the commit hook carries the Graphify marker (R3)
+  // Report verified-external / blocked regardless of provider installation; never execute/write/status.
   if (target.classification === 'external') return externalGraphifyHookOutcome(target);
   const outcome = defaultGraphifyHookOutcome(target);
   if (!installed || target.classification !== 'project-contained') return outcome;
@@ -1031,9 +1031,9 @@ function applyGraphifyHookCapability(repoRoot, runtimeContext, target, pythonPro
     );
 }
 
-// 单仓 consume-side 新鲜度（R10/R11/KTD5a）：spec-first 只在自己生成图时写基线快照；
-// 消费侧只读比对当前 HEAD，产出 advisory 事实，绝不触发重建。external/native hook 刷新的图
-// 无基线时降级 no-baseline，沿用 verify() 既有 unknown 诚实信号。
+// Single bin consume-side freshness (R10/R11/KTD5a): spec-first; baseline snapshot written only when own graph is generated;
+// Consumer-side reads only compare with the current HEAD, producing advisory facts without triggering reconstruction. external/native hook refresh image
+// No-baseline degradation: use the existing unknown honest signal from verify().
 const SINGLE_REPO_GRAPH_BASELINE = 'spec-first-graph-baseline.json';
 
 function graphifyScopeReceiptRef(repoRoot, artifactRoot) {
@@ -1240,7 +1240,7 @@ function writeGraphifyScopeProvenance(repoRoot, artifactRoot, requirementWorkspa
     try {
       if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath);
     } catch (_error) {
-      // 主写入结果仍是权威事实。
+      // The primary write result remains the authoritative fact.
     }
   }
 }
@@ -1299,7 +1299,7 @@ function writeSingleRepoGraphBaseline(repoRoot, artifactRoot) {
     });
     fs.writeFileSync(target, `${JSON.stringify({ schema_version: 'graphify-single-repo-baseline.v1', head_sha: head }, null, 2)}\n`, 'utf8');
   } catch (_error) {
-    // 基线是 advisory；写失败绝不阻塞核心 setup。
+    // Baseline is advisory; write failure does not block core setup.
   }
 }
 
@@ -1619,9 +1619,9 @@ function inspectGraphIntegrity(artifactRoot, supportedCodeFact = { status: 'pres
   }
   const supportedCodePresent = sourceFact.status === 'present';
   try {
-    // 经 readBoundedScopeFile 读取:containment + 读取前后稳定性复核 + 64MiB 合同上限,
-    // 取代旧版无上限 readFileSync(lane finding DR-005);超限/读取期变化与解析失败
-    // 同路返回 artifact 合同不满足。
+    // Read via readBoundedScopeFile: containment + pre-and-post stability verification + 64MiB contract upper limit
+    // Replace the old version with unlimited readFileSync(lane finding DR-005); overflow/reading period change and parsing failure
+    // Same route return artifact contract not satisfied.
     const graph = JSON.parse(readBoundedScopeFile(artifactRoot, graphPath, 'utf8'));
     const nodes = Array.isArray(graph.nodes) ? graph.nodes.length : null;
     if (nodes === null) return { ok: false, reason_code: 'graphify-artifact-contract-mismatch' };
@@ -1873,7 +1873,7 @@ function probePythonDistributionIdentity(context, repoRoot, launcher, dependency
 function launcherInterpreter(launcher) {
   if (path.extname(launcher).toLowerCase() === '.exe') return null;
   try {
-    // 只读首 4KiB 取 shebang,不再整文件读入(lane finding DR-005)。
+    // Only read the first 4KiB to extract the shebang, without loading the entire file into memory (lane finding DR-005).
     const fd = fs.openSync(launcher, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
     let prefix = '';
     try {
@@ -1909,9 +1909,9 @@ function parseJsonStdout(result) {
 }
 
 function graphifyArtifactIsProtected(repoRoot) {
-  // 与 Provider backup_if_protected（graphifyy 0.9.x export.py）同构的触发判定：
-  // graph.json 存在，且 .graphify_semantic_marker 存在，或 .graphify_labels.json
-  // 含任一非默认（非 "Community N"）社区标签。判定失败时保守视为受保护。
+  // Trigger determination mechanism identical to Provider backup_if_protected (graphifyy 0.9.x export.py):
+  // graph.json exists, and .graphify_semantic_marker exists, or .graphify_labels.json exists
+  // Contains any non-default (non "Community N") community tag. Fail conservatively treated as protected.
   try {
     const outDir = path.join(repoRoot, CURRENT_ARTIFACT_ROOT);
     if (!fs.existsSync(path.join(outDir, 'graph.json'))) return false;
@@ -1953,9 +1953,9 @@ function graphifyProcessEnv(context, additions = {}) {
       env[key] = value;
     }
   }
-  // Provider 的 backup_if_protected 会在覆盖前把 curated/semantic 图快照到 graphify-out/<日期>/。
-  // 非 curated 的 setup 管理图关闭按天备份避免逐日镜像堆积；curated/semantic 图保留该快照
-  // 作为覆盖前唯一回滚通道（判定与 backup_if_protected 同构，判定失败时保守保留备份）。
+  // The backup_if_protected of Provider will take a curated/semantic graph snapshot to graphify-out/<date>/ prior to overwrite.
+  // For non-curated setups, disable daily backup to prevent daily image accumulation; for curated/semantic graphs, retain the snapshot.
+  // As the sole rollback pathway prior to the backup (judged congruent with backup_if_protected; if the judgment fails, the backup is conservatively retained).
   if (!graphifyArtifactIsProtected(path.resolve(context.repoRoot || process.cwd()))) {
     env.GRAPHIFY_NO_BACKUP = '1';
   }
@@ -2288,7 +2288,7 @@ function writeContainedText(repoRoot, target, contents, reasonCode) {
     try {
       if (fs.existsSync(temp)) fs.rmSync(temp, { force: true });
     } catch (_error) {
-      // 保留主 mutation 错误。
+      // Keep the main mutation error.
     }
   }
 }

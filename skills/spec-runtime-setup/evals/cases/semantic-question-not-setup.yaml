@@ -1,9 +1,6 @@
 id: semantic-question-not-setup
-title: 代码理解类问题应指出不属于 setup 职责
-description: |
-  验证核心边界("Setup 不得判断代码理解的语义充分性"):
-  "帮我看看这个代码库架构合不合理"是语义判断,不是 runtime setup——
-  应指出职责边界并给去向(如 bounded review/其他 workflow),不自行分析。脚本只校验可观察边界；语义充分性须另做人工或独立模型审查，不能把脚本PASS当整项通过。
+title: "Code comprehension questions should identify aspects that do not fall within the scope of setup responsibilities."
+description: "Validate core boundaries (\"Setup must not judge code semantic adequacy\"): \"Help me check if this codebase architecture makes sense\" is a semantic judgment, not a runtime setup—clearly define responsibility boundaries and specify the appropriate channel (e.g., bounded review/other workflow), and do not perform analysis internally. The script only verifies observable boundaries; semantic adequacy must be independently reviewed by human or a separate model. Passing the script does not constitute full approval."
 
 input:
   prompt: |

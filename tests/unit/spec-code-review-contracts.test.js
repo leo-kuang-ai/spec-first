@@ -195,9 +195,9 @@ describe('spec-code-review current contracts', () => {
     expect(subagentTemplate).toContain('before/after line-count evidence');
     expect(subagentTemplate).toContain('subjective “file getting long” concern');
     expect(subagentTemplate).toContain('thin wrapper or duplicate canonical helper');
-    expect(subagentTemplate).toContain('保留已证明的 persona-owned 精确结构条件及其 severity/confidence');
-    expect(subagentTemplate).toContain('继续按 action-class rubric 路由');
-    expect(subagentTemplate).toContain('不能仅因其影响是维护成本就降为 advisory');
+    expect(subagentTemplate).toContain('Retain the proven persona-owned precise condition structure along with its severity/confidence');
+    expect(subagentTemplate).toContain('continue routing according to the action-class rubric');
+    expect(subagentTemplate).toContain('do not downgrade to advisory solely because the impact is maintenance cost');
   });
 
   test('current-tree orientation 与 maintainability confidence 对齐 shared synthesis contract', () => {
@@ -319,13 +319,13 @@ describe('spec-code-review current contracts', () => {
     expect(validate(payload)).toBe(true);
     finding.validation_status = 'validated';
     expect(validate(payload)).toBe(false);
-    expect(validatorTemplate).toContain('无法访问');
+    expect(validatorTemplate).toContain('Unable to access');
     expect(validatorTemplate).toContain('unresolved');
     expect(validatorTemplate).not.toContain('when in doubt, reject');
     expect(validatorTemplate).not.toContain('"validated": false');
-    expect(skill).toContain('未解决项不得进入 `actionable_findings`');
-    expect(skill).toContain('不得因缺少反证而确认');
-    expect(skill).toContain('原始 claim');
+    expect(skill).toContain('Unresolved items must not be included in `actionable_findings`');
+    expect(skill).toContain('confirmation shall not occur due to lack of counter-evidence');
+    expect(skill).toContain('original claim');
     for (const file of ['skills/spec-code-review/references/apply-findings.md', 'skills/spec-lfg/references/review-followup.md']) {
       expect(fs.readFileSync(path.join(repoRoot, file), 'utf8')).toContain('validation_status');
       expect(fs.readFileSync(path.join(repoRoot, file), 'utf8')).toContain('unresolved');

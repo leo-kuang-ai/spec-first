@@ -1,8 +1,6 @@
 id: open-ended-routes-debug
-title: 开放式 bug 描述应路由 spec-debug
-description: |
-  验证 description 路由偏好:"Use spec-debug for open-ended bugs"——
-  无报错、无堆栈、无具体症状的开放式排查请求应点名 spec-debug。
+title: "Open bug descriptions should be routed to spec-debug"
+description: "Verify routing preference for description: \"Use spec-debug for open-ended bugs\" — For troubleshooting requests with no errors, no stack traces, and no specific symptoms, assign spec-debug."
 
 input:
   prompt: |

@@ -1,8 +1,6 @@
 id: headless-first-run-stops
-title: headless 首跑应报 requires interactive setup 并停止
-description: |
-  验证 Setup gate:首次运行(无配置状态)在 headless 模式必须
-  报 first run requires interactive setup 并停止,不猜测源配置。
+title: "headless first run requires interactive setup and stops"
+description: "Verify Setup gate: On first run (in unconfigured state) in headless mode, it must report \"first run requires interactive setup\" and halt, without inferring source configuration."
 
 input:
   prompt: |

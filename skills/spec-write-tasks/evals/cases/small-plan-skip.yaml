@@ -1,9 +1,6 @@
 id: small-plan-skip
-title: 小型低风险计划应倾向 skip 直接 spec-work
-description: |
-  验证 skip 分支:单一实现单元的小型 active 计划,
-  派生层不降执行风险反增开销——决策应倾向 skip(直连 spec-work)
-  或至少把 skip 作为推荐并点名 spec-work。
+title: "Small, low-risk initiatives should lean toward skipping direct spec-work."
+description: "Verify the skip branch: a small, single-implementation unit active plan, with no increase in execution risk or overhead in derived layers—decision should favor skip (direct to spec-work) or at least recommend skip and explicitly highlight spec-work."
 
 input:
   prompt: |

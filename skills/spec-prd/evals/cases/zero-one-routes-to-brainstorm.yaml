@@ -1,8 +1,6 @@
 id: zero-one-routes-to-brainstorm
-title: 0-1 全新产品探索应路由 spec-brainstorm 而非强上 PRD 仪式
-description: |
-  验证 Phase 0 路由决策:从零做全新产品、产品形态完全未定的请求属 0-1 探索,
-  应交给 spec-brainstorm,不得强行走 brownfield PRD 仪式。
+title: "0-1 New product exploration should follow spec-brainstorming rather than forcing a PRD ceremony"
+description: "Verify Phase 0 routing decision: Requests for entirely new products with undefined product forms should be classified as 0-1 exploration and assigned to spec-brainstorm; walking through brownfield PRD rituals is prohibited."
 
 input:
   prompt: |

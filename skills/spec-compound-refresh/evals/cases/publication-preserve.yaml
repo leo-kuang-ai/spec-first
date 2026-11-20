@@ -1,5 +1,5 @@
 id: publication-preserve
-title: 独有离线知识与实质引用阻止误删
+title: "Only offline knowledge and actual citations prevent accidental deletion"
 input:
   prompt: |
     先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。

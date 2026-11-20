@@ -12,7 +12,7 @@ To surface findings in seconds, **in the same turn that fires the parallel dispa
 
 Scan only for **high-signal, obvious** issues a careful first read catches: data/SQL safety, injection (shell/SQL/LLM-output trust boundary), broken control flow, a missing `await`/unhandled promise, a swapped argument or off-by-one, an enum/status added without updating its sibling switch, a null deref on a value the diff makes reachable. Do **not** do deep analysis, read beyond the diff (except a quick Grep for enum completeness), or chase subtle concerns. Quote the verbatim motivating line for each, same bar as a persona finding.
 
-仅将紧急 P0/P1 候选作为 preliminary 短列表展示，标明尚未验证、将进入最终去重；P2/P3 保留内部候选，验证和去重后再展示。没有紧急候选时只说明深度审查继续，不提前分配稳定 `#`。
+Display only emergency P0/P1 candidates as a preliminary shortlist, marked as unverified and to be entered into final deduplication; retain P2/P3 candidates internally for verification and deduplication before display. No emergency candidates available; only indicates continued deep review, without premature assignment of stable `#`.
 
 The fast pass enters Stage 5 as a pseudo-reviewer named `fast-pass`, with two hard constraints because it is the orchestrator's own read, **not** an independent reviewer (it shares the session model and its blind spots with the orchestrator and the session-model personas):
 
@@ -64,7 +64,7 @@ This preserves review signal without fabricating a roster or closing a gate that
 
 Apply this on **every** dispatched reviewer packet. A missed supported override is a silent cost-and-quality regression, so treat the internal tier list as load-bearing — moving it out of the user-facing output removed the *display*, not the discipline.
 
-显式模型选择优先于默认 tier：当前用户、项目有效指令或本次 prompt 已指定该 reviewer/tier 的模型时采用其指定；否则已配置的 role model 优先于默认 tier。仍须核对实际 selector 能力与返回身份；不支持时继承并披露限制，不能把文字要求当成已切换模型。
+Explicit model selection takes precedence over the default tier: if the current user, project, or the current prompt explicitly specifies a reviewer/tier model, that specified model is used; otherwise, the configured role model takes precedence over the default tier. Still need to verify the actual selector capability against the returned identity; when not supported, inherit and disclose the limitations, and never treat textual requirements as equivalent to a model switch.
 
 **Bounded parallel dispatch.** Respect the current harness's active-subagent limit without hard-coding a number. Keep the selected reviewers in a deterministic queue, dispatch up to the known/accepted capacity, and fill freed slots as reviewers complete. If the harness exposes no limit, start optimistically and learn it from the first capacity response. Treat active-agent/thread/concurrency-limit spawn errors as backpressure, not reviewer failure: leave that reviewer queued, wait for any active reviewer to finish, then retry. If no reviewer from this run has been accepted yet, do not wait on an empty active set: retry after a short bounded delay, and after repeated zero-capacity responses proceed with a user-visible degraded/no-subagent review path instead of waiting forever. Do not shrink the roster, ask the user, or record a reviewer as failed for capacity backpressure. Record a reviewer as failed only after a successful dispatch times out/fails, or when dispatch fails for a non-capacity reason.
 
@@ -74,7 +74,7 @@ For each selected reviewer, read the corresponding local prompt asset from `refe
 
 Load only selected prompt assets. Resolve any path placeholders to the verified current directories before dispatch. This project uses fixed `docs/` paths, not CE's `docs_root` cascade.
 
-宿主支持 reviewer 直接读文件时，可以传递 persona、subagent-template、diff-scope、schema 的精确 source 路径和各 slot 值，要求新 reviewer 在分析前读取并按完整模板工作；不能只传 persona 路径而遗漏输出合同。不能读文件时才内联完整内容。共享 staged diff 按 `diff --git` 边界分段读取，工具截断不算读完。
+The host supports reviewers directly reading files, allowing precise passage of the source paths for persona, subagent-template, diff-scope, and schema, along with the full values for each slot. Reviewers must read and utilize these files before analysis and work according to the complete template; it is not sufficient to only pass the persona path and omit the output contract. Only inline the full content when file reading fails. Read staged diff in segments bounded by `diff --git`, tool truncation does not count as complete reading.
 
 1. Their persona file content (identity, failure modes, calibration, suppress conditions)
 2. Shared diff-scope rules from `references/diff-scope.md`

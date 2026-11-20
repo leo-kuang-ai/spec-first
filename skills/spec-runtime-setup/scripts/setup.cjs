@@ -204,7 +204,7 @@ function runSetup(input = {}) {
     if (actionPlan.args.workspaceGraphStatus) {
       return runWorkspaceGraphStatusSetup(context);
     }
-    // 父目录 bare/check 仅诊断；不得因子仓缺投射阻断只读路径。
+    // Parent directory bare/check diagnoses only; no read-only path blocking shall occur due to missing projection in the factor repository.
     if (target.mode === 'workspace-all-repos' && ['bare', 'check'].includes(actionPlan.mode)) {
       return runParentWorkspaceDiagnostic(context);
     }
@@ -718,7 +718,7 @@ function buildInstallPreviewActions(context, repoRoot, providerPlans) {
   return actions;
 }
 
-// 单一实现抽取至 lib/host-config-repair-command.cjs(lane finding DR-015)。
+// Extract single implementation to lib/host-config-repair-command.cjs (lane finding DR-015).
 function hostConfigRepairCommand(context) {
   return require('./lib/host-config-repair-command.cjs').hostConfigRepairCommand(context);
 }

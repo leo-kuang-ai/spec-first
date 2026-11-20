@@ -1,0 +1,18 @@
+id: writes-design-for-team-review
+title: Deliver a review draft for client engineers and testers
+description: Check the file, fixture integrity, and handoff boundary. Readers assess the design rationale and exceptional cases.
+input:
+  prompt: |
+    Run `node prepare-eval.cjs` once; only this step may create a fixture baseline commit.
+    We want an optional UTC month filter on GET /entries. Without a month, return all entries as before. Return 400 for an invalid month.
+    Client engineers and testers will review the design tomorrow. Write a technical design for that discussion at docs/reviews/month-filter-design-review.md and identify the source file that handles the request today.
+    Deliver meeting material only. Do not change the service, run the application, commit the draft, or send it anywhere.
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-team-design-review.sh
+  timeout_seconds: 30

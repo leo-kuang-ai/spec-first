@@ -30,7 +30,7 @@ Enter this reference only after the leading mode token is stripped and shallow f
 
 If the task pack is invalid, stale, wrong-chain, unverifiable, source-plan-missing, scope-ambiguous, semantically inadequate, or drifted after intake, stop before creating or continuing execution tasks. Return the copy-ready handoff in [Failure Handoff](#failure-handoff). Do not silently reinterpret the file as a legacy plan, infer tasks from human-readable cards, or continue from a cached validation receipt.
 
-非活跃来源且当前用户明确要求补完时，执行第 1 节的 plan owner 接续分支；仍停止旧任务包执行，不把 handoff 当作校验通过。
+For inactive sources and when the current user explicitly requests completion, execute the handover branch in Section 1 of the plan owner; still halt the execution of the old task package, and do not consider the handoff as a validation pass.
 
 ## 1. Lock Roots And Run Deterministic Validation
 
@@ -47,7 +47,7 @@ spec-first tasks hash <source-plan-path> --repo <artifact-root> --json
 
 Require all of the following before semantic intake:
 
-若 CLI 返回 `task-pack-source-plan-non-active` 或 `tasks-source-plan-non-active`，且当前用户明确要求补完，保留失败收据与旧任务包；只将已核验在 artifact root 内且可达的 source plan 路径及发现交给 `spec-plan` Phase 0.1。该交接不视为 validation 成功，不进入下面的 semantic intake；owner 返回有效后继后，从本节重新校验新输入。其他路径、安全、来源或合同错误仍按 Failure Handoff 阻断依赖动作，不从非法任务包猜测 source path。
+If the CLI returns `task-pack-source-plan-non-active` or `tasks-source-plan-non-active`, and the current user explicitly requests completion, retain the failure receipt and the original task package; only pass the source plan path that has been verified and is accessible within the artifact root to the `spec-plan` Phase 0.1. This handover does not constitute a validation success and does not proceed to the subsequent semantic intake; upon the owner returning a valid successor, the input is re-validated from this section. Other path, security, origin, or contract errors still block dependent actions via Failure Handoff, and the system will not infer a source path from an invalid task package.
 
 - validation process succeeded;
 - `schema_version: task-pack-validation/v1`;
@@ -115,7 +115,7 @@ Recompute and compare the pinned facts before every task start and before every 
 - current canonical plan hash vs `source_plan_hash`;
 - current source-plan metadata/content-shape vs the implementation-ready code intake;
 - current source-plan lifecycle status; `completed`, `partially-shipped`, and `superseded` are `source-plan-non-active` and invalidate the task pack even when body hash and readiness still match;
-- 当前用户明确授权补完时，将非活跃 source plan 与核验发现交给 `spec-plan` Phase 0.1；保留旧任务包，核验后继计划，必要时重新生成并校验新 task pack，再从 intake 接续。只读请求不触发计划生产，旧 pins 不得重绑以绕过生命周期拒绝；
+- When the current user explicitly authorizes completion, pass the non-active source plan and validation findings to the `spec-plan` Phase 0.1; retain the original task package, validate the subsequent plan, and regenerate and verify a new task package if necessary, then resume from intake. Read-only requests do not trigger planned production; old pins must not be rebound to bypass lifecycle rejection;
 - selected artifact root and task/source paths vs the pinned receipt.
 
 On mismatch, stop the current task and all dependent work:

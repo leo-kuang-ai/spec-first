@@ -1,8 +1,6 @@
 id: no-input-asks
-title: 空输入应先询问目标 increment 或 PRD 路径
-description: |
-  验证 Input gate:无 prd_input 调用时按 SKILL.md 询问目标 increment 或既有 PRD 路径,
-  不得在拿到输入前推进阶段或产出 PRD。
+title: "Empty input should first prompt for the target increment or PRD path"
+description: "Verify Input gate: Without prd_input invocation, consult SKILL.md to determine the target increment or existing PRD path; do not advance the stage or deliver a PRD prior to receiving input."
 
 input:
   prompt: |

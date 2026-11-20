@@ -13,8 +13,8 @@ function defaultRepairFor(reasonCode) {
 }
 
 /**
- * 执行 registry 提供的有界修复；修复动作本身由调用方执行，避免 loop
- * 越权推断命令。每次尝试后必须重新读取 readiness/probe 结果。
+ * Execute bounded repair provided by registry; the repair action is performed by the caller to avoid loop
+ * Command for overreach inference. After each attempt, the readiness/probe result must be re-read.
  */
 function runBoundedRepairLoop({ initial, repairFor, apply, verify, maxAttempts = MAX_REPAIR_ATTEMPTS } = {}) {
   let state = initial;

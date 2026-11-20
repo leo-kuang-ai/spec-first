@@ -1,7 +1,7 @@
 'use strict';
 
-// Workspace graph 的 build/status/clean 共用 writer lease。锁位于 `.spec-first/`，因此
-// clean 删除 `graphify-out/` 时仍受保护；async wrapper 持锁，setup child 只校验继承 token。
+// The Workspace graph shares a writer lease for build/status/clean. The lock is located at `.spec-first/`, therefore
+// clean removes `graphify-out/` with protection; async wrapper holds lock, setup child only verifies inherited token.
 
 const crypto = require('node:crypto');
 const childProcess = require('node:child_process');
@@ -266,8 +266,8 @@ function snapshotIsStale(snapshot, nowMs, processIdentity = processIdentityState
     && Number.isInteger(Number(owner.owner_pid))) {
     const identity = processIdentity(Number(owner.owner_pid), owner.owner_start_marker);
     if (identity === 'dead' || identity === 'mismatched') return true;
-    // PID 仍存活但 start marker 无法确认时保持 fail closed。按年龄回收会在长任务、
-    // 受限 ps/PowerShell 环境或 marker 短暂不可用时偷走真实 writer lease。
+    // Fail closed when the start marker cannot be confirmed, though the PID is still alive. Age-based recycling occurs during long tasks,
+    // Steal the real writer lease when the restricted PS/PowerShell environment or marker is temporarily unavailable.
     return false;
   }
   return Math.max(0, nowMs - snapshot.stat.mtime_ms) > ORPHANED_LOCK_GRACE_MS;

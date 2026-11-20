@@ -174,11 +174,11 @@ STATUS_READ_CAP = 256
 META_READ_CAP = 64 * 1024
 PAYLOAD_READ_CAP = 2 * 1024 * 1024
 SERVING_RECEIPT_READ_CAP = 32 * 1024
-# 跨模型 serving receipt 的认证 producer 通道尚未建成；关闭期间 start 对任何
-# receipt 形状一律 fail-closed（含 degraded 形状），禁止把自述 receipt 当信任根。
-# 重估条件（翻转本常量本身不解除任何门）：建成经认证的 host producer channel、
-# 为 receipt 增加防伪签名、重写 freshness/identity/allowlist 校验并补正向测试后，
-# 在下一次跨模型 peer 能力批次中整体评估是否解除；在此之前保持 False。
+# The producer channel for cross-model serving receipt authentication has not yet been established; during the closure period, start will be blocked for any
+# The receipt shape must always be fail-closed (including degraded states), and self-reported receipts must not be treated as a trusted root.
+# Revaluation condition (flipping this constant itself does not release any gate): established an authenticated host producer channel,
+# Add anti-forgery signature to receipt, rewrite freshness/identity/allowlist validation and fix issues after testing.
+# Evaluate whether to lift the restriction in the next cross-model peer capability batch; remain False prior to that.
 SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED = False
 SECRET_VALUE_PATTERNS = (
     re.compile(r'\b(?:api[_-]?key|access[_-]?token|password|secret)\s*[:=]\s*["\']?[A-Za-z0-9_./+\-=]{8,}', re.I),
@@ -366,16 +366,16 @@ def validate_start_authority(args, worker_argv):
             != 'authenticated-producer-unavailable'):
         raise RunnerError('provider_serving_receipt_unverified')
     if not SERVING_RECEIPT_PRODUCER_CHANNEL_ENABLED:
-        # 通道关闭是设计状态：file-based receipt 可自伪造，不能作为信任根。
-        # 解除条件：存在经认证的 host producer channel 并为 receipt 增加防伪
-        # 签名后，重写 freshness/identity/allowlist 校验并补正向测试。
+        # Channel closure is designed as a non-secure state: file-based receipt can be forged and cannot serve as a trusted root.
+        # Release condition: presence of an authenticated host producer channel and the addition of anti-forgery to receipts
+        # After signing, rewrite the freshness/identity/allowlist validation and supplement testing.
         raise RunnerError(
             'provider_serving_receipt_unverified'
             ' (authenticated producer channel disabled)')
     raise RunnerError('provider_serving_receipt_unverified')
-    # 通道关闭期间，上一行是本函数的必然终点。曾有版本在其后保留一整段
-    # 不可达的 packet 校验草稿(lane finding DR-006):通道建成时校验本就要求
-    # 按新 receipt 合同整体重写,保留草稿只会无告警腐烂,已删除。
+    # During channel closure, the previous line is inevitably the terminal of this function. There was a version that retained an entire segment at the end.
+    # Packet validation draft (lane finding DR-006): Check required at the time of lane establishment
+    # Rewrite the receipt contract as a whole based on the new receipt; retain draft only without alerts, previously deleted.
 
 
 # --- Windows security + process primitives ------------------------------------
@@ -1520,9 +1520,9 @@ def supervise(job_dir: str, argv, result_path, conf: dict, ack_fd: int) -> None:
             "supervisor_pid": os.getpid(),
             "worker_pid": proc.pid,
         }
-        # pid 复用身份在双平台记录(Windows: GetProcessTimes;POSIX: /proc
-        # starttime 或 ps lstart),供 cmd_reap/kill_tree 的 fail-closed 守卫
-        # 消费(lane finding DR-007)。记录失败时不写字段,消费侧按未证实处理。
+        # pid reuse identity in dual-platform recording (Windows: GetProcessTimes; POSIX: /proc)
+        # starttime or ps lstart), for the fail-closed guard of cmd_reap/kill_tree
+        # Consumption (lane finding DR-007). Do not write field values on record failure; the consumption side handles it as unconfirmed.
         if IS_WINDOWS:
             sup_ident = _win_process_identity(os.getpid())
             worker_ident = _win_process_identity(proc.pid)

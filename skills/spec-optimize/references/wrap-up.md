@@ -48,7 +48,7 @@ Key improvements:
 
 Before claiming final improvement or target completion, confirm the integrated snapshot with the full configured measurement protocol and every required objective. Persist failures or unavailable confirmation as unresolved evidence. Report each required target against the final snapshot, and distinguish a target stop from budget, plateau, manual stop, or blocked execution. Comparison eligibility alone is not proof of integration.
 
-配置 holdout 时，最终集成源须重新获得独立确认，不能复用 standalone 候选的数值；保留 selection 和 holdout 两组原始配对及身份。未配置、数据泄漏、身份不匹配或确认未运行时，按实际情况限制改善 claim，不能把 selection 分数写成泛化收益。确认数据不反流到后续假设。
+When configuring holdout, the final integration source must obtain independent confirmation and cannot reuse the values from the standalone candidates; retain the original paired data and identities for both selection and holdout groups. Limit the claim improvement based on actual circumstances when configuration is not set, data leakage occurs, identity mismatch happens, or verification is not running. Do not treat the selection score as a generalized gain. Confirm that data does not backflow to subsequent assumptions.
 
 The optimization branch (`optimize/<spec-name>`) is preserved with all commits from kept experiments.
 The experiment log remains in local `.spec-first/workflows/spec-optimize/<spec-name>/` scratch space for resume and audit on this machine only; it does not travel with the branch because that run-state path is gitignored. The strategy digest is derived, reconstructable state and may be regenerated from the canonical experiment log.

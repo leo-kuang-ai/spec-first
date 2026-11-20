@@ -26,14 +26,14 @@ const TEMPLATE_ASSETS = [
 
 const TEMPLATE_REQUIRED_ANCHORS = {
   'assets/templates/00-generic.md': ['## Requirements [core]', '## Acceptance Examples [core]'],
-  'assets/templates/10-app.md': ['## App 属性确认', '## 页面与组件状态'],
-  'assets/templates/20-admin.md': ['## Admin 属性确认', '## 权限矩阵'],
-  'assets/templates/30-backend.md': ['## Backend 属性确认', '## 状态语义'],
-  'assets/templates/40-h5-pc.md': ['## Web 属性确认', '## 页面状态'],
-  'assets/templates/50-cli-devtool.md': ['## Tool 属性确认', '## Preview / Mutation Boundary'],
-  'assets/templates/60-mixed.md': ['## Mixed 属性确认', '## Source-Of-Truth Resolution'],
-  'assets/templates/70-large-requirement-index.md': ['## 子 PRD 清单', '## 整体验收'],
-  'assets/overlays/securities.md': ['## 一、行业横切关注点必查清单', '## 七、监管与标准参考（写 PRD 时只作线索）'],
+  'assets/templates/10-app.md': ['## App property confirmation', '## Page and component state'],
+  'assets/templates/20-admin.md': ['## Admin attribute confirmation', '## Permission matrix'],
+  'assets/templates/30-backend.md': ['## Backend property confirmation', '## State semantics'],
+  'assets/templates/40-h5-pc.md': ['## Web property confirmation', '## Page status'],
+  'assets/templates/50-cli-devtool.md': ['## Tool property confirmation', '## Preview / Mutation Boundary'],
+  'assets/templates/60-mixed.md': ['## Mixed property confirmation', '## Source-Of-Truth Resolution'],
+  'assets/templates/70-large-requirement-index.md': ['## Child PRD list', '## End-to-end acceptance testing'],
+  'assets/overlays/securities.md': ['## 1. Required cross-cutting checks', '## 7. Regulations and standards (research leads, not confirmed requirements)'],
 };
 
 function read(filePath) {
@@ -66,9 +66,9 @@ describe('spec-prd product-bundled template assets', () => {
     for (const relativePath of TEMPLATE_ASSETS) {
       expect(skill).toContain(relativePath);
     }
-    expect(skill).toContain('每个会产出 PRD artifact 的 run 都读取 `assets/templates/00-generic.md`');
-    expect(skill).toContain('无行业信号时不得加载');
-    expect(skill).toContain('所有人类问题都询问当前执行对话的用户');
+    expect(skill).toContain('Each run that produces a PRD artifact reads `assets/templates/00-generic.md`');
+    expect(skill).toContain('`assets/overlays/securities.md` is only loaded when input, project source, or the currently executing dialogue user explicitly provides a security/trading signal; it must not be loaded in the absence of an industry signal.');
+    expect(skill).toContain('all human-related queries are directed to the current dialog\'s user');
     expect(skill).not.toContain('template composition/routing');
 
     expect(outputContract).toContain('`SKILL.md` `Template Trigger Map`');

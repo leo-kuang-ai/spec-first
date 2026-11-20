@@ -1,9 +1,6 @@
 id: refine-own-idea-routes-to-brainstorm
-title: 打磨用户既有想法应停止并指向 spec-brainstorm
-description: |
-  验证入口边界（description: "use spec-brainstorm to refine the user's own idea" 与硬出口）：
-  用户已有一个想法、要求打磨成需求时，spec-ideate 不得代行 brainstorm 的工作，
-  应明确把该请求指向 spec-brainstorm。
+title: "Stop refining existing user ideas and steer toward spec-brainstorm"
+description: "Verify entry boundary (description: \"use spec-brainstorm to refine the user's own idea\") versus hard exit: When a user already has an idea and requests refinement into requirements, the spec-ideate module must not perform brainstorming on the user's behalf; instead, the request must be explicitly redirected to spec-brainstorm."
 
 input:
   prompt: |

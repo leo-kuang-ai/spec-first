@@ -1,10 +1,6 @@
 id: clear-req-writes-plan
-title: 需求已清晰时应简短处理并落盘 requirements-only 计划
-description: |
-  验证 0.2 需求清晰路径 + Phase 3 产出合同:验收标准明确、范围受限的单点需求
-  不应触发长对话发散;按用户明确要求落盘时写入 docs/plans/(默认 markdown),
-  文件名符合 YYYY-MM-DD-NNN-<type>-<topic>-plan 合同。artifact frontmatter 的
-  requirements-only / spec-unified-plan/v1 字段写在文件内而非聊天输出,由人工核验。
+title: "Handle and commit requirements-only plans concisely when requirements are clear"
+description: "Validate 0.2: Clear requirement path + Phase 3 contract output: Acceptance criteria are explicit, and scope is limited to isolated, single-point needs—no long-form divergent discussions should be triggered. When writing to disk based on user's explicit instructions, store in `docs/plans/` (default: Markdown), with filename following the format `YYYY-MM-DD-NNN-<type>-<topic>-plan`. The contract artifact frontmatter fields `requirements-only` or `spec-unified-plan/v1` must be written directly into the file, not in the chat output, and require manual verification."
 
 input:
   prompt: |

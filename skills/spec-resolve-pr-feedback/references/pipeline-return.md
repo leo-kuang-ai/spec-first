@@ -56,7 +56,7 @@ If implementation became blocked after writing, retain the actual modified paths
 and failed/not-run checks in a `needs-human` fix entry and the typed residual.
 Do not replace a remaining local diff with an empty `changed_files` array.
 
-恢复 handoff 时，重新核对 PR/head、逐来源正文、相关讨论和当前代码；旧 status、计数或未变的 root body 不证明旧判断仍然有效。发现漂移时保留原来源、实际改动及未满足条件，返回 partial/blocked 供 caller 对账。不得把先前 started/未知验证补写为 passed，也不得在此恢复模式下提交、发布回复或解决 thread。需要外部动作时仍交给持有独立授权的 caller，通过 Full Mode 的新鲜状态与可见回复协议完成。
+When recovering a handoff, reverify the PR/head, the original body content, relevant discussions, and current code; unchanged status, count, or root body does not prove the previous judgment remains valid. On detecting drift, retain the original source, actual modifications, and unmet conditions, and return partial/blocked for caller reconciliation. Do not change previously started/unknown verification status to passed; do not submit, publish, reply, or resolve the thread under this recovery mode. When external actions are required, they are still passed to the caller with independent authorization, accomplished through the fresh state and visibility response protocol of Full Mode.
 
 ## Pending conversation actions
 

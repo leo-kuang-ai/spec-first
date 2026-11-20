@@ -22,8 +22,8 @@ const BLOCK_START = '<!-- spec-first:workspace-routing start -->';
 const BLOCK_END = '<!-- spec-first:workspace-routing end -->';
 const CODEGRAPH_DEGRADED_HOSTS = new Set(['kiro', 'qoder']);
 
-// 此片段保持为静态 source asset：可放入子仓文档，但不宣称 workspace graph、成员关系或
-// CodeGraph provider 已获确认。受管 child routing 生命周期不属于本模块的合同。
+// This fragment remains as a static source asset: can be placed in child repository documents, but does not claim workspace graph or member relationships or
+// CodeGraph provider has been confirmed. The lifecycle of managed child routing does not fall under the contract of this module.
 function renderMemberGuidanceSnippet() {
   return [
     '### 子仓代码图引导',

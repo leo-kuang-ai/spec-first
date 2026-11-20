@@ -2,9 +2,9 @@
 
 Run optimization as a bounded measurement loop: freeze identity and baseline, change one treatment, measure the agreed objective, and keep multi-objective wins only when the evidence supports them. Screen expensive runs before spending them and record `not-run` or `degraded` outcomes honestly.
 
-## 独立确认边界
+## Independent confirmation of boundaries
 
-holdout 只确认已经由 selection 选出的候选；不进入假设、实验 worker、rolling summaries、strategy digest 或排名。只向这些消费者传 selection 的诊断，确认的原始配对和判定单独留在 experiment log 供审计；确认失败不能成为下一轮针对该集合调参的素材。
+holdout verifies only the candidates already selected by selection; it does not enter hypothesis, experiment worker, rolling summaries, strategy digest, or ranking. Only transmit selection diagnostics to these consumers, while keeping the original pairings and judgments separately in the experiment log for audit purposes; confirmation failures must not be used as material for the next round of hyperparameter tuning for the same set.
 
 ## Retuning a prompt or skill corpus
 
@@ -202,7 +202,7 @@ For each completed experiment, **immediately**:
    Preserve ordered sample arrays and the measured source identity in both snapshots. The comparison helper emits a nonzero exit and an `error` decision for invalid configuration or missing evidence; never replace that failure with a prose eligibility claim. Smoke and censor settings must be covered by the measurement execution envelope from Phase 1.
    If that probe finds no runtime, do not invoke an empty command: mark the experiment `error` with that reason and continue the batch. Use `decision` and `next_measurement`. Collect the requested measurement and repeat this sequence whenever `next_measurement` is not `none`. Do not keep a candidate until `next_measurement` is `none`. Record `inconclusive` and `censored` as those outcomes, not as `reverted`. Each extra sample belongs to this same experiment: write it onto the existing entry at CP-3, then decide again.
 
-   `next_measurement: holdout` 表示 selection 的完整协议已通过。此时由 orchestrator 在获授权的确认 envelope 下，对相同 source identities 收集第二组完整 `holdout: {baseline, candidate}`，再次调用同一脚本；不把确认数字覆盖 selection。judge 确认仍由获授权且独立的 judge 执行；seed 必须对应互斥 item。重复/ladder 使用完整 samples（含真实配对 baseline），smoke 事实也须绑定同一源。缺失、失败或不确认同一改善目标时不能集成；不以回填 aggregate、换目标、调阈值或重抽样直至绿来放行。
+   `next_measurement: holdout` indicates that the selection protocol has been completed successfully. At this point, the orchestrator collects a second complete `holdout: {baseline, candidate}` under authorized confirmation envelope for the same source identities, and invokes the same script again; the confirmed numbers are not overwritten in the selection. judge: confirmed to be executed by an authorized and independent judge; seed must correspond to an exclusive item. Repeat/ladder uses complete samples (including real paired baseline), and smoke facts must also be sourced from the same origin. Fails to integrate when goals are missing, failed, or not confirmed; cannot release until aggregate reconciliation, target adjustment, threshold modification, or resampling achieves green status.
 
 7. **IMMEDIATELY persist this experiment on disk (CP-3)** — do not defer this to batch evaluation. The durable unit is one log entry per experiment at `.spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml`. After the first measurement, append that entry. After every later ladder sample for the same experiment, write the accumulated metrics and current outcome onto that same entry. Do not append a second entry for the same hypothesis, and do not rewrite a different experiment's samples. Write a decide terminal only when `next_measurement` is `none`. Until then the entry stays nonterminal: `promising` while the keep path still needs samples, `measured` otherwise (including an inconclusive result that still wants samples). When `next_measurement` is `none`, an eligible result stays `measured` until its diff is on the optimization branch; a non-eligible result gets the decide terminal (`reverted`, `inconclusive`, `censored`, `degenerate`). `kept` and `runner_up_kept` wait until that integration. The raw metrics are on disk and safe from context compaction.
 
@@ -222,7 +222,7 @@ After all experiments in the batch have been measured:
 
 2. **Rank** the eligible experiments in the batch by the script's `rank_score` (primary relative gain when the primary moved; otherwise the strongest required-objective relative gain). Identify that winner as the experiment to keep. An eligible experiment may be kept even if the ranking primary did not move.
 
-   排名只消费 selection 的 `rank_score`。holdout 数值不得改变排序；配置确认时必须先完成脚本要求的确认且得到 `decision: keep`，缺确认的 `promising` 不属于可集成集合。
+   Ranking consumes only the `rank_score` of the selection. holdout value must not alter the ordering; confirmation is required before script requirements are completed and `decision: keep` is obtained; missing confirmation `promising` does not belong to the integrable set.
 
 3. **If `decide.cjs` returns `keep` for that winner: KEEP**
    - Only the orchestrator, with explicit commit and integration authority, commits the verified experiment through the existing commit owner before merge or cherry-pick. Without that authority, preserve the measured candidate and report integration pending; do not label it `kept`.

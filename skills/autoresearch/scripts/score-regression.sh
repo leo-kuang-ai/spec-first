@@ -22,7 +22,7 @@ if [[ $# -lt 2 || "$1" != "verdict" ]]; then
   exit 2
 fi
 
-# 与 spec-riffrec run-python.sh 同型的解释器探测(orchestrate.sh 同)。
+# Interpreter detection (as in orchestrate.sh) of the same type as spec-riffrec run-python.sh.
 resolve_python() {
   local candidate
   for candidate in python3 python; do

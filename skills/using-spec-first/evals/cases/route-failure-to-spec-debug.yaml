@@ -1,10 +1,6 @@
 id: route-failure-to-spec-debug
-title: 失败信号应路由到 spec-debug
-description: |
-  验证入口治理器对报错/堆栈/回归类请求选择恰好一个入口：应选择 spec-debug，
-  而不是 spec-plan / spec-work，也不是链式进入多个 workflow。
-  沙箱为空目录、workflow 未安装，skill 允许按 recommend-and-wait 降级输出推荐模板，
-  因此断言只锚定入口名与排除项，宣告格式（Entering / Recommended entrypoint / 中文变体）均算合法。
+title: "Failure signals should be routed to spec-debug"
+description: "Verify that the entrypoint governor selects exactly one entrypoint for error/stack/regression requests: it should select `spec-debug`, not `spec-plan` or `spec-work`, nor chain-enter multiple workflows. The sandbox is an empty directory, the workflow is not installed, and the skill allows degradation to output a recommended template via `recommend-and-wait`; thus, assertions only anchor on entrypoint name and excluded items, and all formats (Entering / Recommended entrypoint / Chinese variant) are considered valid."
 
 input:
   prompt: |

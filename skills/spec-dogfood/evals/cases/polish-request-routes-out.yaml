@@ -1,8 +1,6 @@
 id: polish-request-routes-out
-title: 协作式 UI 打磨请求应路由 spec-polish
-description: |
-  验证 Not To Use:collaborative UI polish 归 spec-polish——
-  "陪我一起调 UI 细节"应点名 spec-polish。
+title: "Collaborative UI polishing requests should be routed to spec-polish"
+description: "Verification: Not to use: collaborative UI polish — assign to spec-polish — \"Help me refine UI details\" should explicitly reference spec-polish."
 
 input:
   prompt: |

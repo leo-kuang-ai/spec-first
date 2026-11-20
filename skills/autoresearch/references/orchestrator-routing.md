@@ -14,9 +14,9 @@
 | `what-to-build` | what should I build, ideas, improvements, PRD, roadmap | dispatch | improve |
 | `decide-design` | which approach, compare options, design decision, architecture choice | dispatch | reason |
 
-`classify` 仅返回关键词匹配事实（`schema_version: 1` 的 advisory JSON，字段为 `status`、`requires_semantic_judgment`、`candidates[{archetype, mode, matched_keywords}]`）。它不输出最终 archetype/mode，也不处理否定、同义词或语言理解；候选顺序无优先级，无匹配返回空数组。LLM 阅读完整目标后进行语义分类并依入口确认，不将关键词直接变成执行决定。
+`classify` returns only keyword-matched facts (advisory JSON with `schema_version: 1`, fields: `status`, `requires_semantic_judgment`, `candidates[{archetype, mode, matched_keywords}]`). It does not output the final archetype/mode, does not handle negations, synonyms, or language understanding; candidate ordering has no priority, and no match returns an empty array. LLM reads the complete target and performs semantic classification based on entry point confirmation, without directly converting keywords into execution decisions.
 
-兼容说明：旧的两列 label/mode 文本输出已退役；消费者必须解析 v1 JSON 并执行语义判断，不能把第一候选写入状态。仓库内消费者为 SKILL 的 Classify 步骤；既有已确认的 orchestrator-state 格式不变。
+Compatibility note: The old two-column label/mode text output has been retired; consumers must parse the v1 JSON and perform semantic judgment, and must not write the first candidate into state. In the repository, consumers are assigned to the SKILL's Classify step; the format of the confirmed orchestrator-state remains unchanged.
 
 ## Router Decision Table
 
@@ -27,16 +27,16 @@ The `next-hop` subcommand of `scripts/orchestrate.sh` reads `orchestrator-state.
 | `errors > 0` in last handoff | handoff.json `findings` | `fix` |
 | regression verdict `UNSTABLE` | handoff.json `verdict` | `regression` |
 | `untested_gaps` flagged | handoff.json or units output | `debug` |
-| 连续 3 次 units unknown | orchestrator-state.json | `BLOCKED` |
+| Consecutive 3 times units unknown | orchestrator-state.json | `BLOCKED` |
 | `pending_verify` true | orchestrator-state.json | `verify` (fresh independent acceptance check) |
 | hop outcome `blocked` or `failed`, no retry route | orchestrator-state.json | `BLOCKED` (checkpoint + stop) |
-| 失败 hop 有 retry route | orchestrator-state.json | retry route（不能以旧 predicate 收敛） |
-| predicate met，且没有上述待处理信号 | Success predicate command exit/output | `DONE` (exit loop) |
+| Failed hop has retry route | orchestrator-state.json | retry route (cannot converge with old predicate) |
+| predicate met, and there are no of the above-mentioned signals to be processed | Success predicate command exit/output | `DONE` (exit loop) |
 | plateau detected | `scripts/orchestrate.sh plateau` | `PLATEAU` (stop + report) |
 | archetype pipeline has remaining steps | preset pipeline sequence | next preset step |
 | all preset steps exhausted, predicate not met | — | `regression` (convergence re-check) |
 
-`verdict` 与 `next-hop` 共用待处理信号判定：verify → `PENDING-VERIFY`，BLOCKED → `BLOCKED`，其余纠正/重试路由 → `INCOMPLETE`。仅当前最后 hop 的未解决失败阻断；恢复后的 progressed hop 不受历史失败永久阻断。
+`verdict` and `next-hop` share the pending signal determination: verify → `PENDING-VERIFY`, BLOCKED → `BLOCKED`, all others corrected/retried route → `INCOMPLETE`. Only the last hop with unresolved failure is blocked; progressed hops after recovery are not permanently blocked by historical failures.
 
 State signals are cheap reads — last `handoff.json` plus the regression verdict field and error count. No re-run of the full suite just to route.
 

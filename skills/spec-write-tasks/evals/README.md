@@ -1,15 +1,15 @@
 # spec-write-tasks Eval Fixture Contract
 
-本目录包含维护者使用的确定性夹具和可由 skill-up 加载的模型评测配置，不是用户 runtime 依赖。`.skill` 打包器跳过根目录 `evals/`；从 source 仓库执行验证。
+This directory contains deterministic fixtures and model evaluation configuration files loadable by skill-up, and is not a user runtime dependency. The `.skill` packager skips the root directory `evals/`; validation is performed from the source repository.
 
-- `eval.yaml` 与 `skillup/cases/*.yaml`：现有 skill-up 模型评测入口，当前 4 个 case。先在 `skills/spec-write-tasks/` 运行 `skill-up validate evals/eval.yaml`；配置通过只证明可加载。实际 engine 运行需要单独记录版本、命令、逐 case 证据和结果。
-- 下述 JSON/JSONL 与 `scripts/spec-write-tasks/run-output-evals.js`：维护仓库合同、覆盖和已有输出的确定性断言。它们不自动执行或证明模型行为。
-- 两类资产互补；新增或变更 case 时分别检查其 consumer，不将一个 runner 的通过写成另一个 runner 的通过。
+- `eval.yaml` and `skillup/cases/*.yaml`: Existing skill-up model evaluation entry points, currently 4 cases. First run `skill-up validate evals/eval.yaml` in `skills/spec-write-tasks/`; passing configuration only verifies loadability. Actual engine execution requires separate recording of versions, commands, and per-case evidence and results.
+- The following JSON/JSONL and `scripts/spec-write-tasks/run-output-evals.js`: maintain repository contracts, coverage, and deterministic assertions for existing outputs. They do not automatically execute or prove model behavior.
+- Two types of assets are complementary; when a new or modified case is added, separately verify its consumer, and do not treat the pass of one runner as equivalent to the pass of another runner.
 
 ## Contract
 
 - `trigger-cases.json`, `boundary-cases.json`, `failure-cases.json`, and `expected-behavior-cases.json` provide reviewable examples only; they do not replace LLM semantic judgment.
-- `yao-trigger-cases.json`, `semantic_config.json`, and `output/cases.jsonl` provide Yao-compatible smoke fixtures for trigger/output eval tooling. They are compatibility evidence only; 确定性合同以本目录 JSON 和 repo runner 为准，模型评测以 eval.yaml 及其逐 case 证据为准。
+- `yao-trigger-cases.json`, `semantic_config.json`, and `output/cases.jsonl` provide Yao-compatible smoke fixtures for trigger/output eval tooling. They are compatibility evidence only; deterministic contracts are defined by the JSON files in this directory and the repo runner, and model evaluation is governed by eval.yaml and its per-case evidence.
 - `output-quality-cases.json` records file-backed output-quality review cases for judging whether a skill-guided task pack is better than a generic task split. It is not a provider-backed model eval; `deterministic_assertions` can be executed by the repo-level runner, while `objective_assertions` remain reviewer narrative.
 - `expected_decision` must come from the `SKILL.md` Final Decision Envelope: `compile`, `skip`, `return-to-plan`, `draft-only`, or `validate-only`.
 - `expected_failure` must come from the `SKILL.md` Failure Modes enumeration.

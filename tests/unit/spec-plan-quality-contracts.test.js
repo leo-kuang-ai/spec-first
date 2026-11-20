@@ -37,24 +37,24 @@ describe('spec-plan quality integration contracts', () => {
     expect(skill).toContain('## Planning-Only Safety Contract');
     expect(skill).toContain('plan-only request');
     expect(skill).toContain('real Plan Mode');
-    expect(skill).toContain('用户已授权规划后实施');
+    expect(skill).toContain('When implementation is already authorized');
     expect(skill).not.toContain('Handoff stays blocking');
-    expect(skill).toContain('当前 `spec-plan` 产出者不会因为用户授权实施');
-    expect(skill).toContain('无可用执行路径时即使是单文件低风险任务也只能交付规划');
-    expect(handoff).toContain('只有成功进入执行 owner 后');
-    expect(handoff).toContain('不得以“用户已授权实施”为由自行转入编码');
-    expect(handoff).toContain('用户明确选择且宿主具有可用创建接口的原生 goal 按下文 goal 分支启动');
-    expect(handoff).toContain('且用户未明确选择具有已知可用接口的原生 goal，才报告具体交接阻塞');
-    expect(handoff).toContain('另一宿主的 generated runtime 镜像不能替代该来源');
+    expect(skill).toContain('do not make the planner the execution owner');
+    expect(skill).toContain('No execution path means plan-only delivery even for one low-risk file');
+    expect(handoff).toContain('only after successfully becoming the execution owner');
+    expect(handoff).toContain('on the grounds that "the user has authorized implementation');
+    expect(handoff).toContain('native goal with an available creation interface and explicit user selection triggers the goal branch');
+    expect(handoff).toContain('and the user has not explicitly selected a native goal with a known available interface');
+    expect(handoff).toContain('generated runtime image from another host shall not substitute for this source');
     const chatOutput = read('references/output-contracts.md');
-    expect(chatOutput).toContain('同一规划会话和可写工具本身不是执行 owner');
-    expect(chatOutput).toContain('Direct 的“一次陈述并校核”仅核对方案所据的现有事实');
-    expect(chatOutput).toContain('已授权实施时直接交接');
-    expect(chatOutput).toContain('generated runtime 镜像只说明镜像存在');
-    expect(skill).toContain('另一宿主的 generated runtime 镜像不属于该来源');
-    expect(skill).toContain('Direct/Chat brief 按 `references/output-contracts.md` 直接交接');
-    expect(skill).toContain('Direct/Chat brief 不生成这两个元数据字段');
-    expect(handoff).toContain('本节 Phase 5.4 适用于 Durable 计划');
+    expect(chatOutput).toContain('The same planning session or writable tool itself is not considered the executing owner.');
+    expect(chatOutput).toContain('one-time statement and verification');
+    expect(chatOutput).toContain('When requesting a plan only, optional prompts include saving as brief or passing to `spec-work`; upon authorization for execution, proceed directly.');
+    expect(chatOutput).toContain('generated runtime images');
+    expect(skill).toContain("Another host's generated mirror is neither canonical source nor an invocation");
+    expect(skill).toContain('Hand off Direct or Chat brief under `references/output-contracts.md`');
+    expect(skill).toContain('Direct and Chat brief do not emit these fields');
+    expect(handoff).toContain('Phase 5.4 applies to Durable plans');
     expect(skill).not.toContain('This workflow produces a durable implementation plan.');
     expect(skill).toMatch(/do not claim a hard write guarantee from prose alone/i);
   });
@@ -93,18 +93,18 @@ describe('spec-plan quality integration contracts', () => {
     expect(handoff).toContain('Creation capability does not prove inspection or completion capability');
     expect(handoff).toContain('exact documented command');
     expect(handoff).toContain('do not infer support from the host name');
-    expect(handoff).toContain('若只有 documented user command');
-    expect(handoff).toContain('明确实施尚未启动');
-    expect(handoff).toContain('不误判为完全无交接路径，也不宣称已进入执行 owner');
-    expect(handoff).toContain('若既不能调用或按上方来源要求加载执行 owner');
+    expect(handoff).toContain('if only a documented user command');
+    expect(handoff).toContain('explicitly indicate that execution has not yet been initiated');
+    expect(handoff).toContain('do not misinterpret the absence of an initiation as a complete lack of handover path, nor claim that execution has entered the owner\'s responsibility');
+    expect(handoff).toContain('if neither the owner can be invoked or loaded from the specified source');
   });
 
-  test('新增 assurance 指令遵循项目中文治理且保留 contract literals', () => {
-    expect(highRisk).toContain('## 风险驱动保障追踪');
-    expect(highRisk).toContain('对每个高风险计划');
-    expect(highRisk).not.toContain('For each high-risk plan');
-    expect(sections).toContain('在相关时');
-    expect(sections).toContain('避免使用泛化的');
+  test('保障追踪使用英文指令并保留契约字段', () => {
+    expect(highRisk).toContain('## Risk-driven assurance tracking');
+    expect(highRisk).toContain('For each high-risk plan');
+    expect(highRisk).not.toContain('对每个高风险计划');
+    expect(sections).toContain('when applicable');
+    expect(sections).toContain('Avoid using generic');
   });
 
   test('makes the Goal Capsule a compact first-screen decision surface', () => {
@@ -180,7 +180,7 @@ describe('spec-plan quality integration contracts', () => {
 
   test('high-risk planning lands confirmation, risk-to-proof trace, and evidence claim boundaries', () => {
     for (const marker of [
-      '## 风险驱动保障追踪',
+      '## Risk-driven assurance tracking',
       'Product Contract confirmation',
       'largest unproven risk',
       '`required`',
@@ -194,8 +194,8 @@ describe('spec-plan quality integration contracts', () => {
     ]) {
       expect(highRisk).toContain(marker);
     }
-    expect(highRisk).toMatch(/source-bound.*不证明.*provider-confirmed/is);
-    expect(highRisk).toMatch(/workflow-level semantic exit gate.*不是.*runtime hard enforcement/is);
+    expect(highRisk).toMatch(/source-bound does not prove provider-confirmed execution/is);
+    expect(highRisk).toMatch(/workflow-level semantic exit gate.*, rather than runtime hard enforcement/is);
     expect(sections).toMatch(/Verification Contract.*Product Contract confirmation.*evidence authority.*source binding.*required-proof reconciliation/is);
   });
 

@@ -1,81 +1,81 @@
-# CLI / DevTool Surface 模板
+# CLI / DevTool Surface template
 
-> 与 `00-generic.md` 组合使用，只补命令入口、参数语义、preview/mutation、输出、错误恢复、升级和 runtime projection 的产品合同。Frontmatter 与 readiness 由 `references/prd-output-template.md` 提供。
+> Used in combination with `00-generic.md`, this product contract supplements only the command entry point, parameter semantics, preview/mutation, output, error recovery, upgrade, and runtime projection. Frontmatter and readiness are provided by `references/prd-output-template.md`.
 >
-> 所有人类问题只询问当前执行对话的用户。
+> All human-related questions are only directed to the currently executing conversation user.
 
-## Tool 属性确认
+## Tool property confirmation
 
-| 维度 | 内容 |
+| Dimension | content |
 | --- | --- |
-| 工具类型 | CLI / script / workflow / agent-facing command / runtime projection |
-| 目标用户 | 开发者 / reviewer / CI / 本地 agent / 其它 |
-| 公开入口 | 命令 / 参数 / skill / workflow / npm script |
-| 支持平台 | 按目标产品实际支持的操作系统与宿主分别列明，以当前支持注册表/官方合同为依据 |
-| 副作用 | 只读 / 写文件 / 删除 / host config / 外部调用 |
-| consumer | 人类 / shell / CI / downstream workflow / parser |
+| Tool type | CLI / script / workflow / agent-facing command / runtime projection |
+| Target users | Developer / Reviewer / CI / Local agent / Other |
+| Public entry point | command / parameter / skill / workflow / npm script |
+| Supported platforms | List the actual supported operating systems and host environments for the target product, based on current registry/official contract provisions. |
+| Adverse effects | Read-only / Write file / Delete / Host config / External call |
+| consumer | Humans / shell / CI / downstream workflow / parser |
 
-## 命令与参数语义
+## Command and parameter semantics
 
-| 入口 | 参数 / 配置 | 默认值 | 必填条件 | 非法值结果 | 示例 |
+| Entry point | Parameters / Configuration | Default value | Required condition | Invalid value result | Example |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-明确参数优先级、环境变量、配置文件、交互/非交互模式和 exit code。不要在 PRD 中规定解析库或函数实现。
+Clarify parameter precedence, environment variables, configuration files, interactive/non-interactive modes, and exit code. Do not specify parser library or function implementations in the PRD.
 
 ## Preview / Mutation Boundary
 
-| 动作 | 默认行为 | preview 输出 | 确认点 | 实际副作用 | 可恢复方式 |
+| Action | Default behavior | preview output | Confirmation point | Actual side effects | Recoverable mode |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-能 preview-first 的写入不得 silent write。删除、覆盖、host runtime 修改和危险命令必须有明确 mutation boundary。
+Writes that can preview-first must not perform silent write. Deletion, coverage, host runtime modification, and hazardous commands must have clear mutation boundaries.
 
-## 输出与消费方
+## Output and consumption side
 
-| 输出面 | 格式 | 必要字段 / 含义 | consumer | 稳定性 / versioning |
+| Output face | Format | Required fields / Meaning | consumer | Stability / versioning |
 | --- | --- | --- | --- | --- |
 | stdout | human / JSON / NDJSON | | | |
 | stderr | error / warning / degraded | | | |
 | artifact | path / schema / freshness | | | |
 | exit code | 0 / non-zero meaning | | | |
 
-区分 advisory、confirmed、generated 和 degraded；不要让 transcript 声明替代 outcome evidence。
+Distinguish advisory, confirmed, generated, and degraded; do not let transcript declarations substitute for outcome evidence.
 
-## 错误、降级与恢复
+## Errors, Degradation and Recovery
 
-| 失败场景 | 用户可见结果 | reason_code | 是否继续 | 恢复动作 | 残留状态 |
+| Failure scenarios | User-visible results | reason_code | Whether to continue | Recovery action | Residual state |
 | --- | --- | --- | --- | --- | --- |
-| 依赖缺失 | | | | | |
-| 权限不足 | | | | | |
-| 部分写入 | | | | | |
-| 配置冲突 | | | | | |
-| provider 不可用 | | | | | |
+| Dependency missing | | | | | |
+| Insufficient permissions | | | | | |
+| Partial write | | | | | |
+| Configuration conflict | | | | | |
+| provider is unavailable | | | | | |
 
-降级必须响亮：说明未被强制的 gate、原因、限制和继续条件；不能把 advisory fact 升格为 confirmed truth。
+Downgrade must be clear: explain unenforced gates, reasons, limitations, and continuation conditions; do not elevate advisory facts to confirmed truths.
 
-## 多宿主与 runtime projection
+## Multi-host and runtime projection
 
-| Host | source | generated runtime | 支持 / 降级 | 验证方式 |
+| Host | source | generated runtime | Support / Degradation | Verification method |
 | --- | --- | --- | --- | --- |
-| 按本次目标实际宿主逐行填写 | | | | |
+| Fill in each host row according to the actual target host | | | | |
 
-涉及 spec-first 时从 `getSupportedPlatforms()` 核对当前支持集（当前包括 Claude、Codex、Cursor、Kiro、Qoder、OpenCode、ZCode、Pi）；只验证本次需求涉及的目标及共享影响面，不把模板示例当固定支持全集。
+When involving spec-first, verify the current supported platform set via `getSupportedPlatforms()` (currently includes Claude, Codex, Cursor, Kiro, Qoder, OpenCode, ZCode, Pi); validate only the target platforms relevant to the current requirement and shared impact areas, and do not treat template examples as indicative of a fixed, complete support set.
 
-Source-first：修 source/generator，再运行正式 init；不手改 generated mirrors。
+Source-first: Modify source/generator first, then run the formal init; do not manually edit generated mirrors.
 
 ## Upgrade / Compatibility
 
-写清旧配置、旧命令、旧 artifact、旧 runtime 和 unsupported platform 的产品结果；涉及 breaking change 时明确迁移、警告、失败和回退边界。
+Clarify product outcomes for old configurations, old commands, old artifact, old runtime, and unsupported platforms; clearly define migration, warning, failure, and rollback boundaries when breaking changes are involved.
 
-## CLI/DevTool 补充验收
+## CLI/DevTool supplementary acceptance
 
-- 默认参数、显式参数、非法参数和互斥参数。
-- preview 与 confirm 后实际 mutation 一致。
-- stdout/stderr/JSON/exit code 可被 consumer 稳定读取。
-- 中途失败无静默残留，恢复路径明确。
-- 目标宿主 source/runtime projection 按当前实际支持范围验证，区分生成验证、宿主加载和真实任务效果。
+- Default parameters, explicit parameters, invalid parameters, and mutually exclusive parameters.
+- The mutation is consistent after preview and confirm.
+- stdout/stderr/JSON/exit code can be reliably read by the consumer.
+- No silent residue on partial failure; clear recovery path.
+- Target host source/runtime projection validation is verified within the currently supported scope, differentiating between generation validation, host loading, and actual task performance.
 
-## CLI/DevTool 待闭合问题候选
+## CLI/DevTool pending issues for closure candidacy
 
-这里只提示候选缺口，不生成第二套 OQ schema。会改变公开入口、默认行为、副作用、输出 contract、兼容或恢复的决定移入 output contract 的 canonical `Outstanding Questions`；模块拆分、依赖库和内部函数进入 `spec-plan`。
+Here it only prompts candidate gaps and does not generate a second set of OQ schema. Decisions regarding changes to public entry points, default behaviors, side effects, output contract, compatibility, or recovery are moved to the canonical `Outstanding Questions` in the output contract; module splitting, dependency libraries, and internal functions are placed in `spec-plan`.

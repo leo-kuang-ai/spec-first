@@ -40,7 +40,7 @@ describe('spec-prd Contract Reset Lite profile', () => {
   test('keeps a single human confirmer, evidence basis, and release-bounded closure explicit', () => {
     expect(LITE).toContain('`source_ref` and `source_type`');
     expect(SKILL).toContain('the current user is the sole human product confirmer');
-    expect(SKILL).toContain('当前执行对话的用户是唯一人类产品确认人');
+    expect(SKILL).toContain('current dialog\'s user is the sole human product reviewer');
     expect(LITE).toContain('confirmation scope and basis');
     expect(LITE).toContain('The current user is the only human question recipient and the sole product');
     expect(LITE).toContain('named specialists or historical sign-off roles remain evidence');
@@ -100,10 +100,10 @@ describe('spec-prd Contract Reset Lite profile', () => {
         );
         expect(skillOperation).toBeDefined();
         expect(skillOperation.contents).toContain(
-          '当前执行对话的用户是唯一人类产品确认人',
+          'current user is the sole human product confirmer',
         );
         expect(skillOperation.contents).toContain(
-          '不允许路由第二个人类联系人',
+          'do not permit routing to a second human contact',
         );
       } finally {
         fs.rmSync(projectRoot, { recursive: true, force: true });

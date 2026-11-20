@@ -86,10 +86,10 @@ describe('renderMemberGuidanceSnippet — child-repo static guidance', () => {
       '../../skills/spec-runtime-setup/SKILL.md',
     ), 'utf8');
 
-    expect(skill).toContain('### 从子仓开始时的轻量引导');
-    expect(skill).toContain('`projectPath` 使用 CodeGraph');
-    expect(skill).toContain('workspace graph 状态和目标仓范围均已确认');
-    expect(skill).toContain('不向 child `AGENTS.md` / `CLAUDE.md` 注入独立受管 marker');
+    expect(skill).toContain('### Lightweight onboarding from child repository initiation');
+    expect(skill).toContain('projectPath');
+    expect(skill).toContain('Use Graphify only when both the workspace graph state and the target repository scope are confirmed; thereafter, directly examine the candidate sub-repositories.');
+    expect(skill).toContain('This round does not inject independent managed markers into child `AGENTS.md` / `CLAUDE.md`, nor does it provide the corresponding clean lifecycle; the parent directory\'s routing block is still managed by the explicit workspace graph lifecycle.');
     expect(skill).not.toContain('workspace-member-routing.cjs');
   });
 });

@@ -10,10 +10,10 @@ This is a **lazy reference** for SKILL.md. Load when the core classification rul
 
 ## `task-pack` signals（derived execution documents）
 
-- Frontmatter `type: task-pack`；通常同时包含 `generated_by: spec-write-tasks`、`status: derived`、`mode: derived`、`source_plan` 与 `source_plan_hash`
-- 正文包含 `Task Pack Contract` fenced JSON、`Execution Waves`、`Task Cards`、`Traceability Matrix` 或 `Regeneration Rules`
-- JSON tasks 使用 `task_id`、`dependencies`、`files`、`test_focus`、`done_signal`、`wave`、`stop_if` 等执行字段
-- 内容可能出现 U-ID、R-ID、repo-relative files 和 verification，但这些信号不能把 task pack 重新分类为 plan；task pack 始终是 source plan 的 derived index
+- Frontmatter `type: task-pack`; typically includes `generated_by: spec-write-tasks`, `status: derived`, `mode: derived`, `source_plan`, and `source_plan_hash`
+- The main body contains a fenced JSON of `Task Pack Contract`, `Execution Waves`, `Task Cards`, `Traceability Matrix`, or `Regeneration Rules`
+- JSON tasks use execution fields such as `task_id`, `dependencies`, `files`, `test_focus`, `done_signal`, `wave`, and `stop_if`
+- Content may contain U-ID, R-ID, repo-relative files, and verification signals, but these cannot reclassify a task pack as a plan; a task pack is always a derived index of the source plan.
 
 ## `requirements` signals (what-to-build documents)
 

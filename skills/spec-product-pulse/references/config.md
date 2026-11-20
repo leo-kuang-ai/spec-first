@@ -3,7 +3,7 @@
 Read this before interpreting any `pulse_*` value.
 
 
-**读取配置。** 运行 `git rev-parse --show-toplevel`。无法解析目标仓库时，只请求目标路径，不启动访谈，也不按 cwd 推测配置位置。成功后读取 `<repo-root>/.spec-first/config.local.yaml`；文件不存在或未配置产品名才进入首次访谈。否则读取下列 `pulse_*` 键。Reports remain owned by
+Read configuration. Run `git rev-parse --show-toplevel`. When unable to resolve the target repository, only request the target path without initiating interviews or inferring configuration location based on cwd. On success, read `<repo-root>/.spec-first/config.local.yaml`; only proceed to the first interview if the file does not exist or the product name is not configured. Otherwise, read the following `pulse_*` keys. Reports remain owned by
 the fixed `docs/pulse-reports/` contract; this Skill does not introduce a
 global configurable artifact root.
 

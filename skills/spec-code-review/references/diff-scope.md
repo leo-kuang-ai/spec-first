@@ -23,11 +23,11 @@ Instead:
 - Otherwise rely on diff hunks in the provided `<diff>` only.
 - Do not treat local workspace contents as evidence for findings on changed files.
 
-## 整文件删除与存活 consumer
+## Delete entire file and surviving consumer
 
-从实际审查范围的 name-status/patch 识别整文件删除；不要假设上下文一定提供旧文件正文或 `<deleted-files>` block。只有 finding 需要旧导出或 import-time side effect 时，才用该范围已确认的 `git show <base>:<path>` 读取旧正文。已删除正文不作为待修改代码反复审查。
+Identify full file deletion from name-status/patch to detect actual file removal; do not assume context provides the old file content or a `<deleted-files>` block. Use `git show <base>:<path>` to read the old blob only when finding requires a previous export or import-time side effect, and the range has been confirmed. Already deleted body not as pending modification code repeated review.
 
-在被审查的存活树上核对 imports、re-exports、配置、命令入口、文档入口和资源引用，确认删除是否留下可到达的 consumer 或失去 reader 的残留。名称搜索只提供候选，必须读实际 consumer 才能形成 confirmed finding。remote scope 只能使用确认的 reviewed head，不能用当前工作树替代；缺 head/base、无法读 consumer 或 diff 截断时，在 `residual_risks` 明确记录未检查的删除路径及原因，不声称 liveness 已验证。
+Verify imports, re-exports, configurations, command entry points, documentation entry points, and resource references on the reviewed live tree to confirm that deletion does not leave reachable consumers or lose readers' access. Name search only provides candidates; a confirmed finding must be derived from reading the actual consumer. remote scope can only use the confirmed reviewed head and cannot substitute with the current working tree; in the absence of head/base, inability to read consumer or when diff truncation occurs, clearly record unexamined deleted paths and their reasons in `residual_risks`, and shall not claim liveness has been verified.
 
 ## Finding Classification Tiers
 

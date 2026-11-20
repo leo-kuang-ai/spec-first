@@ -62,9 +62,9 @@ describe('spec-prd eval fixture contract', () => {
   test('Contract Reset eval assets keep deterministic facts separate from semantic Gate A judgment', () => {
     const protocol = fs.readFileSync(contractResetProtocolPath, 'utf8');
     const cases = JSON.parse(fs.readFileSync(contractResetCasesPath, 'utf8'));
-    expect(protocol).toContain('没有可证明的硬隔离时不调用模型');
-    expect(protocol).toContain('脚本可报告 `awaiting-semantic-review`，但不能自行写“Gate A passed”');
-    expect(protocol).toContain('Replay 证明协议可重放，不替代原 run grade');
+    expect(protocol).toContain('the model is not called when hard isolation cannot be proven');
+    expect(protocol).toContain('The script can report `awaiting-semantic-review`, but it cannot autonomously write "Gate A passed"');
+    expect(protocol).toContain('Replay proves protocol replayability, and does not substitute for the original run grade');
     expect(cases.run_contract.primary_decision_rule).toContain('at least two');
   });
 });

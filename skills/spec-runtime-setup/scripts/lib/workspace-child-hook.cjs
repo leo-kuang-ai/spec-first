@@ -2,17 +2,17 @@
 
 // U5 — Workspace spec-first-owned child commit hook (R6/KTD5/KTD8).
 //
-// Graphify 0.9.x native hook 只重建 child 默认输出，无法重收敛父目录 out-of-tree merged graph，
-// 因此 workspace 用 spec-first 自有 child hook：commit 后调用 workspace-async-refresh `--trigger`，
-// 后台对全部 confirmed child 执行 bounded CodeGraph sync，再 re-extract Graphify 子图并 merge；
-// commit 立即返回。
+// Graphify 0.9.x native hook only rebuilds child default output and cannot re-converge parent directory out-of-tree merged graph
+// Therefore, the workspace uses its own child hook in a spec-first manner: after a commit, it invokes workspace-async-refresh with the `--trigger` flag.
+// The backend performs a bounded CodeGraph sync on all confirmed child nodes, then re-extracts the subgraph via Graphify and merges it.
+// commit returns immediately.
 //
-// 授权边界（KTD1/KTD2/KTD8，与单仓 verify-or-prompt 对称）：
-//   - 有效 hooks root 在 child 内且可写 → 安装自有 managed hook（`installed`）。
-//   - 有效 hooks root 在 child 外 → 绝不写；只读检测已有 marker，报 `blocked`（merged 降级 advisory）。
-//   - 非 Git / 路径不安全 → `skipped` / `blocked`，不写。
-// 自有 hook 内嵌 verified 绝对 node + async-refresh 脚本 + setup 脚本 + workspace root（KTD5），
-// 不依赖 commit 环境的 PATH。安装 idempotent：只替换 spec-first managed block，保留其他 hook 内容。
+// Authorization boundary (KTD1/KTD2/KTD8, symmetric to single repository verify-or-prompt):
+//   - Effective hooks root inside child and writable → install custom managed hook (`installed`).
+//   - Effective hooks root outside child → Never write; only read and detect existing markers, report `blocked` (downgraded advisory).
+//   - Not Git / insecure path → `skipped` / `blocked`, no write.
+// Built-in hook with verified node + async-refresh script + setup script + workspace root (KTD5)
+// No dependency on PATH in commit environment. Install idempotent: replaces only the spec-first managed block, retains all other hook content.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -88,11 +88,11 @@ function renderWorkspaceRefreshHookBlock({
   ]
     .filter(Boolean)
     .join(' ');
-  // 这里只调用固化的绝对 Node 与 source script，不解析 commit PATH 中的辅助程序。
-  // async-refresh 入口会在执行 trigger/run 逻辑前原地收敛 process.env，后继子进程
-  // 继续使用相同 allowlist，因此无需在 shell 中枚举或解析任意环境变量值。
-  // 所有动态值都编码成一个严格的 POSIX 双引号 shell word；JSON 可合法包含单引号，
-  // 不能假设 `'${...}'` 安全。shellQuote 同时转义双引号、反斜杠、$ 与反引号。
+  // Here, only the hardened absolute Node and source script are invoked, without parsing auxiliary programs in the commit PATH.
+  // The async-refresh entry will locally converge process.env before executing the trigger/run logic, and subsequent child processes.
+  // Continue using the same allowlist, thus eliminating the need to enumerate or parse any environment variable values in the shell.
+  // All dynamic values are encoded as a strict POSIX double-quoted shell word; JSON may legally contain single quotes,
+  // It is not safe to assume `'${...}'` is safe. shellQuote escapes double quotes, backslashes, $, and backticks.
   return [
     BLOCK_START,
     `# ${HOOK_MARKER}`,
@@ -265,9 +265,9 @@ function placeManagedBlockAfterShebang(base, ownedBlock) {
     : `${shebang}\n\n${ownedBlock}`;
 }
 
-// 对称反转：移除 spec-first 自有 managed block（contained only）。idempotent；只改 hook 文件的
-// managed 段；只有安装时明确标记为 spec-first 创建的空 shell hook 才删除文件，
-// 用户预存的空文件、shebang 与其他内容始终保留。
+// Symmetric reversal: remove spec-first's own managed block (containing only). idempotent; modifies only the hook file
+// managed segment; files are only deleted by an empty shell hook explicitly marked as spec-first during installation.
+// User-prestored empty files, shebang lines, and other content are always retained.
 function removeWorkspaceChildHook(childGitRoot, hooksRoot) {
   let changed = false;
   for (const name of HOOK_NAMES) {
@@ -527,7 +527,7 @@ function applyChildHookPosture({
     return { ...base, hook_status: 'skipped', reason_code: target.reason_code };
   }
   if (target.classification === 'external') {
-    // 绝不写外部；只读检测已有 marker，供诚实报告，但 merged 仍降级 advisory。
+    // Never write externally; read and detect existing markers for honest reporting, but merged still degrades to advisory.
     const marker = target.absolute ? probeChildHookMarker(target.absolute) : { spec_first: false, graphify_native: false };
     return {
       ...base,

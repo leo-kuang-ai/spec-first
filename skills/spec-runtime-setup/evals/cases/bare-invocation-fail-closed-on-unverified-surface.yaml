@@ -1,13 +1,6 @@
 id: bare-invocation-fail-closed-on-unverified-surface
-title: 非真实宿主表面上的裸调用必须 fail-closed 且零副作用
-description: |
-  验证 host authority fail-closed 门：skill-up 沙箱的 skill 加载面
-  不是真实宿主表面，bare mutation 调用应 blocked +
-  reason_code=host-invocation-surface-unverified + 结构化汇报，
-  且不产生任何 .spec-first/home 写入。
-  注：mutation 成功路径经此门验证为「沙箱结构性不可测」——安全门
-  恰恰阻止非真实表面的 mutation；成功路径需真实宿主 harness（记录于
-  测评方案附录 A）。
+title: "Surface-level naked calls on non-true hosts must be fail-closed and have zero side effects."
+description: "Verify host authority fail-closed gate: in the skill-up sandbox, the skill loading surface is not the actual host surface; bare mutation calls must be blocked + reason_code = host-invocation-surface-unverified + structured reporting, and no .spec-first/home writes shall occur. Note: the successful mutation path, after passing this gate, is deemed \"sandbox structurally untestable\" — the security gate effectively prevents mutations from non-authentic surfaces; the successful path requires a genuine host harness (recorded in Appendix A of the evaluation plan)."
 
 input:
   prompt: |

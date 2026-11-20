@@ -5,360 +5,360 @@ status: active
 created: 2026-05-30
 author: leokuang
 note: |
-  本附录是证券/券商行业增量需求的可选 product-bundled overlay，由 Template Trigger Map 按需加载。
-  其中的枚举、交收周期、监管辖区规则等均为**行业常见示例**，因展业地/牌照/市场而异，
-  写入具体 PRD 时必须由项目 source 或当前执行对话用户确认实际口径，不得直接当事实落地。
+  This appendix serves as an optional product-bundled overlay for incremental requirements in the securities/brokerage industry, loaded on-demand by the Template Trigger Map.
+  Among which, the enumeration, settlement cycles, regulatory jurisdiction rules, and other items are all **typical examples commonly used in the industry**, and may vary by place of operation, license, or market.
+  When writing the specific PRD, actual definition must be confirmed by the project source or the current executing dialog user; direct implementation without confirmation is not allowed.
 ---
 
-# 证券行业需求关注点与参考附录
+# Securities industry attention points and reference appendix
 
-> 用法：只有输入、项目 source 或当前执行对话用户明确证券/交易行业上下文时才加载。先对照「一、行业横切关注点必查清单」逐项判断是否适用；适用的，在 `00-generic.md` 或对应 surface 模板的 conditional section 里展开。
+> Usage: Loads only when input, project source, or the currently executing dialog user explicitly provides a securities/trading industry context. First, refer to the «Section One: Industry Cross-Vertical Mandatory Check List» to individually determine applicability; for applicable items, expand them in `00-generic.md` or in the corresponding surface template's conditional section.
 >
-> **重要**：本附录所有具体规则（交收周期、交易时段、监管要求、税务）均为**示例口径**，随市场/展业地/牌照变化。写入 PRD 时必须标注证据来源（`confirmed-source` / 合规确认 / `external-research` / `assumption`），不确定的进 Outstanding Questions。
+> **Important**: All specific rules (settlement cycles, trading hours, regulatory requirements, tax obligations) in this appendix are for **example purposes only** and may vary based on market conditions, location of operation, and license type. Evidence source must be annotated when writing PRD (`confirmed-source` / compliance confirmation / `external-research` / `assumption`). Uncertain cases should be marked as Outstanding Questions.
 >
-> **问答边界**：所有需要人类补充或裁决的问题只询问当前执行对话的用户。合规/法务材料和会签记录是 source evidence，不是第二个人类问答路由。
+> **Q&A Boundary**: Any questions requiring human supplementation or ruling shall only be directed to the current dialogue's user. Compliance/legal documentation and co-signature records are source evidence, not a second human Q&A routing.
 
 ---
 
-## 一、行业横切关注点必查清单
+## 1. Required cross-cutting checks
 
-写券商需求时逐项判断"是否适用 / 如何影响本需求"。适用项必须在 PRD 里写清楚，不适用项显式标"不涉及"。
+When writing broker requirements, judge item by item whether it applies / how it affects this requirement. The applicable items must be clearly stated in the PRD; non-applicable items should explicitly mark "not involved".
 
-| # | 关注点 | 必须回答的问题 | 典型涉及 surface |
+| # | Focus point | The questions that must be answered | Typical involvement of surface |
 | --- | --- | --- | --- |
-| C1 | **监管与合规** | 涉及哪个监管辖区/展业地/牌照主体？是否需合规审阅？是否需风险揭示、免责声明、投教/营销内容审核？ | 全部 |
-| C2 | **投资者适当性** | 是否涉及客户分类、风险承受能力、产品风险等级、准入校验、测评过期、风险揭示确认？ | App、Admin、Backend |
-| C3 | **AML 与 KYC** | 是否涉及身份核实、客户风险评估（CRA）、加强尽职调查（EDD）、制裁/黑名单筛查、证件过期、受益所有人？ | Admin、Backend |
-| C4 | **风控** | 是否涉及持仓限制、集中度、保证金/购买力、风险度、强平、限购、冷静期、异常交易？触发条件与处置动作？ | Backend、App、Admin |
-| C5 | **行情数据** | 行情权限（Level 1/Level 2、实时/延时）？行情源/供应商？交易时段、停牌、熔断、无权限如何展示？ | App、Backend |
-| C6 | **交易与订单** | 涉及哪些市场/证券类型？订单类型、有效期、交易时段、撤改单、条件单、多市场规则差异？ | App、Backend |
-| C7 | **资金与清结算** | 多币种？入金/出金？购买力、冻结/解冻、费用、交收周期（T+N）、账单、对账？ | Backend、Admin、App |
-| C8 | **多展业地/多牌照** | 不同展业地（VBrokers/Tickrs/M+Global 等）规则差异？默认规则与地区差异如何隔离？ | 全部 |
-| C9 | **审计与留痕** | 监管要求的操作留痕、交易记录保存期限、风险确认、适当性确认、双录、电子合同存证是否涉及？ | Admin、Backend、App |
-| C10 | **数据精度与时区** | 价格精度、最小变动价位、涨跌幅、货币格式、交易所时区 vs 用户本地时区如何展示与换算？ | App、Backend |
-| C11 | **内容与投顾边界** | 是否涉及资讯、投教、营销、策略、个股推荐、免责声明、适当性提示、内容发布审核？ | App、Admin |
-| C12 | **客诉与异常处置** | 用户失败后如何申诉？资金/订单异常谁处理？是否需要补偿、人工复核、客服口径和 SOP？ | Admin、Backend、App |
-| C13 | **公司行动（Corporate Actions）** | 是否涉及分红派息、拆股/合股、配股/供股、并购、退市、代码变更、ADR 比例调整？如何影响持仓数量、成本价、可用余额、可交易性与用户通知？ | Backend、App、Admin |
-| C14 | **费用、税费与成本披露** | 涉及哪些费用（佣金、平台费、监管规费、汇率点差、融资利息）？税费如何处理（股息预扣税、印花税、资本利得、W-8BEN）？是否需事前披露与事后凭证？ | App、Backend、H5/PC |
-| C15 | **通知触达与时效** | 追保通知（margin call）、成交回报、强平预警、公司行动、异常处置的送达渠道、时效要求、失败重试与留痕？是否有监管送达义务？ | Backend、App、Admin |
-| C16 | **系统可用性与业务连续性** | 交易时段内的可用性目标、熔断/降级策略、故障公告口径、灾备切换、数据不丢失？是否触及关键信息基础设施与应急处置要求？ | Backend、Mixed |
-| C17 | **跨境数据与个人信息保护** | 多展业地下数据存储地、跨境传输、数据主体权利（查询/更正/删除/撤回同意）、同意管理？适用 PIPL / 香港 PDPO / GDPR / 新加坡 PDPA 哪一套？ | 全部 |
-| C18 | **可疑交易上报与监管报送** | 是否触发可疑交易报告（STR）、大额交易报告、持仓/交易监管报送、内部风控上报？触发条件、上报口径、时限与留痕？ | Backend、Admin |
-| C19 | **模拟盘 / 虚拟交易边界** | 是否涉及模拟盘、虚拟资金、体验账户？模拟数据与真实资金/行情/订单如何隔离？是否有防误导标识、不得与真实交易混淆？ | App、Backend |
-| C20 | **账户安全与反欺诈** | 是否涉及登录安全、异常登录识别、会话安全、设备绑定/变更、二次验证（OTP/生物识别）、敏感操作（改密/改绑手机/大额出金）加验？账户被盗（ATO）如何冻结、申诉、恢复？（区别于 C3 身份识别与 C4 交易风控） | App、Backend、Admin |
+| C1 | **Regulation and Compliance** | Which regulatory jurisdiction/operating territory/license holder is involved? Is compliance review required? Are risk disclosures, disclaimer, investor education, or marketing content reviews required? | All |
+| C2 | **Investor Suitability** | Does it involve customer classification, risk tolerance, product risk level, access validation, assessment expiration, and risk disclosure confirmation? | App, Admin, Backend |
+| C3 | **AML and KYC** | Does it involve identity verification, customer risk assessment (CRA), enhanced due diligence (EDD), sanctions/blacklist screening, expired documents, and beneficial ownership? | Admin, Backend |
+| C4 | **Risk Control** | Does it involve position limits, concentration, margin/capital purchasing power, risk exposure, stop-loss, purchase restrictions, cooling-off periods, or abnormal trading? Trigger conditions and response actions? | Backend, App, Admin |
+| C5 | **Market Data** | Market data permissions (Level 1/Level 2, real-time/delayed)? Market data source/supplier? How to display trading hours, suspension, circuit breakers, and no permissions? | App, Backend |
+| C6 | **Trades and Orders** | Which markets/security types? Order types, validity period, trading hours, cancellation/revision, conditional orders, and multi-market rule differences? | App, Backend |
+| C7 | **Funds and Settlement** | Multi-currency? Deposit/withdrawal? Purchasing power, freeze/thaw, fees, settlement cycle (T+N), billing, reconciliation? | Backend, Admin, App |
+| C8 | **Multiple Business Locations/Multiple Licenses** | Rule differences across different operating locations (e.g., VBrokers, Tickrs, M+Global, etc.)? How are default rules and regional variations isolated? | All |
+| C9 | **Audit and Traceability** | Yes, the following requirements involve: operational traceability, transaction record retention period, risk confirmation, suitability confirmation, dual recording (dual recording), and electronic contract notarization. | Admin, Backend, App |
+| C10 | **Data Accuracy and Time Zones** | Price precision, minimum tick size, up-down price limits, currency format, and exchange time zone vs. user's local time zone: how are they displayed and converted? | App, Backend |
+| C11 | **Content and Advisor Boundary** | Does it involve information, investor education, marketing, strategy, individual stock recommendations, disclaimer, suitability warnings, or content publication review? | App, Admin |
+| C12 | **Customer Complaints and Exception Handling** | What to do after a user fails to complete a transaction? Who handles fund/order anomalies? Is compensation required? Is manual review needed? What are the customer service guidelines and SOPs? | Admin, Backend, App |
+| C13 | **Corporate Actions** | Does it involve dividend distributions, stock splits/mergers, rights issues/share offerings, mergers & acquisitions, delisting, stock code changes, or ADR ratio adjustments? How do these affect holding quantity, cost basis, available balance, tradability, and user notifications? | Backend, App, Admin |
+| C14 | **Expenses, Taxes, and Cost Disclosures** | What fees are involved (commissions, platform fees, regulatory fees, exchange rate spreads, financing interest)? How are taxes handled (dividend withholding tax, stamp duty, capital gains, W-8BEN)? Is prior disclosure and post-trade documentation required? | App, Backend, H5/PC |
+| C15 | **Notification Delivery and Timeliness** | Delivery channels, time requirements, retry mechanisms, and audit trails for margin calls (margin call notifications), trade confirmations, forced liquidation warnings, company actions, and abnormal situation handling? Are there regulatory obligations regarding delivery? | Backend, App, Admin |
+| C16 | **System Availability and Business Continuity** | Availability objectives during trading hours, circuit breaking/grading strategies, incident announcement guidelines, disaster recovery switching, data integrity and non-loss? Does this meet the requirements for critical information infrastructure and emergency response? | Backend, Mixed |
+| C17 | **Cross-border Data and Personal Information Protection** | Multiple data storage locations, cross-border data transmission, data subject rights (query, correction, deletion, withdrawal of consent), and consent management – which regulatory framework applies: PIPL (China), Hong Kong PDPO, GDPR, or Singapore PDPA? | All |
+| C18 | Suspicious Transaction Reporting and Regulatory Submission | Whether suspicious transaction reports (STR), large-value transaction reports, position/trading regulatory submissions, and internal risk control alerts are triggered? Conditions for triggering, reporting criteria, time limits, and record-keeping requirements? | Backend, Admin |
+| C19 | **Simulated Desk / Virtual Trading Boundary** | Does it involve simulation accounts, virtual funds, or demo accounts? How are simulated data and real funds/trading conditions/order execution isolated? Are there anti-misleading labels to prevent confusion with actual trading? | App, Backend |
+| C20 | **Account Security and Anti-Fraud** | Does it involve login security, anomaly login detection, session security, device binding/changes, two-factor authentication (OTP/biometric), and additional verification for sensitive operations (password change, phone number update, large withdrawals)? How is account takeover (ATO) handled—frozen, appealed, and restored? (Distinguished from C3 identity verification and C4 transaction risk control) | App, Backend, Admin |
 
-> C13–C20 是在 C1–C12 主线之上补充的高频遗漏领域。写需求时同样逐项判断"适用/不涉及"，适用项在对应 surface 的 conditional section 展开。
+> C13–C20 are high-frequency gaps supplemented on the C1–C12 main line. When writing requirements, evaluate each item individually as "applicable"/"not involved"; applicable items expand the corresponding surface's conditional section.
 
 ---
 
-## 二、证券 PRD 行业元数据模板
+## 2. Securities PRD metadata
 
-建议所有证券行业 PRD 在开头补齐下列元数据，便于 `spec-prd` 和 `spec-plan` 做正确 lens 选择。
+It is recommended that all securities industry PRDs include the following metadata at the beginning, to facilitate correct lens selection by `spec-prd` and `spec-plan`.
 
-| 项 | 内容 |
+| Item | content |
 | --- | --- |
-| 展业地 / 监管辖区 | |
-| 牌照主体 / 业务主体 | |
-| 目标市场 | 港股 / 美股 / A股 / 基金 / 期权 / 债券 / 其它 |
-| 证券 / 产品类型 | |
-| 客户类型 | 零售投资者 / 专业投资者 / 机构 / 未开户用户 / 内部角色 |
-| 账户类型 | 现金 / 保证金 / 综合账户 / 模拟账户 / 不涉及 |
-| 是否触及资金或交易 | 是 / 否 |
-| 是否触及个人信息或敏感数据 | 是 / 否 |
-| 是否需要合规/风控确认 | 是 / 否 / 待确认 |
-| 规则证据来源 | 合规意见 / 运营规则 / 交易所规则 / 第三方协议 / 源码文档 / assumption |
+| Place of operation / Regulatory jurisdiction | |
+| License holder / Business entity | |
+| Target market | HK stocks / US stocks / A-shares / Funds / Options / Bonds / Others |
+| Securities / Product Type | |
+| Customer Type | Retail investors / Professional investors / Institutions / Unaccounted users / Internal roles |
+| Account type | Cash / Margin / Comprehensive Account / Demo Account / Not involved |
+| Whether it involves funds or trading | Yes / No |
+| Does it involve personal information or sensitive data? | Yes / No |
+| Do you need compliance/risk control confirmation? | Yes / No / Pending confirmation |
+| Rule evidence source | Compliance opinion / Operating rules / Exchange rules / Third-party agreements / Source code documentation / assumption |
 
 ---
 
-## 三、常用枚举参考（示例，需按实际市场/展业地确认）
+## 3. Example values to confirm for each market and jurisdiction
 
-> 以下为行业常见取值，**不是事实**。写 PRD 时按目标市场与展业地确认实际支持范围，不支持的明确标"本期不支持"。
+> The following are common industry values, **not facts**. When writing a PRD, confirm the actual support scope based on the target market and place of operation; for unsupported features, clearly mark "Not supported this period".
 
-### 订单类型（示例）
+### Order type (example)
 
-| 类型 | 含义 | PRD 要写清 |
+| Type | Meaning | PRD needs to be clearly written |
 | --- | --- | --- |
-| 市价单 Market | 以当前最优价立即成交 | 是否允许、适用时段、价格保护/失败提示 |
-| 限价单 Limit | 指定价格或更优价成交 | 价格精度、最小变动价位、超价处理 |
-| 止损单 Stop | 触发价到达后转市价 | 触发条件、触发后用户感知 |
-| 止损限价 Stop-Limit | 触发价到达后转限价 | 触发价与限价关系 |
-| 条件单 | 满足条件后触发下单 | 条件有效期、触发失败、撤销规则 |
+| Market order | Execute immediately at the current best price | Whether allowed, applicable period, price protection/failure prompt |
+| Limit Order | Fill at specified price or better | Price precision, minimum tick size, and overprice handling |
+| Stop Order | After trigger price is reached, switch to market order | Trigger conditions, user perception after trigger |
+| Stop-Limit Order | After trigger price is reached, switch to limit order | Relationship between trigger price and limit price |
+| Conditional Order | Place an order upon meeting the conditions | Validity period, failure trigger, cancellation rules |
 
-### 订单有效期（示例）
+### Order validity period (example)
 
-当日有效 Day / 撤单前有效 GTC / 即时成交否则撤销 IOC / 全部成交否则撤销 FOK。
+Valid for the day / Good till cancelled (GTC) / Immediate or cancel (IOC) / Fill or kill (FOK).
 
-PRD 必须写清：本期支持哪些有效期、默认值、不同市场差异、过期后状态和用户提示。
+PRD must clearly specify: the validity periods supported, default values, market-specific differences, status after expiration, and user prompts.
 
-### 交易时段（示例，按市场不同）
+### Trading hours (example, by market)
 
-| 市场 | 时段（示例，需确认） | PRD 关注点 |
+| market | Period (example, to be confirmed) | PRD focus points |
 | --- | --- | --- |
-| 港股 | 盘前竞价、上午盘、下午盘、收市竞价；部分券商支持暗盘 | 暗盘是否支持、收市竞价如何展示 |
-| 美股 | 盘前、盘中、盘后（按券商支持范围） | 盘前盘后订单类型限制、时区 |
-| A股 | 集合竞价、上午盘、下午盘 | 涨跌停、最小单位、交易日历 |
+| Hong Kong stocks | Pre-market bidding, morning session, afternoon session, closing bidding; some brokerage firms support dark pool trading | Does the dark pool support? How to display the closing auction? |
+| US stocks | Pre-market, in-market, post-market (based on broker support) | Pre- and post-market order type restrictions, time zones |
+| A-shares | Collective bidding, morning session, afternoon session | Up-down limit, minimum unit, trading calendar |
 
-### 账户类型（示例）
+### Account type (example)
 
-现金账户 Cash / 保证金账户 Margin / 综合账户 / 模拟账户。
+Cash Account / Margin Account / Integrated Account / Simulation Account
 
-### 账户状态（示例）
+### Account status (example)
 
-待开户 / 审核中 / 已开通 / 限制交易 / 冻结 / 休眠 / 已销户。
+Pending account opening / Under review / Already activated / Transaction restricted / Frozen / Dormant / Closed.
 
-### 客户分类（示例，按辖区）
+### Customer segmentation (example: by region)
 
-专业投资者 / 零售投资者；不同分类对应不同适当性、风险揭示和产品准入规则。
+Professional investors / retail investors; different categories correspond to different suitability, risk disclosure, and product access rules.
 
-### 资金状态（示例）
+### Funds status (example)
 
-待入账 / 已入账 / 待审核 / 已冻结 / 已解冻 / 出金处理中 / 出金失败 / 已退回。
+To be booked / Booked / To be reviewed / Frozen / Thawed / Fund withdrawal in progress / Fund withdrawal failed / Returned.
 
-### 交收周期（示例，必须确认）
+### Settlement cycle (example, must confirm)
 
-港股、美股、A 股等的交收周期（如 T+N）随市场规则与监管调整而变，**不得在 PRD 中写死，需以合规/运营确认的当期口径为准**。
-
----
-
-## 四、业务域检查表
-
-### 开户 / KYC / 资料变更
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 身份资料 | 采集字段的产品含义、是否必填、是否敏感、展示/脱敏 |
-| 证件有效期 | 过期前提醒、过期后限制、恢复方式 |
-| CRA / EDD | 触发条件、处理节点、人工复核、用户提示 |
-| 制裁/黑名单 | 命中后用户/运营看到什么，是否冻结功能 |
-| 资料变更 | 是否重新审核、是否影响交易/出入金 |
-
-### 适当性 / 产品准入
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 客户分类 | 适用客户、不可见/不可操作/需确认 |
-| 产品风险等级 | 产品与客户承受能力匹配规则 |
-| 测评过期 | 提醒、限制、重新测评入口 |
-| 风险揭示 | 展示时机、确认动作、留痕 |
-| 不通过结果 | 拦截/提示/人工处理/允许继续确认 |
-
-### 行情 / 搜索 / 资讯
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 行情权限 | 实时/延时/无权限展示 |
-| 行情源 | 供应商/规则来源，未确认则标 assumption |
-| 刷新机制 | 产品感知的实时/定时/手动刷新 |
-| 停牌/熔断 | 展示、可操作项、提示 |
-| 内容边界 | 投教/资讯/投顾/营销内容是否需审核与免责声明 |
-
-### 交易 / 订单 / 持仓
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 下单前置条件 | 登录、开户、交易权限、适当性、风控 |
-| 价格/数量 | 精度、单位、最小变动价位、上下限 |
-| 状态流转 | 提交中、已委托、部分成交、全部成交、已撤、失败 |
-| 异常处理 | 超时、重复提交、状态冲突、部分成功 |
-| 撤单/改单 | 展示条件、可点击条件、结果文案 |
-
-### 资金 / 清结算 / 对账
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 资金影响 | 可用、可取、购买力、冻结、解冻、手续费 |
-| 币种/汇率 | 展示币种、换算口径、待确认项 |
-| 入出金 | 审核、失败、退回、到账时效 |
-| 交收 | T+N 口径、可用/可取变化、市场差异 |
-| 对账 | 对账失败、差异处理、人工补偿、用户感知 |
-
-### 公司行动（Corporate Actions）
-
-> 极易被遗漏、又直接改动持仓与资金的领域。涉及分红、拆合股、配股供股、并购、退市、代码/比例变更时必查。
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 行动类型 | 现金分红 / 股票股利 / 拆股 / 合股 / 配股 / 供股 / 并购 / 退市 / 代码变更 / ADR 比例调整 |
-| 对持仓影响 | 数量变化、成本价调整、可用/冻结数量、碎股处理规则 |
-| 对资金影响 | 派息入账时机、预扣税、费用、币种、到账口径 |
-| 可交易性 | 停牌期、除权除息日、登记日、可否下单/撤单 |
-| 用户选择权 | 需要用户选择的行动（如现金/股票二选一）的入口、截止时间、默认处理 |
-| 通知 | 通知渠道、时点、内容、是否需确认（与 C15 呼应） |
-| 展示 | 除权前后价格/涨跌幅、历史成本、持仓明细如何标注 |
-
-### 费用、税费与成本披露
-
-| 检查项 | PRD 必须写清 |
-| --- | --- |
-| 费用类型 | 佣金、平台费、交易所/监管规费、结算费、融资利息、汇率点差、最低收费 |
-| 计算口径 | 按笔/按量/按比例、封顶/保底、币种、精度、四舍五入规则 |
-| 事前披露 | 下单前是否展示预估费用/税费；分项还是合计 |
-| 税费 | 股息预扣税、印花税、资本利得、跨境税务（如 W-8BEN）；代扣代缴口径 |
-| 事后凭证 | 费用明细、成交单、账单、可否导出，保存口径 |
-| 展业地差异 | 不同市场/牌照的费率与税则差异（进多展业地差异表） |
+The settlement cycles (e.g., T+N) for Hong Kong stocks, U.S. stocks, A-shares, and other markets may vary according to market rules and regulatory adjustments; **the PRD must not lock in fixed values, and should instead reflect the official settlement terms confirmed by compliance or operations for the current period**.
 
 ---
 
-## 四b、数据留存期限矩阵（模板）
+## 4. Business domain checklist
 
-> 各类记录的保存期限散落各处易出错，用此表集中。**保存期限、是否可导出、销毁口径均须由合规确认当期口径**，PRD 中标 evidence tag，未确认进 Outstanding Questions。
+### Account Opening / KYC / Document Update
 
-| 记录类型 | 数据敏感级别 | 保存期限（合规确认） | 可查询角色 | 是否可导出 | 到期处理（归档/脱敏/销毁） | 证据 tag |
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Identity information | Product meaning of the collection field, required or not, sensitive or not, display / de-identification |
+| Document validity period | Expiry reminder, expiry restriction, recovery method |
+| CRA / EDD | Trigger condition, handling node, manual review, user prompt |
+| Sanctions/Blacklist | What do users/operations see after a hit? Is the function frozen? |
+| Data change | Whether to re-approve, whether it affects transactions/funds transfer |
+
+### Suitability / Product Admission
+
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Customer segmentation | Applicable customers, hidden, disabled, or subject to confirmation |
+| Product risk level | Product and customer tolerance matching rules |
+| Evaluation expired | Reminders, restrictions, and re-evaluation entry point |
+| Risk Disclosure | Display timing, confirmation action, traceability |
+| Not through result | Intercept/Notify/Manual Handling/Allow Continue Confirmation |
+
+### Market / Search / News
+
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Market rights permission | Real-time / Delayed / No permission display |
+| Market data source | Supplier/Rule Source; marked as assumption if not confirmed |
+| Refresh mechanism | Real-time/periodic/manual refresh of product perception |
+| Suspension / Circuit Breaker | Display, actionable items, hints |
+| Content boundaries | Do investment education, information, advisory, and marketing contents require review and disclaimer? |
+
+### Trade / Order / Position
+
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Pre-ordering prerequisites | Login, Account Opening, Trading Permissions, Suitability, Risk Control |
+| Price/Quantity | Accuracy, Unit, Minimum Price Tick, Upper and Lower Limits |
+| State transition | Submitting, delegated, partial settlement, full settlement, cancelled, failed |
+| Exception Handling | Timeout, duplicate submission, status conflict, partial success |
+| Cancel/Modify Order | Display conditions, clickable conditions, result copy |
+
+### Funds / Clearing and Settlement / Reconciliation
+
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Financial impact | Available, retrievable, purchasing power, frozen, unfrozen, transaction fee |
+| Currency/Exchange rate | Display currency, conversion basis, and pending confirmation items |
+| Inbound and outbound funds | Review, failure, return, settlement timing |
+| Settlement | T+N caliber, availability/availability changes, market differences |
+| Reconciliation | Reconciliation failure, discrepancy handling, manual compensation, user perception |
+
+### Corporate Actions
+
+> Highly prone to being overlooked, and directly alters positions and funds. Must be reviewed when involving dividends, stock splits, rights issues, mergers & acquisitions, delistings, or changes in stock code/ratio.
+
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Action type | Cash dividend / Stock dividend / Stock split / Consolidation / Rights issue / Bonus issue / Mergers & acquisitions / Delisting / Stock code change / ADR ratio adjustment |
+| Impact on positions held | Quantity changes, cost price adjustments, available/frozen quantities, broken shares handling rules |
+| Impact on funds | Dividend crediting timing, withholding tax, fees, currency, and settlement methodology |
+| Tradability | Trading halt period, rights/dividend payment date, registration date, able to place/cancel order |
+| User selection rights | Entry point for user to select an action (e.g., cash or stock), deadline, default handling |
+| Notice | Notification channel, timing, content, whether confirmation is required (in alignment with C15) |
+| Display | How to annotate prices/percentage changes before and after rights adjustment, historical cost, and position details? |
+
+### Expenses, Taxes, and Cost Disclosures
+
+| Inspection item | PRD must be clearly specified |
+| --- | --- |
+| Cost type | Commission, platform fees, exchange/regulatory fees, settlement fees, financing interest, exchange rate points, minimum charge |
+| Calculation Scope | Per-transaction / per-quantity / per-ratio, ceiling / floor, currency, precision, rounding rule |
+| Pre-disclosure | Whether to display estimated fees/taxes before ordering; itemized or total? |
+| Taxes and fees | Dividend withholding tax, stamp duty, capital gains, cross-border tax (e.g., W-8BEN); withholding and deduction basis |
+| Post-transaction voucher | Expense details, transaction order, invoice, export and save criteria |
+| Business operation location differences | Differential fees and tariff variations across markets/licensing categories (variations by operational territory) |
+
+---
+
+## 4b. Data Retention Period Matrix (Template)
+
+> The retention periods for various records are scattered and prone to errors; use this table to centralize them. **Retention period, exportability, and destruction criteria must all be confirmed by compliance for the applicable period**, marked with the evidence tag in the PRD; unconfirmed items remain in Outstanding Questions.
+
+| Record type | Data sensitivity level | Retention period (compliance confirmation) | Queryable role | Can it be exported? | Expiration handling (archiving/obscuring/destroys) | Evidence tag |
 | --- | --- | --- | --- | --- | --- | --- |
-| 客户身份资料（KYC） | 敏感个人信息 | | | | | |
-| 适当性 / 风险测评记录 | 合规记录 | | | | | |
-| 交易 / 委托 / 成交记录 | 交易记录 | | | | | |
-| 资金流水 / 出入金记录 | 资金记录 | | | | | |
-| 双录 / 电子合同 / 存证 | 合规记录 | | | | | |
-| 操作 / 审计日志 | 审计记录 | | | | | |
-| 风控 / AML 处置与上报记录 | 合规记录 | | | | | |
-| 通知 / 送达记录 | 审计记录 | | | | | |
+| Customer Identity Verification (KYC) | Sensitive personal information | | | | | |
+| Suitability / Risk Tolerance Assessment Record | Compliance records | | | | | |
+| Trade / Order / Transaction Record | Transaction record | | | | | |
+| Funds flow / Inbound and outbound records | Funds record | | | | | |
+| Dual recording / Electronic contract / Evidence preservation | Compliance records | | | | | |
+| Operation / Audit Log | Audit log | | | | | |
+| Risk Control / AML Response and Reporting Records | Compliance records | | | | | |
+| Notice / Delivery Record | Audit log | | | | | |
 
 ---
 
-## 四c、运营与合规专项检查表（C15–C20）
+## 4c. Operations and compliance checklist (C15–C20)
 
-### 通知触达与时效（C15）
+### Notification Delivery and Timeliness (C15)
 
-| 检查项 | PRD 必须写清 |
+| Inspection item | PRD must be clearly specified |
 | --- | --- |
-| 通知类型 | 追保通知 / 成交回报 / 强平预警 / 公司行动 / 资金到账 / 风控处置 / 系统公告 |
-| 送达渠道 | 站内信 / 推送 / 短信 / 邮件 / 电话；是否多渠道冗余 |
-| 时效要求 | 实时 / 分钟级 / T+N；是否有监管送达义务与时限 |
-| 失败处理 | 送达失败重试、降级渠道、是否阻塞关键动作 |
-| 留痕 | 是否记录送达状态、时间、渠道、内容（与留存矩阵呼应） |
+| Notification type | Premium Notice / Trade Confirmation / Forced Liquidation Alert / Company Action / Fund Arrival / Risk Control Response / System Announcement |
+| Delivery channels | Intranet messages / push notifications / SMS / email / phone calls; multi-channel redundancy? |
+| Time requirement | Real-time / minute-level / T+N; Are there regulatory delivery obligations and time limits? |
+| Failure Handling | Delivery failure retry, downgrade channel, whether to block critical actions |
+| Traceable | Whether to record delivery status, time, channel, and content (aligning with the retention matrix) |
 
-### 系统可用性与业务连续性（C16）
+### System Availability and Business Continuity (C16)
 
-| 检查项 | PRD 必须写清 |
+| Inspection item | PRD must be clearly specified |
 | --- | --- |
-| 可用性目标 | 交易时段内可用性口径；关键链路（下单/撤单/资金）可接受停机 |
-| 降级策略 | 第三方/柜台/行情不可用时隐藏入口 / 排队 / 只读 / 人工处理 |
-| 故障公告 | 用户可见的故障提示与公告口径、恢复通知 |
-| 灾备 / 数据 | 切换后数据是否不丢失、是否重复、用户是否需重试 |
-| 应急处置 | 是否触及关键信息基础设施与监管应急报告要求 |
+| Availability objectives | Availability metric during trading hours; key links (order placement/cancellation/funding) acceptable downtime |
+| Degradation strategy | Hide entry when third-party/counter/quote unavailable / Queue / Read-only / Manual handling |
+| Fault Announcement | User-visible error messages, incident announcements, and recovery notifications |
+| Disaster recovery / Data | Will data be lost after the switch? Will there be data duplication? Does the user need to retry? |
+| Emergency response | Whether it involves critical information infrastructure and regulatory emergency reporting requirements |
 
-### 跨境数据与个人信息保护（C17）
+### Cross-border Data and Personal Information Protection (C17)
 
-| 检查项 | PRD 必须写清 |
+| Inspection item | PRD must be clearly specified |
 | --- | --- |
-| 适用法规 | PIPL / 香港 PDPO / GDPR / 新加坡 PDPA（按展业地确认） |
-| 数据存储地 | 数据落在哪个辖区、是否允许跨境 |
-| 跨境传输 | 传输目的、最小必要、是否需单独同意或安全评估 |
-| 数据主体权利 | 查询 / 更正 / 删除 / 撤回同意 / 拒绝的入口与时限 |
-| 同意管理 | 同意采集时机、可撤回、留痕 |
+| Applicable regulations | PIPL / Hong Kong PDPO / GDPR / Singapore PDPA (based on place of operation) |
+| Data storage location | Which jurisdiction does the data fall under, and is cross-border transmission permitted? |
+| Cross-border transmission | Transmission purpose, minimum necessary, whether separate consent or security assessment required |
+| Data subject rights | Query / Correct / Delete / Withdraw / Reject entry and time limit |
+| Agreement Management | Agree to data collection timing, revocability, and traceability |
 
-### 可疑交易上报与监管报送（C18）
+### Suspicious Transaction Reporting and Regulatory Submission (C18)
 
-| 检查项 | PRD 必须写清 |
+| Inspection item | PRD must be clearly specified |
 | --- | --- |
-| 触发条件 | 可疑交易（STR）、大额交易、异常行为的识别口径 |
-| 上报动作 | 报送对象、口径、时限、经办/复核、是否人工确认 |
-| 监管报表 | 持仓/交易/资金监管报送的产出、频率、责任角色 |
-| 保密要求 | 上报不得向客户泄露（tipping-off）等约束 |
-| 留痕 | 上报记录保存（与留存矩阵呼应） |
+| Trigger condition | Identification criteria for suspicious transactions (STR), large-value transactions, and abnormal behaviors |
+| Report action | Reporting recipient, scope, deadline, responsible/officer for review, whether manual confirmation required |
+| Regulatory Reports | Position/Trading/Funds Supervision Reporting: Output, Frequency, Responsible Roles |
+| Confidentiality Requirements | Reporting must not involve tipping off customers or similar constraints |
+| Traceable | Report record retention (aligns with retention matrix) |
 
-### 模拟盘 / 虚拟交易边界（C19）
+### Simulated Desk / Virtual Trading Boundary (C19)
 
-| 检查项 | PRD 必须写清 |
+| Inspection item | PRD must be clearly specified |
 | --- | --- |
-| 隔离 | 模拟资金/持仓/订单与真实账户完全隔离，互不影响 |
-| 数据来源 | 模拟行情是实时/延时/模拟；是否与真实行情一致 |
-| 防误导 | 全程明确"模拟"标识；不得让用户误以为真实成交/盈亏 |
-| 转化 | 模拟到真实的引导是否合规、是否含适当性与风险揭示 |
-| 留痕 | 模拟操作是否需留痕、是否计入任何真实统计 |
+| Isolation | Simulated funds/trading positions/orders are completely isolated from the real account, with no impact on each other. |
+| Data source | Simulated market data: real-time/delayed/simulated; consistent with real market data |
+| Anti-deception | Clear "simulated" labeling throughout; ensure users do not mistakenly believe actual trades or profit/loss have occurred. |
+| Transformation | Whether the guidance from simulation to reality is compliant, appropriate, and includes adequate risk disclosure |
+| Traceable | Does simulation operation require logging? Is it included in any real statistical analysis? |
 
-### 账户安全与反欺诈（C20）
+### Account Security and Anti-Fraud (C20)
 
-> 区别于 C3（身份识别/AML）与 C4（交易风控）：C20 关注**账户被谁在用、是否本人、是否被盗用**。证券 App 是高价值攻击目标，登录、会话、敏感操作的安全校验是产品级需求。写产品/风控可感知的规则与用户感知，不写风控引擎/加密算法实现。
+> Differing from C3 (identity verification/AML) and C4 (transaction risk control): C20 focuses on **who is using the account, whether it is the account holder, and whether it has been compromised**. The securities app is a high-value target for attacks; login, session, and security verification for sensitive operations are product-level requirements. Rules perceivable to product and risk control, and user-perceivable; do not describe risk control engine or encryption algorithm implementations.
 
-| 检查项 | PRD 必须写清 |
+| Inspection item | PRD must be clearly specified |
 | --- | --- |
-| 登录安全 | 登录方式、失败锁定、异常登录识别（异地/换设备/换 IP）与处置 |
-| 会话安全 | 会话超时、并发登录、踢下线、公共设备退出 |
-| 设备与绑定 | 设备绑定/解绑、换设备校验、可信设备管理 |
-| 二次验证 | 哪些敏感操作（改密、改绑手机/邮箱、大额出金、修改收款账户）需 OTP/生物识别/人脸；验证失败结果 |
-| 账户盗用（ATO） | 疑似盗用如何冻结、通知、申诉、恢复；恢复期间可做/不可做什么 |
-| 反欺诈边界 | 与 AML（C3）、交易风控（C4）的职责分工，不重复也不遗漏 |
-| 留痕 | 登录、敏感操作、冻结/解冻、申诉是否留痕（与留存矩阵呼应） |
+| Login Security | Login methods, account lockout on failure, anomaly detection (remote location/device/IP change) and response measures |
+| Session Security | Session timeout, concurrent login, kick offline, public device exit |
+| Devices and Binding | Device binding/unbinding, device replacement verification, trusted device management |
+| Secondary verification | Which sensitive operations (password change, phone/email binding change, large withdrawals, recipient account modification) require OTP/biometric/face verification? Verification failure results |
+| Account takeover (ATO) | How to freeze, notify, appeal, and restore a suspected case of unauthorized use; actions allowed/forbidden during restoration period |
+| Anti-fraud boundary | Division of responsibilities with AML (C3) and transaction risk control (C4), without overlap or omission |
+| Traceable | Login, sensitive operations, freeze/thaw, appeal logging (aligning with retention matrix) |
 
-不得只写"加了验证码"。必须写清：哪个操作、何时触发、验证方式、失败与超时结果、是否可绕过、留痕由谁可查。账户安全事件通常也触及 C16 可用性与 C9/C15 通知留痕。
+Do not simply write "added CAPTCHA". Must specify: which operation, when it triggers, verification method, results on failure and timeout, whether it can be bypassed, and who can review the audit trail. Account security events often also involve C16 availability and C9/C15 notification logging.
 
 ---
 
-## 五、多展业地差异表（模板）
+## 5. Differences by jurisdiction
 
-> 不要把展业地差异散落在正文，统一用此表描述。
+> Do not scatter the differences by business location throughout the main text; use this table to describe them uniformly.
 
-| 差异项 | 默认规则 | 展业地 A | 展业地 B | 影响模块 |
+| Difference items | Default rules | Place of operation A | Business location B | Influence module |
 | --- | --- | --- | --- | --- |
-| 币种 | | | | 金额展示、结算 |
-| 时区 | | | | 交易时段、统计口径 |
-| 可交易市场 | | | | 行情、下单 |
-| 适当性/客户分类规则 | | | | 准入、风险揭示 |
-| 合规限制 | | | | 用户准入、风控 |
-| 税务（如美股 W-8BEN） | | | | 开户、出金 |
-| 费率 / 费用规则 | | | | 下单、账单、成本披露 |
-| 数据存储地 / 跨境传输 | | | | 数据合规、隐私 |
-| 数据保存/导出 | | | | 审计、报表 |
+| Currency | | | | Amount display, settlement |
+| Time zone | | | | Trading hours, statistical criteria |
+| Tradable Market | | | | Market data, order placement |
+| Suitability/Client Classification Rules | | | | Access control, risk disclosure |
+| Compliance restrictions | | | | User onboarding, risk control |
+| Taxes (such as U.S. stock W-8BEN) | | | | Account opening, withdrawal of funds |
+| Fee / Cost Rules | | | | Place order, billing, cost visibility |
+| Data storage location / Cross-border transmission | | | | Data compliance, privacy |
+| Data saving/export | | | | Audit, Reports |
 
 ---
 
-## 六、术语表（券商常用，按需补充）
+## 6. Brokerage glossary
 
-| 术语 | 说明 |
+| Terminology | Explanation |
 | --- | --- |
-| KYC | 客户身份识别（Know Your Customer） |
-| CRA | 客户风险评估（Customer Risk Assessment） |
-| EDD | 加强尽职调查（Enhanced Due Diligence） |
-| 适当性 | 投资者风险承受能力与产品风险等级的匹配管理 |
-| 购买力 | 账户可用于交易的资金/额度 |
-| 保证金 / 维持保证金 | 保证金账户的担保与维持要求 |
-| 强平 | 风险度超限时的强制平仓处置 |
-| 行情权限 | Level 1/Level 2、实时/延时等行情数据访问级别 |
-| 停牌 / 熔断 | 交易暂停机制 |
-| 展业地 | 券商展业的牌照/地区主体（如 VBrokers/Tickrs/M+Global） |
-| 双录 | 监管要求的销售过程录音录像 |
-| 四眼复核 | 经办与复核由不同角色/人员完成的控制机制 |
-| Maker-Checker | 与四眼复核相近的经办-复核机制 |
-| 公司行动 | 分红、拆合股、配股、并购、退市等影响持仓与资金的证券发行人行为 |
-| 追保通知 / Margin Call | 保证金不足时要求客户补充保证金的通知，通常有送达时效要求 |
-| 除权 / 除息 | 公司行动导致的价格与持仓成本调整 |
-| 预扣税 / Withholding Tax | 股息等收入在派发时按税则预先扣缴的税款 |
-| STR | 可疑交易报告（Suspicious Transaction Report） |
-| Tipping-off | 向被调查客户泄露其被上报/被调查的行为，通常为监管所禁止 |
-| BCP / DR | 业务连续性计划 / 灾难恢复 |
-| ATO | 账户盗用（Account Takeover），未经授权使用他人账户 |
-| OTP | 一次性验证码（One-Time Password），用于敏感操作二次验证 |
-| 2FA / MFA | 双因素 / 多因素认证 |
-| 可信设备 | 经绑定或验证、后续可免额外校验的用户设备 |
+| KYC | Customer Due Diligence (KYC) |
+| CRA | Customer Risk Assessment |
+| EDD | Strengthened Due Diligence (EDD) |
+| Appropriateness | Investor risk tolerance and product risk level matching management |
+| Purchasing power | Funds/Quota available for trading |
+| Margin / Maintenance Margin | Collateral Account: Collateral and Maintenance Requirements |
+| Forcing liquidation | Forced liquidation upon risk level exceeding threshold |
+| Market rights permission | Level 1/Level 2, real-time/delayed market data access tiers |
+| Suspension / Circuit Breaker | Trading suspension mechanism |
+| Place of business operation | Brokerage operation licenses / regional entities (e.g., VBrokers/Tickrs/M+Global) |
+| Audio-visual recording | Sales process audio and video recording as required by regulatory requirements |
+| Four-eye review | A control mechanism where processing and reconciliation are carried out by different roles/persons |
+| Maker-Checker | A processing-review mechanism similar to the "Four-Eyes Review" |
+| Corporate Action | Dividends, stock splits, rights issues, mergers & acquisitions, delistings, and other securities issuer actions that affect holdings and capital |
+| Margin call | A notice to customers requiring additional margin due to insufficient margin usually has specific delivery time requirements. |
+| Rights suspension / Dividend suspension | Price adjustments due to company actions and position cost revisions |
+| Pre-withholding tax / Withholding Tax | Dividends and other income are subject to advance tax withholding at the time of distribution. |
+| STR | Suspicious Transaction Report |
+| Tipping-off | Leak to the investigated client its being reported/being investigated status, typically prohibited by regulators |
+| BCP / DR | Business Continuity Plan / Disaster Recovery |
+| ATO | Account takeover: unauthorized use of another user's account |
+| OTP | One-time password (OTP) used for two-step verification during sensitive operations |
+| 2FA / MFA | Two-factor / Multi-factor authentication |
+| Trusted Device | Devices bound or verified, allowing subsequent bypass of additional validation checks |
 
 ---
 
-## 七、监管与标准参考（写 PRD 时只作线索）
+## 7. Regulations and standards (research leads, not confirmed requirements)
 
-> 以下是写证券行业 PRD 时常用的法规/标准线索。PRD 中引用时必须标注日期、适用辖区、适用主体和证据 tag；具体口径以合规确认和最新原文为准。
+> The following are commonly used regulatory and standard references when drafting PRDs for the securities industry. When referencing in PRD, the date, applicable jurisdiction, applicable entity, and evidence tag must be annotated; specific definitions shall follow compliance confirmation and the latest original text.
 
-| 参考 | 适用线索 | PRD 关注点 |
+| Reference | Applicable leads | PRD focus points |
 | --- | --- | --- |
-| 《证券期货投资者适当性管理办法》（证监会令第130号） | 投资者分类、产品或服务风险匹配、适当性义务 | 客户分类、测评、准入、风险揭示、确认留痕 |
-| 《证券期货业网络和信息安全管理办法》（证监会令第218号） | 网络和信息安全、投资者个人信息保护、应急处置、关键信息基础设施等 | 个人信息、系统可用性、安全事件、数据保护、操作留痕 |
-| 《金融机构客户尽职调查和客户身份资料及交易记录保存管理办法》（中国人民银行、国家金融监督管理总局、中国证监会令〔2025〕第11号） | 客户尽职调查、客户身份资料及交易记录保存、可追溯 | KYC、AML、资料留存、交易记录、授权查询 |
-| 《证券期货业数据安全管理与保护指引》等行业标准 | 数据安全管理与保护、行业数据治理 | 数据分类分级、导出、脱敏、保存、访问权限 |
+| The Securities and Futures Investors Appropriateness Management Measures (CSRC Order No. 130) | Investor classification, product or service risk matching, suitability obligations | Customer segmentation, evaluation, access control, risk disclosure, and confirmation tracing |
+| Management Measures for Network and Information Security in the Securities and Futures Industry (CSRC Order No. 218) | Network and information security, investor personal information protection, emergency response, and critical information infrastructure | Personal information, system availability, security incidents, data protection, operational audit trails |
+| Management Measures for Customer Due Diligence, Customer Identity Data, and Transaction Record Retention by Financial Institutions (PBOC, CBIRC, and CSRC Order No. 11, 2025) | Customer Due Diligence, Customer Identity Documentation and Transaction Record Retention, Traceability | KYC, AML, document retention, transaction records, authorization inquiry |
+| "Guidelines for Data Security Management and Protection in the Securities and Futures Industry" and other industry standards | Data security management and protection, industry data governance | Data classification and grading, export, de-identification, storage, access permissions |
 
-这些参考只能帮助 PRD 作者发现问题，不自动给出产品结论。比如"交易记录保存多久""某客户能否交易某产品""某市场交收周期是什么"，都必须按展业地、牌照主体、交易所/清算规则和合规确认落地。
+These references can only assist PRD authors in identifying issues; they do not automatically generate product conclusions. For example, "how long are transaction records retained," "can a particular client trade a specific product," and "what is the settlement cycle in a particular market" must all be determined according to the operating location, license holder, exchange/settlement rules, and compliance approval.
 
 ---
 
-## 八、WHAT not HOW 提醒（券商场景尤其重要）
+## 8. Specify product behavior, not implementation
 
-券商需求极易把技术/柜台实现写进 PRD。守住边界：
+Brokerage requirements easily lead to technical/cash desk implementations being written into PRD. Guard the boundaries:
 
-| 写（产品/合规约束） | 不写（留给 `spec-plan` / 柜台 / 接口文档） |
+| Write (product/compliance constraints) | No writing (left for `spec-plan` / counter / interface documentation) |
 | --- | --- |
-| 「下单前必须做适当性校验，不通过则拦截并提示」 | 适当性服务接口、规则引擎实现 |
-| 「该市场订单成交后按当期交收周期交收」 | 清算系统对接、账务分录 |
-| 「行情无权限时展示延时行情并标注」 | 行情网关协议、datatype 编码 |
-| 「风险度超阈值触发强平提醒」 | 强平引擎算法、保证金计算公式实现 |
-| 「出金需经合规/风控审核」 | 审核工作流引擎、状态表设计 |
-| 「导出客户资料需有权限、脱敏、留痕」 | 导出任务表结构、文件存储实现 |
+| «Before placing an order, perform appropriate suitability verification; if failed, intercept and prompt» | Appropriateness service interface, rule engine implementation |
+| Orders in this market will be settled according to the settlement cycle of the period when the trade is executed. | Clearing system integration, accounting journal entries |
+| Display delayed market data and annotate when market data permission is unavailable | Market Data Gateway Protocol, datatype encoding |
+| "Risk level exceeds threshold to trigger strong liquidation reminder" | Strong-liquidation engine algorithm and margin calculation formula implementation |
+| Funds withdrawal requires compliance/risk control review | Audit workflow engine and status table design |
+| Exporting customer data requires authorization, sensitivity masking, and audit trail recording | Export task table structure, file storage implementation |

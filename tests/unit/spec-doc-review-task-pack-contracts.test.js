@@ -40,10 +40,10 @@ describe('spec-doc-review task-pack consumer contract', () => {
   test('uses deterministic intake as a floor and reviews source-plan fidelity above it', () => {
     expect(fs.existsSync(lensPath)).toBe(true);
     expect(lens).toContain('spec-first tasks validate <task-pack-path> --repo <artifact-root> --json');
-    expect(lens).toContain('`Task Pack Contract` JSON 是任务结构权威');
-    expect(lens).toContain('`source_plan` 仍是 scope、acceptance、architecture、non-goals 与 verification 的唯一权威');
-    expect(lens).toContain('不得把 deterministic validation 当作 semantic-fit');
-    expect(lens).toContain('当前 validator 不返回 task-pack digest');
+    expect(lens).toContain('Task Pack Contract');
+    expect(lens).toContain('source_plan');
+    expect(lens).toContain('Do not treat deterministic validation as semantic fit');
+    expect(lens).toContain('the current validator does not return the task-pack digest');
     expect(lens).not.toContain('source-plan hash、task-pack digest');
     for (const field of [
       '`dependencies`',
@@ -75,8 +75,8 @@ describe('spec-doc-review task-pack consumer contract', () => {
     expect(handoff).toContain(invocation);
     expect(handoff).toContain('task_pack_outcome.review_result: passed');
     expect(handoff).toContain('task_pack_outcome.next_action: spec-work-task-pack');
-    expect(handoff).toContain('不得只消费自由文本 `Review complete`');
-    expect(handoff).toContain('三者都不构成 subagent dispatch authority');
+    expect(handoff).toContain('Do not consume free text `Review complete` alone');
+    expect(handoff).toContain('none of the three grants subagent dispatch authority');
     for (const field of [
       '`output_mode: json`',
       '`mutation_policy: report-only`',
@@ -87,14 +87,14 @@ describe('spec-doc-review task-pack consumer contract', () => {
     ]) {
       expect(handoff).toContain(field);
     }
-    expect(handoff).toContain('`task_pack_outcome.source_plan` 与本次 deterministic receipt 的 `source_plan.path` 相同');
-    expect(handoff).toContain('单独的 `Review complete` 永远不是 execution handoff 证据');
+    expect(handoff).toContain('task_pack_outcome.source_plan');
+    expect(handoff).toContain('`terminal_signal` is a required field for a complete envelope, but `Review complete` alone is never conclusive evidence of execution handoff.');
   });
 
   test('fails closed before personas and keeps roster selection separate from dispatch authority', () => {
-    expect(lens).toContain('不 dispatch personas');
-    expect(lens).toContain('返回 `review_status: incomplete`');
-    expect(lens).toContain('`roster:full` 只选择所有实际 qualified personas，不授予 subagent dispatch');
+    expect(lens).toContain('Do not dispatch personas, do not downgrade the file to a regular plan, and do not have the LLM compute hash when CLI is unavailable, invalid, stale, wrong-chain, draft, path escape, source-plan missing, or any other deterministic failure occurs.');
+    expect(lens).toContain('Return `review_status: incomplete`');
+    expect(lens).toContain('`roster:full` selects only the actual qualified personas, without granting subagent dispatch.');
     expect(lens).toContain('`dispatch_authorization_missing`');
   });
 

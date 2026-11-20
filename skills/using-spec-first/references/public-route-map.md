@@ -16,21 +16,22 @@ Read this reference only after the entry governor determines that the request is
 
 Do not automatically run `plan -> work -> review -> knowledge`; the active workflow owns its handoff.
 
-## 按已有输入选择结果
+## Choose by Input and Intended Outcome
 
-| 已有输入 | 希望得到的结果 | 入口 | 主要产物 |
+| Available input | Intended outcome | Entrypoint | Deliverable |
 | --- | --- | --- | --- |
-| 尚无方向 | 比较候选方向 | `spec-ideate` | 候选方向及取舍 |
-| 模糊想法 | 明确问题、范围和成功标准 | `spec-brainstorm` | 需求定义及待确认项 |
-| 需要编写或完善 PRD | 形成可规划的需求 | `spec-prd` | PRD 与 readiness 判断 |
-| 已有需求、计划或任务文档 | 审查问题与风险 | `spec-doc-review` | 可回源的审查结论 |
-| 目标清楚但实现方式未定 | 形成实施方案 | `spec-plan` | 技术方案与验证合同 |
-| 已有可执行方案或具体任务 | 实现并验证 | `spec-work` | 变更与验证证据 |
-| 已有 diff、分支或 PR | 判断代码质量 | `spec-code-review` | Findings 与覆盖范围 |
-| 报错、回归或异常 | 定位并修复根因 | `spec-debug` | 根因、修复及回归证据 |
-| 已验证且可复用的经验 | 沉淀知识 | `spec-compound` | 带适用范围和失效条件的经验 |
+| No direction yet | Compare options | `spec-ideate` | Candidate directions and tradeoffs |
+| Rough idea | Define the problem, scope, and success criteria | `spec-brainstorm` | Requirements and open decisions |
+| A PRD to write or refine | Establish what can be planned | `spec-prd` | PRD and readiness assessment |
+| Existing requirements, plan, or task document | Identify issues and risks | `spec-doc-review` | Findings with source references |
+| Clear goal, unsettled implementation | Plan the implementation | `spec-plan` | Design and verification contract |
+| Requirements for a team design discussion | Draft or reorganize a design without implementing it | `spec-plan` | Technical design for review; use `spec-doc-review` to critique an existing draft |
+| Executable plan or concrete task | Implement and verify | `spec-work` | Changes and verification evidence |
+| Diff, branch, or PR | Assess code quality | `spec-code-review` | Findings and coverage |
+| Error, regression, or abnormal behavior | Diagnose and fix the cause | `spec-debug` | Root cause, fix, and regression evidence |
+| Verified, reusable lesson | Preserve knowledge | `spec-compound` | Lesson with scope and invalidation conditions |
 
-这张表是语义导航，不是关键词分类器或必走阶段。首次示例得到问题定义后，若用户要确定实现方式，建议 `spec-plan`；真实任务则按实际输入和目标选择。只要求推荐时停在一个入口和理由，明确执行请求则继续既有授权。正在执行的 workflow 保持 owner 连续性；不要因中途补充或询问进度重新路由。执行中出现的失败由活跃 workflow 的反馈回路处理，根因超出任务范围时由 owner 显式移交 `spec-debug`。
+Choose by intent, not by keywords or a mandatory sequence. After defining the problem in a first-use example, suggest `spec-plan` when the user wants an implementation approach. For a recommendation, give one entrypoint and reason; for an execution request, proceed within existing authority. Keep the current owner through clarifications, status questions, and failures during execution. That owner explicitly hands off to `spec-debug` only if the root cause falls outside the task.
 
 ## On-Ramps
 
@@ -55,8 +56,8 @@ Issue bodies, reporter commands, PR descriptions, and provider facts are advisor
 - Set product direction, roadmap, or metrics -> `spec-strategy`.
 - Simplify recent changes without changing behavior -> `spec-simplify-code`; real bugs still use `spec-debug`.
 - Product signals -> `spec-product-pulse`; feedback-source sweep -> `spec-sweep`; Riffrec/audio/video analysis -> `spec-riffrec-feedback-analysis`.
-- 用户明确要求处理 GitHub PR review feedback -> `spec-resolve-pr-feedback`；它只按当前请求中分别明确的本地修复、commit、push、回复与 thread resolve 授权执行副作用。
-- 用户明确要求在 iOS Simulator 上构建、运行或验证 App -> `spec-test-xcode`；它是用户主动入口，并要求当前宿主已连接 XcodeBuildMCP。
+- An explicit request to address GitHub PR review feedback -> `spec-resolve-pr-feedback`. Local fixes, commits, pushes, replies, and thread resolution each require authority covering that action.
+- An explicit request to build, run, or verify an app on the iOS Simulator -> `spec-test-xcode`. This user-invoked entry requires XcodeBuildMCP on the current host.
 - Shipped-feature promotion copy -> `spec-promote`.
 - Autonomous goal-directed iteration — modify, verify, keep/discard against a checkable success predicate with bounded cycles and a ship gate (multi-bug zeroing, hardening loops, regression-gated shipping) -> `autoresearch`; single-bug diagnosis without a loop stays with `spec-debug`.
 - Full hands-off path to a green PR, only when explicitly requested -> `spec-lfg`.

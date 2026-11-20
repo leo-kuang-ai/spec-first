@@ -15,11 +15,11 @@ Distinguish task-direction authority from Product Contract decision authority. T
 
 Read summary/metadata first, then only the source sections needed for the active decision. Re-read exact source when wording, freshness, compatibility, or a completion claim depends on it. Do not expand context merely because more files are available.
 
-## 工具授权与调研降级
+## Tool authorization and research downgrade
 
-调研要求不是工具授权。调用前核对当前任务允许的工具、命令与写入范围；只读用途不豁免显式命令限制。目录发现、版本或 git 身份核对也遵守同一边界，不为完成调研清单扩大授权。
+The research requirements do not involve tool authorization. Before invocation, verify the current task's allowed tools, commands, and write permissions; read-only usage does not exempt from explicit command restrictions. Directory discovery, version, or Git identity verification also adheres to the same boundary and does not expand authorization to complete the reconnaissance checklist.
 
-所需专用工具未列出或不可用时，只能使用当前已授权且实际可用的等价工具；没有此类路径就记录尚未确认的事实及其影响，继续不依赖该证据的规划。不得用未授权 shell 替代发现工具，也不得把读取失败等同于目录或文件不存在。若已误调用，立即停止该类动作，在交付中披露实际偏差；道歉、演示纠正或验证“已停止”都不需要再发起工具调用。此规则是模型遵守的约定，不声称宿主已硬强制权限。
+When dedicated tools are not listed or unavailable, only the currently authorized and actually available equivalent tools may be used; if no such alternative exists, record the unverified fact and its impact, and proceed with planning without relying on this evidence. Do not use unauthorized shell tools to replace discovery tools, and do not equate read failures with the non-existence of directories or files. If mistakenly invoked, immediately halt the action and disclose the actual deviation during delivery; no further tool invocation is required for apologies, demonstrations of correction, or verification of "halted". This rule is a convention followed by the model, and does not claim that the host has enforced permissions.
 
 ## Source / Runtime Boundary
 
@@ -27,9 +27,9 @@ Generated runtime mirrors and host-local managed slices are not source-of-truth.
 
 Provider graphs, MCP results, run-local orientation summaries, historical learnings, and external research are advisory. Record provenance and freshness, then confirm any load-bearing conclusion against current source, tests, logs, contracts, or a current owner decision. A provider self-report, stale plan, or past transcript cannot support a confirmed planning claim by itself.
 
-## 新依赖事实
+## New dependency facts
 
-计划引入新包、服务或API，且其存在性或版本影响可实施性时，核对官方注册表、项目官方文档或当前锁文件中的名称、来源、可用版本及所需API。模型记忆、相似包名和搜索摘要仅作线索；未取得证据的依赖标为待核实，不生成可直接执行的确定安装建议，也不把该依赖相关单元标为已就绪。读取失败保留具体缺口；核实依赖不授权安装、付费或提交数据。
+Plan to introduce a new package, service, or API, and verify its existence and version impact on implementability by checking the official registry, project official documentation, or the current lock file for name, source, available versions, and required APIs. Model memory, package name similarity, and search summaries serve only as clues; dependencies without evidence are marked as pending verification, no actionable installation recommendations are generated, and no units related to such dependencies are marked as ready. Read failure retains specific gap; verify dependency not authorized for installation, payment, or data submission.
 
 ## Cross-Repo Scope
 

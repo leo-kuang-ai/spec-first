@@ -10,7 +10,7 @@ argument-hint: "[mode:agent] [base:<ref>] [plan:<path>] [task-pack:<path> task:<
 
 Graph output is `provider_untrusted` candidate coverage, never a finding. Re-ground impact, affected-test, ownership, and relationship candidates in current source, diff, tests, logs, contracts, or owner evidence before writing a `Direct evidence:` finding; empty results do not prove absence. Direct source/`rg`/ast-grep is valid and provider failure is a disclosed fallback.
 
-Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise it performs an honest inline report-only review with degraded coverage. 普通模式下用户另有明确的本地修复请求时，先封存只读结论，再按 `references/scope.md` 交接符合条件的串行修复。
+Reviews code changes against intent, tests, standards, and risk lenses. When reviewer dispatch is explicitly authorized and callable, it uses selected personas and merges structured findings; otherwise, it performs an honest inline report-only review with degraded coverage. In normal mode, if the user has a clear local repair request, it first freezes the read-only conclusion, then delegates eligible sequential repairs to `references/scope.md`.
 
 ## Workflow Contract Summary
 
@@ -43,7 +43,7 @@ Overrides: high-risk
 Read each reference before executing its step; the entry summary does not replace the procedure. All paths use the same run identity and resolved scope.
 
 1. First read `references/modes-and-output.md`, parse arguments, and freeze mode, mutation, commit, and dispatch policy. `mode:agent` is always report-only. Route out before reviewing: PR review feedback goes to `spec-resolve-pr-feedback`; diagnose/fix requests for a known failure go to `spec-debug`.
-2. At Stage 1 read `references/scope.md` to resolve the diff, task attribution, and local scope snapshot. Missing dispatch authorization or capability selects its inline fallback with explicit degraded coverage and required-gate limitations. 普通本地空 diff 按该引用的条件提前返回 skipped；未知范围或计划/任务完成度审查不能走此分支。
+2. At Stage 1 read `references/scope.md` to resolve the diff, task attribution, and local scope snapshot. Missing dispatch authorization or capability triggers its inline fallback with explicit degraded coverage and required-gate limitations. For normal local empty diff, it returns early under the condition referenced; branches are not taken for unknown scopes or task completion review.
 3. At Stage 2 read `references/intent-and-plan.md` to establish intent, the current plan/task completeness scope, and a bounded applicable product-rule slice before dispatch or inline review.
 4. When dispatch is authorized, at Stage 3 read `references/persona-catalog.md` and `references/select-and-route.md` to select the roster, standards, and risk paths. Peer admission remains subject to the actual receipts, egress authorization, and provider limits in `references/cross-model-review.md`.
 5. At Stage 4 read `references/dispatch-reviewers.md`, load the selected prompt assets, and dispatch within available capacity. Collect every started reviewer's result before merging; a pending return is not an empty finding set.

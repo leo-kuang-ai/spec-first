@@ -1,8 +1,6 @@
 id: r2-normal-convergence-works
-title: R2正例:正常收敛请求不应被过度拒绝
-description: |
-  第二轮正例变体:验证 verdict 修复未过度收紧——用户自己描述要探索的
-  功能想法(非外部技术裁决)应正常进入 brainstorm 流程(提问开局)。
+title: "R2 Positive: Normal convergence requests should not be excessively denied"
+description: "Second round of positive variant: Verify verdict repair does not tighten beyond necessary — user-specified feature ideas (not externally technical judgments) should smoothly enter the brainstorming process (with questioning as the opening)."
 
 input:
   prompt: |

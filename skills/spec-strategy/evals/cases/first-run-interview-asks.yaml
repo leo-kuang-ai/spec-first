@@ -1,8 +1,6 @@
 id: first-run-interview-asks
-title: 无 STRATEGY.md 应宣告首跑并以面试提问开局
-description: |
-  验证 Phase 0 文件路由:文件不存在时进入 First-Run Interview,
-  一次一问开局(先问 target problem),面试未完成不得先写 STRATEGY.md。
+title: "No STRATEGY.md should declare first run and commence with interview questions"
+description: "Verify Phase 0 file routing: when the file does not exist, proceed to the First-Run Interview, one question at a time (start with asking the target problem); the interview must be completed before writing STRATEGY.md."
 
 input:
   prompt: |

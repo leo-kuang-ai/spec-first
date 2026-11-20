@@ -1,8 +1,6 @@
 id: invalid-origin-rejected
-title: 非法 origin token 应 fail-closed 拒绝
-description: |
-  验证 origin 校验:非 loopback host + 带 path 的 origin 必须
-  not_run/target-origin-invalid,不得规范化或取第一个。
+title: "Illegal origin token should fail-closed and be rejected."
+description: "Verify origin validation: For non-loopback host + origin with path, must be not_run/target-origin-invalid; normalization or taking the first one is not allowed."
 
 input:
   prompt: |

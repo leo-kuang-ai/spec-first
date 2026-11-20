@@ -1,9 +1,6 @@
 id: non-software-universal
-title: 非软件主题应走 universal 路线不产软件计划
-description: |
-  验证 0.1b 非软件分类:家庭庆典规划无任何软件信号,应路由 universal-brainstorming
-  (Core Principles 与 Interaction Rules 仍适用:一次一问),不产 spec-unified-plan
-  软件计划。断言锚定"提问开局 + 无计划产出";是否真正加载 universal reference 由 transcript 核验。
+title: "Non-software topics should follow the universal approach and not develop a software plan."
+description: "Verify 0.1b: Non-software category: Household celebration planning with no software signals; route to universal-brainstorming (Core Principles and Interaction Rules still apply: one question at a time), do not generate a spec-unified-plan software plan. Assert anchor point: \"question-based opening + no plan output\"; whether the universal reference is truly loaded is verified by transcript."
 
 input:
   prompt: |

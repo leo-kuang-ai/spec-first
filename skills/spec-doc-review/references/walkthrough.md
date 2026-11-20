@@ -50,7 +50,7 @@ The walk-through receives, from the orchestrator:
 - The run id for artifact lookups (when applicable).
 - Premise-dependency chain annotations from synthesis step 3.5c: each finding may carry `depends_on: <root_id>` or `dependents: [<ids>]`.
 
-每条finding的推荐动作由synthesis 3.5b（Lead Recommended Action）基于已验证后果、修正收益、约定范围、既有决策与授权选择。walk-through消费producer的`recommended_action`，不按固定动作优先序重算；明确的用户选择仍优先。缺少具体`suggested_fix`的Apply按producer合同降为Defer。
+The recommended action for each finding is determined by Synthesis 3.5b (Lead Recommended Action) based on verified impacts, correction benefits, agreed scope, existing decisions, and authorizations. Walk through the consumer's `recommended_action`, recalculating actions without adhering to a fixed priority order; explicit user choices take precedence. Lack of specific `suggested_fix`: Apply according to producer contract and downgrade to Defer.
 
 **Root-first iteration order.** When a finding has `dependents`, iterate it before any of its dependents regardless of severity order within the chain. The root always comes first so the user's root decision can cascade.
 

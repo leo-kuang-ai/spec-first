@@ -1,9 +1,6 @@
 id: update-reads-existing-doc
-title: 更新前应真读现有文档并给出现状摘要
-description: |
-  验证 Phase 2 读文件纪律:更新 run 先完整读 STRATEGY.md,
-  输出 3-5 行现状总结——断言必须引用 fixture 的独特内容(LedgerFlow、
-  对账时长),证明是真实读取而非模板复读。
+title: "Read the existing documentation carefully before updating and provide a summary of the current status."
+description: "Verify Phase 2 file reading discipline: Update run with complete reading of STRATEGY.md, output a 3-5 line summary of current status—assertions must reference unique content from the fixture (LedgerFlow, reconciliation duration) to prove actual reading rather than template replication."
 
 input:
   prompt: |

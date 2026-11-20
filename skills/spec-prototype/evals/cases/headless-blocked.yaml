@@ -1,8 +1,6 @@
 id: headless-blocked
-title: 无人值守运行应 blocked 不启动
-description: |
-  验证 human-experience 硬前提:unattended/pipeline 模式无人体验结果,
-  必须返回 blocked-human-experience-required 且不开始构建。
+title: "Block startup in unattended mode."
+description: "Verification of human-experience is a hard prerequisite: in unattended/pipeline mode, if human experience is not feasible, the system must return `blocked-human-experience-required` and refrain from initiating the build."
 
 input:
   prompt: |

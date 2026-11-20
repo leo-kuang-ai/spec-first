@@ -1,9 +1,6 @@
 id: headless-no-qualifying-no-complete
-title: mode:headless 无合格 learning 时不得宣称 Documentation complete
-description: |
-  验证 headless 完成语契约：Emit "Documentation complete" only after
-  successful publication——无合格 learning（可从代码恢复）时输出
-  no-op 报告与理由，不出现 Documentation complete。
+title: "mode:headless Do not claim Documentation complete during learning if no valid learning is present"
+description: "Verify headless completion of the contract: Emit \"Documentation complete\" only after successful publication — when no valid learning is available (recoverable from code), output a no-op report with the rationale and do not emit \"Documentation complete\"."
 
 input:
   prompt: |

@@ -1,8 +1,6 @@
 id: unconfigured-guides-setup
-title: 未配置时应引导 setup 而非硬跑空报告
-description: |
-  验证配置 gate:pulse_product_name 未设时 skill 为 unconfigured,
-  应引导 setup/配置流程而非产出空报告。
+title: "When not configured, prompt for setup instead of generating a blank report."
+description: "Verify that when the gate:pulse_product_name configuration is not set, the skill is unconfigured; in this case, guide the user through the setup/configuration process instead of generating an empty report."
 
 input:
   prompt: |

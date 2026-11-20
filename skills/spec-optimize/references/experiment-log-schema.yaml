@@ -242,7 +242,7 @@ experiment_entry:
 
     holdout:
       type: object
-      description: "可选增量：精确 source/corpus 身份、互斥 item 依据、完整 baseline/candidate 原始配对、命令/日志引用和 decide 确认结果。仅供确认与审计，不进入假设、worker、digest 或排名；旧日志缺此字段不算已确认。"
+      description: "Optional incremental: precise source/corpus identity, mutually exclusive item basis, complete baseline/candidate original pairs, command/log references, and decide confirmation result. For verification and audit purposes only; does not enter assumptions, worker, digest, or ranking; logs without this field are not considered verified."
 
     changes:
       type: array

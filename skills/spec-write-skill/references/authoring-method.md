@@ -1,140 +1,140 @@
 # Authoring Method
 
-**trigger_condition：** core branch 已确定为 owner blocked、Tier A apply 或 full apply，需判断是否值得 authoring、解析 canonical source/effect，或设计 portable core。
-**purpose：** 只承接 portable authoring 的 qualification、source/effect resolution、resource placement 与迁移 disposition。
-**fallback_if_unread：** near-neighbor 只路由；无法确认 owner 时只给 candidate preview 并保持零 mutation；不得用本 reference 代替 delivery evidence。
+**trigger_condition:** core branch has been determined as owner blocked, Tier A apply, or full apply; need to evaluate whether authoring is warranted, parse canonical source/effect, or design portable core.
+**purpose:** Handles only the qualification, source/effect resolution, resource placement, and migration disposition of portable authoring.
+**fallback_if_unread:** Near-neighbor routing only; when owner cannot be confirmed, provide candidate preview only and maintain zero mutation; do not use this reference as a substitute for delivery evidence.
 
-宿主差异见 `target-profiles.md`，项目治理与 source/runtime 见 `project-profiles.md`，验证见 `delivery-gates.md`。
+Host differences see `target-profiles.md`, project governance and source/runtime see `project-profiles.md`, validation see `delivery-gates.md`.
 
 ## Qualification And Intent Contract
 
-只有满足至少一项才创建或扩展 Skill：
+A Skill is created or expanded if at least one of the following conditions is met:
 
-- recurring job 会重复发生；
-- near-neighbor 容易误路由；
-- deterministic script/reference 能减少重复错误；
-- portability、治理或 source ownership 是承重边界。
+- recurring job will occur repeatedly;
+- near-neighbor prone to misrouting;
+- deterministic script/reference can reduce repetitive errors;
+- portability, governance, or source ownership serves as the boundary of responsibility.
 
-默认不创建或修改 Skill：一次性回答、解释/总结/翻译、普通文档导出、只讨论未来大纲、普通 code review/debug/plan/work、第三方安装或导入。纯安装/导入请求直接路由 installer，不进入本 workflow，也不强制附加 readiness 检查。只有用户明确同时要求独立的 readiness、安全或结构检查时，才先以 `base_operation=revise`、`effect=validate-only` 完成 no-follow 检查并停止；复制、安装或导入仍交给独立入口重新授权。
+Default: no creation or modification of Skill; one-time response, explanation/summary/translation, standard document export, discussion of future outline only, standard code review/debug/plan/work, third-party installation or import. Direct installation/import requests are routed to the installer, bypassing this workflow and without enforcing a readiness check. Only when the user explicitly requests independent readiness, security, or structural checks will a no-follow check be performed first with `base_operation=revise` and `effect=validate-only`, then halted; copying, installation, or import will still be handled by separate entry points with reauthorization.
 
-Near-neighbor 或 should-not-trigger 请求只返回路由结论：`base_operation=null`、`effect=not-entered`、`modifier=none`。后续入口可以建议普通 code work、bounded source review、installer 或 runtime maintenance，但不得把那些入口的预期动作记成本 workflow 的 `apply`/`validate-only`，也不得继续执行本 workflow 的 inventory、validator 或 mutation步骤。
+Near-neighbor or should-not-trigger requests return only the routing conclusion: `base_operation=null`, `effect=not-entered`, `modifier=none`. Subsequent entry points may suggest ordinary code work, bounded source review, installer, or runtime maintenance, but shall not record the expected actions of those entry points as part of the workflow's `apply`/`validate-only` steps, nor shall the workflow continue with its inventory, validator, or mutation steps.
 
-进入 authoring 前至少得到：
+Before entering authoring, you must have:
 
-- one-sentence recurring job；
-- real inputs 与 required outputs；
-- should-trigger 和 should-not-trigger/near-neighbor 各一个真实示例；
-- base operation：`create|revise`；
-- effect：`apply|validate-only`；
-- modifier：`migrate|audit-remediation|none`；
-- target repo、Skill root、canonical source owner；
-- mutation authorization：`ready|preview-only|blocked`；
-- first verification target。
+- one-sentence recurring job;
+- real inputs and required outputs
+- should-trigger and should-not-trigger/near-neighbor each one real example;”
+- base operation: `create|revise`;
+- effect: `apply|validate-only`;
+- modifier: `migrate|audit-remediation|none`;
+- target repo, Skill root, canonical source owner;
+- mutation authorization: `ready|preview-only|blocked`;
+- first verification target.
 
-`ready` 表示当前轮明确 create/revise，且已确认 target root 与预期 source surfaces 未超出请求范围；`preview-only` 表示用户只要求设计/preview，或 owner/scope 尚未解析；`blocked` 表示没有 mutation 授权。不要只因为生成了 preview 就再次询问；只有 exact write set 扩大范围、覆盖当前请求未明确包含的 dirty path，或新增 external/network/高风险副作用时才重新确认。
+`ready` indicates a clear create/revise in the current round, and the target root and expected source surfaces have been confirmed to be within the requested scope; `preview-only` indicates the user only requests design/preview, or the owner/scope has not yet been resolved; `blocked` indicates no mutation authorization is available. Do not re-ask merely because a preview has been generated; re-verification is only required when the exact write set expands, covers dirty paths not explicitly included in the current request, or introduces new external/network/high-risk side effects.
 
-当 revision 仅是 typo、计数、metadata/术语修正、明确不可达内容删除或等价结构整理，且不改变 trigger、schema、contract、threshold、gate、roster 或 model routing，可按 `authoring-workbench.md` 的 Tier A short path 处理；它仍要 owner、授权、preview/write-set binding 与最窄结构验证。不要把承重行为变化伪装成 Tier A。
+When a revision consists only of typos, counting adjustments, metadata/terminology corrections, explicit removal of unreachable content, or equivalent structural reorganization, and does not alter trigger, schema, contract, threshold, gate, roster, or model routing, it may be processed via the Tier A short path in `authoring-workbench.md`; it still requires owner approval, authorization, preview/write-set binding, and validation against the narrowest structure. Do not disguise changes in load-bearing behavior as Tier A.
 
-只询问答案会改变 package 设计、权限或不可逆结果的最少问题，并尽量合并为一轮。能从 source 发现或以低风险、可撤销假设推进时，记录假设并继续；不要用更多目录、profiles 或 fallback 掩盖真正未决的意图。
+Asking only the minimum number of questions that could alter package design, permissions, or lead to irreversible outcomes, and consolidating as many questions as possible into a single round. Record the assumption and proceed when an assumption can be derived from source or when advancing with low-risk, revocable assumptions; do not use additional directories, profiles, or fallbacks to obscure genuine unresolved intentions.
 
 ## Source And Effect Resolution
 
-按以下顺序确认 target：
+Confirm target in the following order:
 
-1. 用户明确给出的 Skill directory；
-2. 当前 repo 中与名称匹配的 project-owned source；
-3. 项目规则声明的 canonical Skill root；
-4. 都无法确认时保持 `preview-only`。
+1. The skill directory explicitly provided by the user;
+2. The project-owned source in the current repo that matches the name;
+3. The canonical Skill root declared in the project rules;
+4. Keep it as `preview-only` when neither can be confirmed.
 
-用户已绑定单一 target repo、但未写出 Skill root 时，不要立即以 `blocked-source-owner` 结束：先检查项目规则与相邻 project-owned packages。若仍不能唯一确认，给出一个明确标注“candidate only”的 canonical path preview、完整 package outline、不会修改的 surfaces 和一个会改变路径的澄清问题；在用户确认前保持零 mutation。只有跨 repo、多候选 owner、repo-external 或 generated-only 等无法绑定单一 source owner 的情况才使用 `layer_result=blocked-source-owner`。
+Do not immediately conclude with `blocked-source-owner` when the user has bound a single target repo but has not specified a Skill root: first verify the project rules and adjacent project-owned packages. If ambiguity persists, provide a clearly labeled "candidate only" canonical path preview, a complete package outline, immutable surfaces, and a clarifying question that alters the path; maintain zero mutation until user confirmation. Use `layer_result=blocked-source-owner` only in cases where the repository is cross-repo, multiple candidate owners are involved, repo-external, or generated-only, and thus cannot be bound to a single source owner.
 
-当用户明确要求 create/revise、但 target/source owner 不唯一、跨 repo 或 generated-only 时，保留该请求的 `base_operation=create|revise` 与 `effect=apply`，但以 `layer_result=blocked-source-owner` 报告，且 would-change paths/commands 必须为空、不得 mutation。`not-entered` 只用于根本不是 authoring/readiness 的 near-neighbor；不要把 source-resolution blocker 误路由成拒绝后的近邻。
+When a user explicitly requests create/revise, but the target/source owner is not unique, spans across repositories, or is generated-only, retain the request's `base_operation=create|revise` and `effect=apply`, but report with `layer_result=blocked-source-owner`; furthermore, the would-change paths/commands must be empty and no mutations are permitted. `not-entered` is only for cases that are fundamentally not authoring/readiness near-neighbors; do not mistakenly route a source-resolution blocker as a rejected neighbor.
 
-`validate-only` 永远不升级为 apply。对已存在 package 的 readiness 检查使用 `base_operation=revise`；`revise` 在此只表示输入是现有 package，不代表允许修改。`audit-remediation` modifier 只处理已接受 finding。`migrate` modifier 只处理同 repo trusted source；第三方 package 和跨仓目标只允许 inventory/readiness。Modifier 不改变 base operation 或 effect，也不创建第三套执行主干。
+`validate-only` is never upgraded to apply. For readiness checks of existing packages, use `base_operation=revise`; the term `revise` here merely indicates that the input is an existing package, and does not imply permission to modify it. The `audit-remediation` modifier processes only accepted findings. The `migrate` modifier only handles trusted source within the same repository; third-party packages and cross-repository targets are allowed only inventory/readiness. Modifier does not alter the base operation or effect, nor does it create a third execution lineage.
 
-对现有 package 先列 inventory，不把全部正文加载给 LLM：文件、目录、symlink、special file、frontmatter fields、Markdown references、scripts 和 secret-like paths。Bundled validator 会在本地预算内读取非 secret-like 文本字节，用于 UTF-8、敏感内容和引用检查，但不返回正文或敏感值；Inventory 仍是 advisory facts，是否采用内容由 LLM 判断。
+List the inventory of the existing package without loading the entire content into the LLM: files, directories, symlinks, special files, frontmatter fields, Markdown references, scripts, and secret-like paths. The bundled validator reads non-secret-like text bytes within the local budget for UTF-8, sensitive content, and citation checks, without returning the full text or sensitive values; the Inventory remains advisory facts, and adoption of content is determined by the LLM.
 
 ## Portable Authoring Core
 
 ### Description As Trigger Contract
 
-Frontmatter `description` 必须同时表达：
+The Frontmatter `description` must simultaneously express:
 
-- Skill 拥有的 recurring job；
-- 会触发的真实用户动作；
-- 容易混淆的负向边界；
-- 必要时声明只读或显式调用边界。
+- Skill possesses a recurring job;
+- Real user actions that trigger;
+- Confusing negative boundaries;
+- Declare as read-only or explicitly call boundaries if necessary.
 
-避免尖括号占位符、同义词堆叠和只在正文出现的触发规则。先用 positive、negative、near-neighbor 样例检查 route，再扩展 package。
+Avoid angle-bracket placeholders, synonym stacking, and trigger rules that appear only in the body text. First use positive, negative, and near-neighbor examples to verify the route, then expand the package.
 
 Mechanism-led ordering (from the CE authoring pass): sentence 1 names the distinctive mechanism — what a sibling skill would not produce — front-loading the word that should fire it in prompts; a category opener without the mechanism fails. Write each "Use when…" trigger as an observable work-state, not a phrasing. Prefer routing a sibling's job as "Use <sibling> for <that job>", and keep "Not for" only when the same words would fire both skills. Never stuff quoted utterances or `/name` aliases into a model-invoked description — they belong only on a user-invoked or `disable-model-invocation` skill, after the mechanism.
 
 ### Branch-First Information Hierarchy
 
-先列只有在输入、步骤、输出或验证不同才成立的 branch，再放置资源：
+List the branch that only takes effect when input, step, output, or validation differs, then place the resources:
 
-- `SKILL.md`：所有 branch 共用的执行骨架、边界、输出和安全默认值；
-- `references/`：只有特定 branch 才需要的长规则、target/project profile、schema 或示例；
-- `scripts/`：确定性、重复、容易手写错且可测试的逻辑；
-- `assets/`：输出中复制或改造的静态素材；
-- `evals/`：维护者 route/output regression，不是 runtime 必读内容。
+- `SKILL.md`: Execution skeleton, boundaries, outputs, and security default values shared across all branches;
+- `references/`: Long rules, target/project profiles, schemas, or examples required only for specific branches;
+- `scripts/`: deterministic, repeatable, easily mistyped and testable logic;
+- `assets/`: static media assets copied or modified in the output;
+- `evals/`: Maintainer route/output regression; not runtime essential content.
 
-Context pointer 必须说明“什么条件下读取”和“读完支持什么判断”。如果正常路径每次都读取全部 references，说明分支或 owner 切分失败，应合并承重规则或重新按条件拆分。
+The context pointer must specify "under what conditions reading occurs" and "what judgments are supported after reading."If the normal path reads all references each time, it indicates a failure in branch or owner splitting; the load-bearing rules should be merged or the splitting should be redone based on conditions.
 
 ### Match Freedom To Failure Cost
 
-按任务脆弱度分配约束强度：开放式语义判断使用原则与判据；有首选路径但允许变化时使用步骤骨架或参数化模板；容易造成数据损坏、越权或格式破坏的动作交给窄脚本和 hard gate。不要用长 prompt 模拟本可确定性验证的 schema/path/hash，也不要用脚本替代产品、架构或语义判断。
+Allocate constraint strength based on task vulnerability: use principles and criteria for open semantic judgment; when a preferred path exists but variation is allowed, employ step skeletons or parametric templates; delegate actions that easily cause data corruption, privilege escalation, or format damage to narrow scripts and hard gates. Do not use long prompts to simulate deterministic verification of schema/path/hash; also do not use scripts to replace product, architectural, or semantic judgment.
 
-当 Skill 的主要机制是 prose、角色/persona、few-shot、输出格式或 agent loop 时，读取 `behavior-contract-design.md`。它只负责模型行为合同，不取代本文件的 package、source owner、resource placement 与 portability 规则。
+When a Skill's primary mechanism is prose, role/persona, few-shot, output format, or agent loop, read `behavior-contract-design.md`. It only governs the model behavior contract and does not replace the package, source owner, resource placement, and portability rules specified in this document.
 
 ### Completion Criteria And Pruning
 
-写入、shell、runtime、network、delegate 和 handoff 步骤必须同时有：
+Write, shell, runtime, network, delegate, and handoff steps must all be present:
 
-- clarity：能判断 done/not done；
-- demand：明确需要完成的调查、验证或交付物；
-- failure behavior：条件不满足时停止、降级或交接什么。
+- clarity: can determine done/not done;
+- demand: a clearly defined requirement for completing an investigation, verification, or deliverable;
+- failure behavior: Stops, degrades, or handoffs when conditions are not met.
 
-逐句检查 prose 是否改变触发、读取、写入、判断、验证或 handoff；没有改变就删除。一个概念只保留一个 owner，不用重复解释制造多真相源。
+Check each sentence of prose for changes to trigger, read, write, judge, validate, or handoff; remove if no changes. A concept retains only one owner to avoid redundant explanations that create multiple conflicting truths.
 
 ## External Pattern And Migration Rules
 
-借鉴顺序是 external benchmark → user source → local fit。只吸收可复用 pattern，不复制平台 invocation、绝对路径、权限假设或未经验证的 public claims。
+The reference order is external benchmark → user source → local fit. Only absorbs reusable patterns, without copying platform invocations, absolute paths, permission assumptions, or unverified public claims.
 
-Same-repo migration 对每个非 portable 文件给出 disposition：
+Same-repo migration provides a disposition for each non-portable file:
 
-- `preserve`：目标仍消费且内容不需改变；
-- `translate`：有 confirmed target/project mapping；
-- `drop-with-reason`：确认是生成物、maintainer-only 或目标不支持；
-- `manual-decision`：owner、语义或消费者不明确。
+- `preserve`: the target continues to consume and the content remains unchanged;
+- `translate`: has confirmed target/project mapping;
+- `drop-with-reason`: confirm it is a generated item, maintainer-only, or the target is not supported;
+- `manual-decision`: owner, semantics, or consumer is not clear.
 
-未知 metadata、sidecar 和用户文件默认 `preserve` 或 `manual-decision`，不能为了“干净”删除。
+Unknown metadata, sidecar, and user files default to `preserve` or `manual-decision` and should not be deleted for the sake of "cleanliness".
 
 ## Anti-Pattern Families
 
-- `one-off-vs-reusable`：把一次性请求包装成 Skill。
-- `audit-not-authoring`：只审计却直接写 source。
-- `external-import-mutation`：第三方 package 未经 trust/source-owner 确认就复制或执行。
-- `runtime-mirror-patch`：把 generated runtime 当 canonical source。
-- `project-profile-leak`：把单一项目治理写成 portable contract。
-- `target-profile-leak`：把单一宿主 metadata 当通用标准。
-- `weak-context-pointer`：条件 reference 没有读取条件。
-- `vague-completion-criterion`：步骤只有动作名，没有 done signal。
-- `fixture-as-behavior-proof`：结构样例通过却声称模型行为改善。
-- `leading-word-no-op`：口号不改变实际动作。
-- `adjective-persona`：用形容词堆人设，却没有可观察行为倾向。
-- `flat-must-wall`：把 hard gate、偏好和启发式都写成同强度命令。
-- `example-without-boundary`：只有理想正例，没有 near-neighbor/bad/why 校准。
-- `self-check-as-evidence`：把模型自检或“已遵守”当成 semantic/field proof。
-- `fixed-tool-quota`：用固定调用次数或“工具免费”假设替代成本、依赖与风险判断。
+- `one-off-vs-reusable`: Package a one-time request into a Skill.
+- `audit-not-authoring`: Audits only and directly writes source.
+- `external-import-mutation`: Copying or executing a third-party package without confirmation from a trusted/source owner.
+- `runtime-mirror-patch`: Treat the generated runtime as the canonical source.
+- `project-profile-leak`: Express a single-project governance as a portable contract.
+- `target-profile-leak`: Treats the metadata of a single host as a general standard.
+- `weak-context-pointer`: The reference condition has not been read.
+- `vague-completion-criterion`: Steps contain only action names and no done signal.
+- `fixture-as-behavior-proof`: The structural example passes but claims model behavior improvement.
+- `leading-word-no-op`: The slogan does not alter the actual action.
+- `adjective-persona`: Uses adjectives to construct a persona, but lacks observable behavioral tendencies.
+- `flat-must-wall`: Write hard gate, preference, and heuristic as commands of the same strength.
+- `example-without-boundary`: Contains only ideal positive examples, with no near-neighbor/bad/why calibration.
+- `self-check-as-evidence`: Treats model self-verification or "compliance" as semantic/field proof.
+- `fixed-tool-quota`: Replace cost, dependency, and risk assessment with a fixed number of calls or the "tool-free" assumption.
 
 ## Skill Creator Compatibility
 
-- `name` 使用 kebab-case，并与目录及目标项目治理记录一致。
-- Portable baseline 只要求 `name` 和 `description`；目标扩展字段由 target profile 判断并保留未知字段。
-- Description 不使用 `<placeholder>`；需要占位时用自然语言或 `{placeholder}`。
-- 新增脚本必须有实际运行和零意外写入证据。
-- Forward testing 只传 raw artifact 和真实用户请求，不泄漏预期答案或 intended fix。
+- `name` uses kebab-case and is consistent with the directory structure and the target project's governance records.
+- Portable baseline requires only `name` and `description`; additional fields are determined and retained by the target profile, with unknown fields being preserved.
+- Description Do not use `<placeholder>`; use natural language or `{placeholder}` when a placeholder is needed.
+- New scripts must have evidence of actual execution and zero unintended writes.
+- Forward testing passes only the raw artifact and the actual user request, without leaking the expected answer or intended fix.
 
 ### Plain prose during size restructuring
 

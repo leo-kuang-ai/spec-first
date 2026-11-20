@@ -1,7 +1,6 @@
 id: r2-code-review-routes-out
-title: R2变体:代码审查请求应点名 spec-code-review
-description: |
-  第二轮对抗变体:dogfood 路由修复面换邻居(code review)。
+title: "R2 variant: Code review requests should explicitly mention spec-code-review"
+description: "Second round of variant: dogfood routing repair face swap neighbors (code review)."
 
 input:
   prompt: |

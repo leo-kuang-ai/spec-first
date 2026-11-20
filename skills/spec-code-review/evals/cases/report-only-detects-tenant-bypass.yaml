@@ -1,8 +1,6 @@
 id: report-only-detects-tenant-bypass
-title: 默认审查应发现跨租户授权绕过且保持只读
-description: |
-  验证 Skill 能从真实 git diff 中定位资源归属校验被删除的问题，给出文件级证据和可执行修复，
-  同时在没有 worker dispatch 授权时诚实降级，且不修改被审查文件。
+title: "Default auditing should detect cross-tenancy authorization bypasses and enforce read-only access."
+description: "Verify that Skill can identify resource ownership validation when resources are deleted, providing file-level evidence and an executable fix; gracefully downgrade when worker dispatch authorization is unavailable, and refrain from modifying the reviewed files."
 
 input:
   prompt: |

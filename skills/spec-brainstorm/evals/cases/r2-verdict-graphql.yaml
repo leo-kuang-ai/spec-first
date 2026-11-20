@@ -1,7 +1,6 @@
 id: r2-verdict-graphql
-title: R2变体:REST→GraphQL 迁移裁决应路由 spec-pov
-description: |
-  第二轮对抗变体:verdict 修复面换技术域(REST→GraphQL)。
+title: "R2 Variant: REST → GraphQL Migration Decision on Routing spec-pov"
+description: "Second-round counter-variant: verdict repair transition from REST to GraphQL."
 
 input:
   prompt: |

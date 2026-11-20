@@ -209,7 +209,7 @@ describe('spec-doc-review current contracts', () => {
     expect(synthesis).toMatch(/output_mode.*json.*JSON object/is);
     expect(skill).toMatch(/output_mode: json[\s\S]*do not print this line[\s\S]*final JSON object/is);
     expect(skill).toMatch(/JSON mode's machine-readable single-object contract overrides the normal announcement requirement/i);
-    expect(synthesis).toMatch(/单对象合同覆盖[\s\S]*cost-shape[\s\S]*reviewer announcement[\s\S]*terminal_signal/is);
+    expect(synthesis).toMatch(/single-object contract covers the cost-shape.*reviewer announcement.*terminal_signal/is);
     expect(synthesis).toContain('"mutation_reason": "caller-requested-apply-fixes|default-review-report-only|caller-requested-report-only|task-pack-derived-artifact|html-artifact|format-conflict-or-ambiguous|write-unavailable"');
     expect(synthesis).toContain('"fixes_applied": 0');
     expect(synthesis).toContain('"applied_fixes": []');
@@ -217,8 +217,8 @@ describe('spec-doc-review current contracts', () => {
     expect(synthesis).toContain('"coverage": []');
     expect(synthesis).toContain('"limitations": []');
     expect(synthesis).toMatch(/coverage.*selected\/skipped personas.*cost shape.*isolation.*reviewer outcomes/is);
-    expect(synthesis).toMatch(/不得因 JSON 输出而获得 producer write authority/);
-    expect(synthesis).toMatch(/`markdown-write` \+ `output:json`.*实际 `N`.*对应明细/is);
+    expect(synthesis).toMatch(/no producer write authority is granted/);
+    expect(synthesis).toMatch(/`markdown-write` \+ `output:json`.*actual count `N`.*corresponding details/is);
     expect(synthesis).toMatch(/`report-only`.*`0`.*`\[\]`/is);
     expect(synthesis).toMatch(/output_mode: json[\s\S]*Return only the single JSON object/);
     expect(synthesis).toMatch(/terminal signal exclusively in `terminal_signal: "Review complete"`/);

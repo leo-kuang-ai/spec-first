@@ -8,7 +8,7 @@ argument-hint: "[question, document, or developed approaches, plus any links] �
 
 Return a project-grounded adoption verdict, holistic document take, or position among supplied approaches. The subject is the input in the current prompt or conversation. Stay read-only while forming and reconciling the POV; finish with the POV and its attribution, or an explicit blocker. Use the current host date when weighting source recency and dating artifacts.
 
-方案来自内部还是外部不是分流条件。用户已经给出成形的备选、约束和取舍标准，只要求基于项目证据裁决时，保留全部方案进入 POV。若只有方案名称，还需要生成选项、设计行为或确定标准，则按 `references/intake.md` 转给 `spec-ideate`、`spec-brainstorm` 或 `spec-plan`，不把待设计问题包装成裁决。
+Whether the scheme comes from internal or external sources is not a diversion condition. The user has already established predefined, constraints, and trade-off criteria; all that remains is to make decisions based on project evidence, while retaining all options in the POV. If only the scheme name is provided and additional options, design behaviors, or criteria need to be generated, pass it to `spec-ideate`, `spec-brainstorm`, or `spec-plan` via `references/intake.md`; do not package the design problem for decision-making.
 
 ## The one rule that is the whole moat
 

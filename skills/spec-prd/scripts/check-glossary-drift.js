@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-// 确定性术语 drift 检测:扫描目标 PRD 文本中 canonical glossary 的 avoid 别名字面命中。
-// 这是 script-owned facts —— 脚本只报告"哪里字面出现了 avoid 术语",是否构成真实问题
-// (引用、讨论该术语本身、还是真的用错词)由 LLM 在 readiness 判断中裁决。
-// 脚本不提取新术语、不判断定义是否偏离 canonical —— 那些是 LLM-owned 语义判断。
+// Deterministic term drift detection: scan PRD text for literal matches of canonical glossary terms to avoid.
+// These are script-owned facts — the script only reports "where the literal term 'avoid' appears", and whether this constitutes a real issue.
+// (Whether to cite, discuss, or genuinely misuse the term) is adjudicated by the LLM in the readiness judgment.
+// The script does not extract new terms or judge whether definitions deviate from canonical — those are LLM-owned semantic judgments.
 
 const fs = require('fs');
 const path = require('path');
@@ -32,10 +32,10 @@ function parseArgs(argv) {
   return args;
 }
 
-// 解析 glossary 的 ### 条目,提取 { canonical_name, avoid[], status }
+// Parse the ### entries in glossary, extract { canonical_name, avoid[], status }
 function parseGlossary(text) {
-  // 先剥离 fenced code blocks —— glossary 文档会内嵌格式示例(``` 代码块里的
-  // 示例 ### 条目不是真实条目),不剥离会把示例误当成 canonical term。
+  // First extract the fenced code blocks —— the glossary document will embed format examples (``` code block contents
+  // (Example items are not real items); without stripping, examples might be mistakenly treated as canonical terms.
   const withoutFences = text.replace(/^```[\s\S]*?^```/gm, '');
   const entries = [];
   const blocks = withoutFences.split(/^### /m).slice(1);
@@ -60,13 +60,13 @@ function parseGlossary(text) {
   return entries;
 }
 
-// 字面查找一个 alias 在一行中是否出现。
-// 不用正则 —— 正则的 `g` flag 有状态(lastIndex 跨调用累积会漏报),
-// 且 `\b` 词边界对以非字母数字结尾的术语(C++、.NET、C#)永远失败。
-// 改为无状态的 indexOf 扫描 + 显式边界判断:
-//   - 纯 ASCII 字母数字术语要求"整词"(两侧非字母数字),避免 bill 命中 billing;
-//   - 含非 ASCII(中文等)或非字母数字字符的术语用纯字面匹配,
-//     因为这类术语没有可靠的词边界概念,误报由 LLM 在 readiness 裁决兜底。
+// Perform a literal search to check if an alias appears in a line.
+// No regular expressions — the `g` flag in regular expressions has state (lastIndex accumulates across calls, leading to missed matches)
+// Moreover, the `\b` word boundary always fails for terms ending with non-alphabetic or non-numeric characters (C++, .NET, C#).
+// Modify to stateless indexOf scanning + explicit boundary checking:
+//   - Pure ASCII alphanumeric terms require "whole word" matching (non-alphanumeric on both sides), to avoid matching "bill" in "billing";
+//   - Terms containing non-ASCII (e.g., Chinese) or non-alphanumeric characters are matched literally.
+//     Since these terms lack reliable word boundary concepts, false positives are handled by the LLM in readiness decisions.
 function lineContainsAlias(line, alias) {
   if (!alias) return false;
   const hay = line.toLowerCase();
@@ -138,7 +138,7 @@ function main() {
   try {
     glossaryText = fs.readFileSync(path.resolve(args.glossary), 'utf8');
   } catch (err) {
-    // glossary 是 opt-in;不存在则优雅降级为无 drift,不报错
+    // glossary is opt-in; if not present, gracefully degrades to none drift, no error reported
     result.glossary_status = 'absent';
     process.stdout.write(JSON.stringify(result, null, 2) + '\n');
     process.exit(0);

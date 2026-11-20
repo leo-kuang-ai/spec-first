@@ -48,7 +48,7 @@ describe('spec-lfg current contracts', () => {
     expect(entry).not.toContain('gh pr edit PR_NUMBER');
     expect(entry).not.toContain('capabilities.exact_origin_confirmed');
     expect(reviewFollowup).toContain('validation_status: unresolved');
-    expect(reviewFollowup).toContain('不得应用');
+    expect(reviewFollowup).toContain('shall not be applied');
   });
 
   test('gives child skills the task view and restores the remaining pipeline after return', () => {

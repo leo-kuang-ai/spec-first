@@ -124,7 +124,7 @@ The line-number, signature, and code-spec rules are not new — they have always
 
 ## When to skip the blocking confirmation
 
-先检查 Phase 0.5 的真实产品阻塞，再按当前授权决定等待。WHAT 已闭合且用户已授权自主规划、写入或续跑时，各深度均可说明范围后继续，不因 Standard/Deep 或修订重复确认；明确要求逐阶段确认时仍等待。无自主授权时保留默认：Lightweight 且零 call-outs 自动继续，Standard/Deep 或存在需用户裁决的实质分歧时确认。自动继续必须如实标为已授权执行或委托判断，不能写成用户已逐项审阅。
+First check the actual product blocking in Phase 0.5, then wait based on current authorization. WHAT When closed and user has authorized autonomous planning, writing, or continuation, range specifications at each depth may proceed without requiring standard/deep or revision reconfirmation; continuation is still required if explicit stage-by-stage confirmation is mandated. Retain default: Lightweight with zero call-outs automatically continues; confirm when Standard/Deep or substantive disagreements require user adjudication. Automatic continuation must accurately mark as authorized execution or delegated judgment, not written as user has reviewed each item.
 
 When auto-proceed applies (Lightweight + zero call-outs), emit a one-line announcement and continue:
 
@@ -136,7 +136,7 @@ No open decisions to weigh in on — proceeding to [research / plan-write]. Inte
 
 The announcement is mandatory when skipping — silent proceeding is not allowed. The "why" (no forks worth flagging) must be visible.
 
-仅在当前需要确认时，Standard/Deep with zero call-outs 使用 confirmation template; the "Call outs:" header is simply omitted. The user gets the summary plus the explicit confirmation request.
+Confirmation template is used only when confirmation is required; the "Call outs:" header is omitted in such cases. The user gets the summary plus the explicit confirmation request.
 
 There is a third skip condition: the **opt-in `SKIP_SCOPING_CONFIRM` setting** (Phase 0.0 — `confirm:auto` token or the `plan_skip_scoping_confirm` config key). When it resolves to skip, the gate auto-proceeds for *any* tier or call-out count — the user has pre-authorized it. The announcement is still mandatory (it names that confirmation is off and that inferred scope landed in `## Assumptions`), and the skip is scoped to this confirmation only: genuine blocking questions and the Phase 5.4 handoff rules still apply. This differs from headless mode only in that announcement — headless has no synchronous user to announce to.
 
@@ -160,7 +160,7 @@ Both variants share these structural rules. They address failure modes where the
 
 **Anti-pattern: numerical attestation.** "All nine requirements covered," "all three flows in scope," "five acceptance examples addressed," counts of files or test scenarios. These are the agent showing its work or attesting completeness, not naming scope decisions. "Covers the full brainstorm scope" already conveys the claim; the count adds nothing the user can affirm or redirect. Cut the numbers; keep the scope claim.
 
-**修订不等于确认，也不撤销已有执行授权。** 合并用户修订后，若范围、重要后果和授权未变且 WHAT 已闭合，简述变化并继续写计划。若用户选择逐阶段共创，或修订产生新的实质产品决策、权限或副作用缺口，重新呈现相关差异并等待必要答案；只阻塞依赖该答案的动作。不得把代理理解、用户沉默或修订本身伪写为人工确认。
+**Revisions do not constitute confirmations, nor do they revoke existing execution authorizations.**After merging user updates, if the scope, significant implications, and authorization remain unchanged and WHAT has been closed, summarize the changes and proceed with the plan. If the user chooses phased co-creation, or if revisions lead to new substantive product decisions, permissions, or side-effect gaps, re-present the relevant differences and wait for necessary responses; block actions that depend on these responses. Do not treat proxy understanding, user silence, or modifications themselves as manual confirmation.
 
 
 ---
@@ -248,7 +248,7 @@ Each guard is an explicit conditional in `references/intake.md`, not implicit. R
 
 **Anti-fluff guidance:** lead with the actual thing being planned in plain words. No qualifiers ("comprehensive," "thoughtful," "substantive"). No re-stating the user's prompt. If the scope cannot be said within the tier budget without filler, the synthesis isn't ready yet.
 
-**Confirmation template（仅在上述授权与阻塞判断要求等待时使用）：**
+**Confirmation template (to be used only when the above authorization and blocking judgment requirements are pending):**
 
 The opener defaults to "Based on your request" — add "and our brief discussion" only when the Phase 0.4 bootstrap actually involved back-and-forth clarifying questions. Solo invocations often proceed with no dialogue, and claiming a discussion the user didn't have reads as off.
 
@@ -302,7 +302,7 @@ Most of these will not survive the keep test as separate call-outs. Surface only
 
 **Anti-fluff guidance:** lead with the actual implementation shape in plain words. No qualifiers, no re-stating the brainstorm's WHAT. If the summary just restates the brainstorm's Problem Frame, rewrite it to focus on plan-time decisions.
 
-**Confirmation template（仅在上述授权与阻塞判断要求等待时使用）：**
+**Confirmation template (to be used only when the above authorization and blocking judgment requirements are pending):**
 
 ```
 The brainstorm scopes [1-2 sentence restatement of the brainstorm's scope as orientation; in the brainstorm's own vocabulary; NOT an enumeration of Implementation Units, constraints, or acceptance examples].

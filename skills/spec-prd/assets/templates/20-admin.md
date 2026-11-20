@@ -1,94 +1,94 @@
-# Admin / 中后台 Surface 模板
+# Admin / Middle-backend Surface Template
 
-> 与 `00-generic.md` 组合使用，只补 Admin surface 的角色、数据范围、作业流、批量操作、导出和审计要求。机器合同由 `references/prd-output-template.md` 提供。
+> Used in combination with `00-generic.md`, this specification only addresses the Admin surface aspects including roles, data scope, workflow, batch operations, export requirements, and audit requirements. The machine contract is provided by `references/prd-output-template.md`.
 >
-> 所有人类问题只询问当前执行对话的用户。证券行业规则仅在命中行业信号后叠加 `../overlays/securities.md`。
+> All human-related questions are only directed to the currently executing conversation user. The securities industry rules are applied only after an industry signal is matched, then overlay `../overlays/securities.md`.
 
-## Admin 属性确认
+## Admin attribute confirmation
 
-| 维度 | 内容 |
+| Dimension | content |
 | --- | --- |
-| 使用角色 | 运营 / 客服 / 审核 / 财务 / 管理员 / 其它 |
-| 数据范围 | 全局 / 组织 / tenant / 团队 / 本人 / 自定义 |
-| 入口 | 菜单 / 工作台 / 列表 / 详情 / 审批队列 |
-| 作业类型 | 查询 / 配置 / 审核 / 批处理 / 导出 / 报表 |
-| 是否涉及敏感数据 | |
-| 是否需要复核 | 单人 / maker-checker / 多级审批 / 不涉及 |
+| Use role | Operations / Customer Service / Review / Finance / Administrator / Other |
+| Data range | Global / Organization / Tenant / Team / Self / Custom |
+| Entry point | Menu / Workbench / List / Details / Approval Queue |
+| Assignment type | Query / Configuration / Audit / Batch Processing / Export / Reports |
+| Does it involve sensitive data | |
+| Do you need to verify? | Single / Maker-Checker / Multi-level Approval / Not involved |
 
-## 菜单、入口与可见性
+## Menus, Entry Points, and Visibility
 
-| 入口 | 可见角色 | 数据范围 | 不可见 / 禁用条件 | 默认落点 |
+| Entry point | Visible roles | Data range | Invisible / Disabled condition | Default landing point |
 | --- | --- | --- | --- | --- |
 | | | | | |
 
-区分“菜单不可见”“进入后无权限”“按钮禁用”和“数据不可见”，并写明每种状态的用户反馈。
+Distinguish among "menu not visible", "no permission upon entry", "button disabled", and "data not visible", and specify the user feedback for each state.
 
-## 权限矩阵
+## Permission matrix
 
-| 角色 | 查看 | 新建 | 编辑 | 审核 | 删除 | 导出 | 批量操作 | 敏感字段 |
+| Role | View | New | Edit | Review | Delete | Export | Batch operation | Sensitive fields |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | | | |
 
-PRD 只定义能力和数据范围，不写权限码、接口字段或鉴权实现。
+PRD defines capabilities and data scopes, without specifying permission codes, interface fields, or authentication implementation.
 
-## 列表与检索
+## List and Search
 
-| 维度 | 产品要求 |
+| Dimension | Product requirements |
 | --- | --- |
-| 默认排序 / 分页 | |
-| 搜索字段与匹配方式 | |
-| 筛选条件与组合 | |
-| 空态 / 无权限态 / 错误态 | |
-| 列展示、隐藏与脱敏 | |
-| 刷新与实时性 | |
-| 选中跨页规则 | |
+| Default sorting / pagination | |
+| Search fields and matching methods | |
+| Filter conditions and combinations | |
+| Idle state / Unauthorized state / Error state | |
+| Column display, hide, and de-identification | |
+| Refresh and Real-time Performance | |
+| Select pagination rule | |
 
-## 详情、表单与校验
+## Details, Forms, and Validation
 
-| 字段 / 分组 | 展示条件 | 是否必填 | 产品校验 | 编辑权限 | 错误提示 |
+| Field / Group | Display conditions | Is it required? | Product validation | Edit permission | Error message |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-写清草稿、提交、取消、离开未保存、重复提交、并发编辑和过期数据的产品结果。
+Clear draft, submit, cancel, leave without saving, duplicate submission, concurrent editing, and expired data product outcomes.
 
-## 作业流与复核
+## Workflow and Review
 
-| 状态 | 可执行角色 | 可执行动作 | 下一状态 | 驳回 / 撤回 | 用户可见原因 |
+| Status | Executable role | Executable actions | Next state | Reject / Withdraw | Reasons visible to users |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-需要 maker-checker 时，明确发起人与复核人能否相同、复核时看到什么、驳回后如何重提、重复复核和超时如何处理。
+When maker-checker is required, clarify whether the initiator and reviewer can be the same person, what information the reviewer sees during review, how to re-submit after rejection, how to handle duplicate reviews, and how to manage timeout scenarios.
 
-## 批量操作
+## Batch operation
 
-| 操作 | 选择范围 | 上限 / 边界 | 二次确认 | 部分成功 | 重试 / 导出结果 |
+| Operation | Select range | Upper limit / Boundary | Secondary confirmation | Partial success | Retry / Export Results |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-批量操作必须有“全部成功、全部失败、部分成功、重复执行、权限不足、处理中离开页面”验收。
+Batch operations must undergo acceptance criteria including: "all successful", "all failed", "partial success", "re-execution", "insufficient permissions", and "leaving page while processing".
 
-## 导出与报表
+## Export and Reports
 
-写明可导出角色、字段、脱敏、筛选继承、数据量边界、生成时效、下载有效期、失败通知和导出审计。不要在 PRD 中规定文件生成库或存储实现。
+Specify exportable roles, fields, de-identification, inheritance of filters, data volume boundaries, generation timeliness, download validity period, failure notifications, and export audit. Do not specify a file generation library or storage implementation in the PRD.
 
-## 操作日志与审计
+## Operation logs and auditing
 
-| 动作 | 操作人 | 对象 | 前后值 | 原因 / 备注 | 时间 | 查询角色 |
+| Action | Operator | Object | Before and after values | Cause / Note | Time | Query role |
 | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | |
 
-## 运营与支持
+## Operations and Support
 
-需要运营 SOP、客服口径、人工补偿、异常升级或值班处理时，写产品级触发条件、可见证据和结束状态。
+Required for operations SOP, customer service scripts, manual compensation, exception escalation, or on-duty handling: write product-level trigger conditions, visible evidence, and end state.
 
-## Admin 补充验收
+## Admin supplemental acceptance
 
-- 菜单、页面、按钮、字段和数据范围权限一致。
-- 列表搜索、筛选、排序、分页、空态和无权限态。
-- 作业流正向、驳回、撤回、重复提交、并发处理和超时。
-- 批量操作部分成功与重试。
-- 导出脱敏、有效期、失败通知和审计。
+- Menu, page, button, field, and data scope permissions are consistent.
+- List search, filter, sort, pagination, empty state, and unauthorized state.
+- Workflow forward, rejection, withdrawal, duplicate submission, concurrent processing, and timeout.
+- Batch operation partially successful and retry.
+- Export de-identification, validity period, failure notifications, and audit logs.
 
-## Admin 待闭合问题候选
+## Admin pending issue candidates
 
-这里只提示候选缺口，不生成第二套 OQ schema。只把会改变角色、数据范围、状态、审核、导出、审计或验收的问题移入 output contract 的 canonical `Outstanding Questions`；实现层权限码、组件和接口设计进入 `spec-plan`。
+Here it only prompts candidate gaps and does not generate a second set of OQ schema. Only move issues that affect role changes, data scope, status, approval, export, audit, or acceptance into the canonical `Outstanding Questions` of the output contract; implementation-layer permission codes, component, and interface designs are included in `spec-plan`.

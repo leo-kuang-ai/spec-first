@@ -116,7 +116,7 @@ Normalize dispatch, inline, and serial paths as `worker_dispatch_outcome`. Host 
 
 ## 6. Choose Inline, Serial, Or Bounded Parallel
 
-依赖链上必须顺序执行的单元优先在当前上下文 inline 完成；单独派 worker 无法缩短这段依赖等待。只有当前上下文拥挤且 fresh context 能实质帮助该单元时，才在既有授权与能力门槛满足后采用 serial worker。独立单元仍按下述依赖、争用和隔离事实选择有界并行；不因一个串行单元把整个独立层改为串行。
+Units that must be executed sequentially in the dependency chain should be inlined and completed preferentially in the current context; spawning a worker cannot reduce this dependency waiting time. A serial worker is employed only when the current context is congested and the fresh context can practically assist the unit, provided that the existing authorization and capability thresholds are satisfied. Independent units still select bounded parallelism based on the facts of dependencies, contention, and isolation; not making the entire independent layer serial simply because a serial unit does so.
 
 For an authorized native dispatch, correct a pre-launch argument rejection once without changing the unit packet, isolation, or required capabilities. Capacity-limited work stays queued until a slot frees; repeated zero capacity uses the bounded inline fallback. Other launch failures execute the unit inline under the same packet and verification contract only after confirming no worker launched. Once a worker launches, reconcile its terminal outcome and actual tree before retrying or falling back.
 

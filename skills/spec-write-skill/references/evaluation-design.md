@@ -10,7 +10,7 @@ Prefer the target project's existing native eval owner. If none exists, create t
 | artifact producer | artifact contract, erroneous outputs, and consumer | machine assertion + semantic artifact rubric |
 | deterministic setup/validation | facts, reason code, failure boundary | unit/integration assertion; prose cannot replace deterministic facts |
 | prose/agentic workflow | authority, output contract, good/bad/why | positive, near-neighbor, failure fresh-source cases |
-| long-horizon loop | checkpoint、stop/resume/recovery | authority + checkpoint + recovery path |
+| long-horizon loop | checkpoint, stop/resume/recovery | authority + checkpoint + recovery path |
 | hybrid | evidence for each consequential surface | combine necessary cases without forcing one aggregate score |
 
 New protected behavior needs a `protected_behavior -> source carrier -> contract assertion -> semantic eval case` mapping. A passing fixture, model self-check, or source byte count is not runtime quality. Feedback, transcripts, and issues start as advisory: bind them to source/host/model, redact sensitive data, minimize the reproduction, confirm expected behavior, and obtain eval-source mutation authorization before promoting them to regressions. Otherwise record observations only.

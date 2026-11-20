@@ -136,7 +136,7 @@ Only one flow runs per candidate; the reference contains the per-action criteria
 
 ## Phase 4.5: Vocabulary Capture
 
-完成逐文档操作后，读取 `references/concepts-vocabulary.md` 的通用词汇规则，再读取 `references/vocabulary-refresh.md` 的本轮聚合、候选发布与报告流程。
+After completing the per-document operation, load the general terminology rules from `references/concepts-vocabulary.md`, then load the current aggregation, candidate release, and reporting process rules from `references/vocabulary-refresh.md`.
 
 ## Phase 4.75: Validate And Publish
 

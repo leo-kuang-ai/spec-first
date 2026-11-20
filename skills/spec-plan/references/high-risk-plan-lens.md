@@ -39,17 +39,17 @@ Apply this branch when the change affects shipped runtime behavior, a production
 - A feature flag names its safe default, owner, cohort, success and failure signals, rollback trigger, and removal condition. A flag name alone is not a rollout or rollback plan.
 - A staged rollout names entry and exit criteria, observation window, operational owner, support impact, rollback action, and runbook. Alerts must identify an actionable threshold or condition, an owner, and the response the runbook enables.
 
-## 风险驱动保障追踪
+## Risk-driven assurance tracking
 
-对每个高风险计划，显式写出信任链，但不要把它变成刚性 schema 或所有任务通用的测试仪式：
+For each high-risk plan, explicitly document the trust chain, but do not turn it into a rigid schema or a universal testing ritual for all tasks:
 
-- 将 **Product Contract confirmation** 记录为 `confirmed`、`unconfirmed` 或 `inherited`，并附 owner/source basis。如果同一模型或 Agent 编写了 Product Contract、计划、实现和审查，却没有 owner confirmation reference，应声明 correlation limitation，不得暗示已经发生独立人工批准。
-- 在选择 checks 前明确 **largest unproven risk**。把每个 load-bearing acceptance group 或 failure mode 映射到标记为 `required`、`optional`、`not applicable` 或 `deferred` 的 proof intents；deferred 项必须写明 owner、unblock condition 或 claim limitation。
-- 分开记录 evidence authority 与 source identity。`transcribed` 表示 command result 由 caller 提供；`provider-confirmed` 需要可验证 provider 或 supervised-process receipt；`source-bound` 表示 enclosing evidence 还标识最终 revision、fingerprint 或等价 source state。source-bound 不证明 provider-confirmed execution，provider-confirmed execution 也不证明它运行在最终 source state 上。
-- closeout 必须执行 **required-proof reconciliation**：每个 required intent 都要落到实际 result、明确的 not-applicable reason、deferred item 或 unbound limitation。即使 recorded checks 全绿，完全遗漏 required intent 仍阻断 `complete` 或 `verified` claim。
-- 首轮把 reconciliation 作为 `workflow-level semantic exit gate`，而不是 runtime hard enforcement。Scripts 继续校验 schema、identity、hash、path、exit code 和 duplicate check IDs 等确定性事实；LLM 或人工判断 intent coverage 与 not-applicable reasoning 的语义充分性。
+- Record the **Product Contract confirmation** as `confirmed`, `unconfirmed`, or `inherited`, along with owner/source basis. If the same model or Agent has prepared the Product Contract, plan, implementation, and review, but lacks an owner confirmation reference, a correlation limitation shall be declared, and no implication of independent manual approval shall be suggested.
+- Before selecting checks, clearly identify the **largest unproven risk**. Map each load-bearing acceptance group or failure mode to proof intents marked as `required`, `optional`, `not applicable`, or `deferred`; deferred items must specify owner, unblock condition, or claim limitation.
+- Record evidence authority and source identity separately. `transcribed` indicates that the command result is provided by the caller; `provider-confirmed` requires a verifiable provider or receipt from a supervised process; `source-bound` indicates that the enclosing evidence also identifies the final revision, fingerprint, or equivalent source state. source-bound does not prove provider-confirmed execution, and provider-confirmed execution does not prove that it runs on the final source state.
+- closeout must perform **required-proof reconciliation**: each required intent must be mapped to an actual result, a clear not-applicable reason, a deferred item, or an unbound limitation. Even if all recorded checks appear green, a `complete` or `verified` claim is still blocked if the required intent is entirely omitted.
+- In the first round, treat reconciliation as a `workflow-level semantic exit gate`, rather than runtime hard enforcement. Scripts continue to verify deterministic facts such as schema, identity, hash, path, exit code, and duplicate check IDs; LLM or human judgment assesses the semantic adequacy of intent coverage and not-applicable reasoning.
 
-低风险工作保持轻量。如果不存在 high-risk trigger 或 load-bearing proof gap，不要仅为填满模板而制造扩展 trace。
+Low-risk tasks remain lightweight. Do not generate extended traces merely to fill the template if there is no high-risk trigger or load-bearing proof gap.
 
 ## Review Checks
 

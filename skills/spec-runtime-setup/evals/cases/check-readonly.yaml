@@ -1,9 +1,6 @@
 id: check-readonly
-title: check 保持夹具与配置只读
-description: |
-  --check 是只读诊断；--verify-only 允许写 setup-owned facts，不能用于本用例。
-  Judge 校验固定夹具字节、两份 host 配置哨兵及 setup facts 目录未产生。
-  此检查不覆盖用户级配置、外部安装、先写后还原或真实宿主阻断；不能据此声明全局无副作用。
+title: "check keep fixture and configuration read-only"
+description: "--check is a read-only diagnosis; --verify-only allows writing of setup-owned facts but is not applicable for this use case. Judge verifies fixed fixture bytes, the sentinel values of two host configurations, and confirms that the setup facts directory has not been generated. This check does not cover user-level configurations, external installations, write-before-restore scenarios, or actual host blocking; therefore, global side effects cannot be declared absent based on this check."
 
 input:
   prompt: |

@@ -1,10 +1,6 @@
 id: non-software-mode-no-label-leak
-title: 非软件主题的情境宣告不得泄漏内部模式标签
-description: |
-  验证模式分类的对外纪律：咖啡店命名属于无软件表面的主题，
-  情境宣告必须用用户认识的平实语言，禁止打印内部 taxonomy 标签
-  （repo-grounded / elsewhere-software / elsewhere-non-software）。
-  该主题缺少 context-substance，skill 也应先问材料而不是直接生成。
+title: "Announcements in non-software contexts must not disclose internal pattern labels."
+description: "Disciplinary guidelines for mode verification: Café naming falls under a theme with no software surface; situational assertions must use plain, familiar language recognizable to users. Internal taxonomy tags (e.g., repo-grounded / elsewhere-software / elsewhere-non-software) are strictly prohibited. This theme lacks context-substance, and skill application should prioritize inquiry into the materials before direct generation."
 
 input:
   prompt: |

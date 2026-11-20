@@ -1,7 +1,6 @@
 id: empty-input-asks
-title: 空输入应询问优化目标
-description: |
-  验证 Input gate:无输入时询问"想优化什么/给 spec 路径"。
+title: "Empty input should prompt inquiry into the optimization objective"
+description: "Verify Input gate: When no input is provided, prompt \"What would you like to optimize / specify path?\""
 
 input:
   prompt: |

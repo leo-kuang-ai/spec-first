@@ -16,11 +16,11 @@ A learning has several dimensions that can independently go stale. Surface-level
 
 Match investigation depth to the learning's specificity — a learning referencing exact file paths and code snippets needs more verification than one describing a general principle.
 
-### 核查声明的失效条件
+### Verify the expiration conditions of the declaration
 
-读取已有 `invalidation_condition`，按其声明的方法核对当前 source/版本或外部 issue/release 证据；外部条件由 orchestrator 检查并汇总，不能假定 investigation worker 已处理。记录检查日期、来源、观察结果和适用范围到本次报告，不向 learning 写入例行 checked-at/status。来源不可达时记录 unverified 并保留原学习，不能把无法检查当成条件未满足或已失效；缺条件的 legacy 文档只报告缺口，不反推作者未声明的退役条件。
+Read the existing `invalidation_condition`, verify current source/version or external issue/release evidence against its declared method; external conditions are checked and aggregated by orchestrator and must not be assumed to have been handled by the investigation worker. Record the inspection date, source, observation results, and applicable scope in this report, without writing routine checked-at/status to learning. When the source is unreachable, record as "unverified" and retain the original learning; do not treat uncheckability as a condition not met or already expired; legacy documents with missing conditions only report the gaps and do not infer retired conditions not explicitly declared by the author.
 
-条件满足只触发重新分类和回源：issue closed 不等于修复已发布，已发布不等于当前项目已采用；仍按 classify/publication 合同判断 Update/Replace/Delete。需要删除 workaround、升级依赖或运行写入验证时留作有授权的后续实施，不在只读调查中执行。
+Conditions met trigger only reclassification and resourcing: issue closed does not equal fix published, published does not equal current project adopted; updates/replace/delete are still determined by the classify/publication contract. Leave workaround removal, dependency upgrades, or write validation execution for authorized follow-up actions; do not perform these in read-only investigations.
 
 ### Drift Classification: Update vs Replace
 

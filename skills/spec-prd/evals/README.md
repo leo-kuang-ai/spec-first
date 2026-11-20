@@ -3,12 +3,12 @@
 This directory is source-only maintainer evidence and is intentionally excluded from generated host runtime packages.
 
 - `examples.json` contains the source-owned examples-as-context fixture.
-- `run-evals.js` validates deterministic fixture structure, coverage buckets, and reason-code facts；`--run-dir` 还会从 frozen cases 推导精确 schedule，并交叉校验 materialization receipt、attempted/completed sessions、五类 isolation deny facts、retained-evidence provenance/hash，以及 committed holdout 对 attempt/candidate/source/authority/expiry 的绑定；`--require-run-audit` 额外强制 enclosing audit manifest、逐文件 hash 与 artifact type。
+- `run-evals.js` validates deterministic fixture structure, coverage buckets, and reason-code facts; `--run-dir` also derives an exact schedule from frozen cases and cross-validates materialization receipt, attempted/completed sessions, five types of isolation deny facts, retained-evidence provenance/hash, and committed holdout bindings to attempt/candidate/source/authority/expiry; `--require-run-audit` additionally enforces an enclosing audit manifest, file-by-file hash, and artifact type.
 - `evaluation-governance.md` records maturity, evidence labels, review cadence, and promotion boundaries.
-- `contract-reset-protocol.md` 与 `contract-reset-cases.json` 冻结 Gate A 三臂、case role、material-effect、complexity、session/order、isolation、retention 和 no-go/inconclusive 合同。
-- `contract-reset-candidate.patch` 是 eval-only candidate；它只在隔离 materialized tree 中应用，不是默认 source/runtime patch。
-- `run-contract-reset-arm.js` 是 source materialization、fresh arm session 与 active hard-isolation probe 的唯一 owner；macOS probe 通过 `/usr/bin/sandbox-exec` 启动最小 `/usr/bin/perl` errno helper，只开放系统运行库、dyld shared-cache namespace、当前 arm namespace 与 probe output，五类读取必须取得真实 `EPERM`/`EACCES`；任一 primitive/helper/deny fact 不可证明时不调用模型。
-- `prepare-contract-reset-evidence.js` 确定性生成 arm-neutral blind packet、private retained evidence 与 hashes；它拒绝 symlink ancestor、非法 UTF-8、quoted credential、未绑定 arm/session/tree/model-visible provenance 和越界/重叠 raw cleanup target。Enclosing run audit 会按原 run-relative path 保留每个 completed session 的 retained manifest、sanitized Product Contract、blind packet、event log 与 grading notes，并逐文件标注 hash/artifact type。
+- Freeze Gate A three-arm, case role, material effect, complexity, session/order, isolation, retention, and no-go/inconclusive contracts in `contract-reset-protocol.md` and `contract-reset-cases.json`.
+- `contract-reset-candidate.patch` is an eval-only candidate; it is applied only within the isolated materialized tree and is not the default source/runtime patch.
+- `run-contract-reset-arm.js` is the sole owner of source materialization, fresh experiment-arm sessions, and active hard-isolation probing; the macOS probe launches a minimal `/usr/bin/perl` errno helper via `/usr/bin/sandbox-exec`, exposing only the system runtime libraries, dyld shared-cache namespace, the current ARM namespace, and probe output; any of the five required read operations must trigger a genuine `EPERM`/`EACCES`; no model invocation occurs if any primitive/helper/deny fact cannot be proven.
+- `prepare-contract-reset-evidence.js` deterministically generates arm-neutral blind packets, private retained evidence, and hashes; it rejects symlink ancestors, invalid UTF-8, quoted credentials, unbound arm/session/tree/model-visible provenance, and out-of-bounds/overlapping raw cleanup targets. The enclosing run audit preserves, relative to the original run path, the retained manifest, sanitized Product Contract, blind packet, event log, and grading notes for each completed session, and annotates each file with a hash/artifact type.
 
 Run the deterministic fixture check from the repository source checkout:
 
@@ -16,16 +16,16 @@ Run the deterministic fixture check from the repository source checkout:
 node skills/spec-prd/evals/run-evals.js --json
 ```
 
-验证 producer 尚未导出的原始冻结 run directory（严格只读）：
+Verify the original frozen run directory before export (strictly read-only):
 
 ```bash
 node skills/spec-prd/evals/run-evals.js --run-dir <run-dir> --json
 ```
 
-验证可交接的 durable run-audit bundle 时必须同时校验 enclosing manifest：
+When verifying a transferable durable run-audit bundle, the enclosing manifest must be validated concurrently.
 
 ```bash
 node skills/spec-prd/evals/run-evals.js --run-dir <durable-audit-dir> --require-run-audit --json
 ```
 
-Gate A 的语义 product-quality/materiality 结论由独立 reviewer 与 owner 裁决；runner 只确认确定性地板，不能把 fixture 或结构通过写成 outcome evidence。
+The semantic product-quality/materiality conclusion for Gate A is determined by an independent reviewer and owner; the runner may only confirm deterministic flooring and shall not treat fixture or structural items as outcome evidence.

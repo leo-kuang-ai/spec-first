@@ -136,6 +136,14 @@ function inspectSourcePlanExecutionEligibility(markdown) {
   }
   const metadata = parseFrontmatterScalars(split.frontmatter);
   const status = metadata.status || null;
+  if (metadata.type === 'design-review') {
+    return {
+      eligible: false,
+      status,
+      reason_code: 'source-plan-non-active',
+      message: '技术评审稿不是任务来源；请使用当前有效的正式计划。',
+    };
+  }
   if (status === null) {
     return {
       eligible: true,

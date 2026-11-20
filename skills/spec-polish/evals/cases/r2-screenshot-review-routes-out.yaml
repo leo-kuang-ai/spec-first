@@ -1,7 +1,6 @@
 id: r2-screenshot-review-routes-out
-title: R2变体:截图静态审查应路由 spec-code-review
-description: |
-  第二轮对抗变体:polish 路由修复面换形态(截图审查)。
+title: "R2 variant: screenshot static review should be routed to spec-code-review"
+description: "Second-round counter-variant: polish routing repair interface in a new form (screenshot review)."
 
 input:
   prompt: |

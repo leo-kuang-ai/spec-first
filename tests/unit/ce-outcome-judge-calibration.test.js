@@ -77,6 +77,26 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     expect(judge('spec-doc-review', script).status).toBe(1);
   });
 
+  test('会议稿判分读取真实文件，拒绝仅聊天声明、冲突身份和额外任务包', () => {
+    setup('spec-plan', 'mini-ledger');
+    const check = () => judge('spec-plan', 'check-team-design-review.sh', '会议材料已写好。').status;
+    const file = path.join(workspace, 'docs/reviews/month-filter-design-review.md');
+    const draft = '---\ntype: "design-review"\nstatus: draft\n---\n# 按月筛选\n现状：src/server.js 比较整个请求地址，带查询参数时匹配不到。建议先匹配路径，再解析 UTC 月份；GET /entries 不传月份仍返回全部，非法月份返回 400。\n';
+    expect(check()).toBe(1);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, draft);
+    expect(check()).toBe(0);
+    fs.writeFileSync(file, draft.replace('src/server.js', '某个文件'));
+    expect(check()).toBe(1);
+    fs.writeFileSync(file, draft.replace('status: draft', 'status: draft\nstatus: active'));
+    expect(check()).toBe(1);
+    fs.writeFileSync(file, draft);
+    fs.mkdirSync(path.join(workspace, 'docs/tasks'));
+    fs.appendFileSync(path.join(workspace, '.git/info/exclude'), '\n/docs/tasks/\n');
+    fs.writeFileSync(path.join(workspace, 'docs/tasks/month-tasks.md'), '# 任务包\n');
+    expect(check()).toBe(1);
+  });
+
   test('PRD validation rejects body mutation even with the original marker', () => {
     setup('spec-prd', 'rough-prd');
     expect(judge('spec-prd', 'check-validate-report-only.sh').status).toBe(0);

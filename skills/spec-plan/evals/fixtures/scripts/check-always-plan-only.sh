@@ -18,8 +18,8 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // the output contract does not forbid it, so strip one fence layer before parse.
 // Skills whose contract explicitly bans fences still fail on the assertions
 // that follow — this only widens the accepted envelope, never narrows it.
-// 行锚定 fence 配对：```<info> 开栏到下一个 fence 行闭栏。naive 正则会把
-// 非 json 信息串（如 ```yaml）的闭栏误当开栏，吞掉后续真正的 ```json 块。
+// Row anchor fence pairing: ```<info> From opening column to next fence row closing. naive regex will match
+// Misinterpreting a closing delimiter in non-JSON content (such as ```yaml) as an opening delimiter, thereby consuming the subsequent genuine ```json block.
 function fencedBlocks(text) {
   const blocks = [];
   let open = false;

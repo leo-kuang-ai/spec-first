@@ -55,4 +55,4 @@ Routing rules:
 
 ## Protected Artifacts
 
-本地 pipeline artifact 保护范围为 repo-relative `docs/plans/`、`docs/solutions/`、legacy `docs/brainstorms/` 下的全部文件，包含嵌套分类；不得建议删除、移除或 gitignore。普通同名目录与 `skills/**/references/personas/` prompt assets 不因名称相似获得保护。当前合同使用固定 `docs/` root，不从 CE 配置引入第二 artifact root。此规则约束所有 review 路径，synthesis 丢弃违反此规则的清理 finding；对内容缺陷的正常审查仍有效。
+The local pipeline artifact protection scope includes all files under the repo-relative paths `docs/plans/` and `docs/solutions/`, as well as legacy `docs/brainstorms/`, including all nested subdirectories; no deletion, removal, or gitignore is permitted. Ordinary similarly-named directories do not receive protection due to name similarity with prompt assets in `skills/**/references/personas/`. The current contract uses a fixed `docs/` root and does not inherit a second artifact root from CE configuration. This rule constrains all review paths; synthesis discards cleanup findings that violate this rule; normal review for content defects remains effective.

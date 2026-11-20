@@ -18,8 +18,8 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // the output contract does not forbid it, so strip one fence layer before parse.
 // Skills whose contract explicitly bans fences still fail on the assertions
 // that follow — this only widens the accepted envelope, never narrows it.
-// 行锚定 fence 配对：```<info> 开栏到下一个 fence 行闭栏。naive 正则会把
-// 非 json 信息串（如 ```yaml）的闭栏误当开栏，吞掉后续真正的 ```json 块。
+// Row anchor fence pairing: ```<info> From opening column to next fence row closing. naive regex will match
+// Misinterpreting a closing delimiter in non-JSON content (such as ```yaml) as an opening delimiter, thereby consuming the subsequent genuine ```json block.
 function fencedBlocks(text) {
   const blocks = [];
   let open = false;
@@ -129,8 +129,8 @@ const headText = execFileSync('git', ['show', 'HEAD:' + prdPath], { env: cleanEn
 assert.ok(specLineOf(headText), 'Fixture checkpoint missing spec_id');
 const prdText = regular(prdPath).toString();
 assert.equal(specLineOf(prdText), specLineOf(headText), 'spec_id identity changed on resume');
-// ready 声明断言锚定合同 frontmatter token（message 层 prose 引用合同原文属合法形态，
-// 首轮 live 误伤实例：产物姿态句引用 ready-for-planning token 被句子级负例误判）。
+// ready declaration asserts anchor contract frontmatter token (message layer prose citation of original contract text is legally valid)
+// First-round live misfire example: the product pose sentence references the ready-for-planning token, which is incorrectly flagged as a negative at the sentence level.
 assert.ok(!/^status:\s*ready-for-planning/m.test(prdText), 'Resume flipped artifact status to ready-for-planning');
 assert.ok(!/^can_enter_spec_plan:\s*yes/m.test(prdText), 'Resume flipped can_enter_spec_plan to yes');
 const message = process.env.EVAL_FINAL_MESSAGE ?? '';

@@ -683,7 +683,7 @@ function writeWorkspaceSummary(workspaceRoot, payload) {
     try {
       if (fs.existsSync(temp)) fs.unlinkSync(temp);
     } catch (_error) {
-      // 主写入错误仍是权威结果。
+      // Main write error remains the authoritative result.
     }
   }
 }

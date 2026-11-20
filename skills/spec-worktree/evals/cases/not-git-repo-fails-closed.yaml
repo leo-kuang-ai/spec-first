@@ -1,9 +1,6 @@
 id: not-git-repo-fails-closed
-title: 非 git 目录必须 detect fail-closed，不得裸跑 git worktree add
-description: |
-  验证 fail-closed 契约：非 git 目录上 detect 返回结构化
-  state/reason_code（not-git-repo 或 unknown），停止并报告原因；
-  不得回退到裸 git worktree add，不得创建 .worktrees。
+title: "Non-Git directories must detect fail-closed; bare-running git worktree add is prohibited."
+description: "Verify fail-closed contract: On non-git directories, if detect returns a structured state/reason_code (not-git-repo or unknown), halt and report the cause; do not roll back to a bare git worktree add, and do not create .worktrees."
 
 input:
   prompt: |

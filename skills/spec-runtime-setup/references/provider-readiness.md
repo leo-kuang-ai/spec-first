@@ -20,6 +20,6 @@ Graphify may add `first_generation.scope_provenance` to separate requested scope
 
 ## Display derivation and scope fields
 
-The human status table may derive `readiness_scope` and `probe_status` from existing lifecycle bits to separate install/index readiness from real server/query probes. `probe_status` 是派生显示列；机器字段 `readiness_scope=installation|artifact` 标识本次验证范围，旧数据缺失按 artifact 路径兼容，不推断安装已验证。
+The human status table may derive `readiness_scope` and `probe_status` from existing lifecycle flags to distinguish between install/index readiness and actual server/query probes. `probe_status` is a derived display column; the machine field `readiness_scope=installation|artifact` indicates the scope of the current validation. Legacy data missing these fields maintains compatibility via the artifact path, without inferring installation readiness.
 
 The decision rules that gate setup judgments (fresh→unknown, stale→stale, `query_verified` reserved for real probes, never summarizing false/missing probes as confirmed) stay in `SKILL.md` because every run needs them on load.

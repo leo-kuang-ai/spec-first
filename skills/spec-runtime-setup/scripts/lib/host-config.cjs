@@ -227,9 +227,9 @@ function containmentRootForTarget(rawPath, scope, target, { repoRoot, homeDir, e
   if (/^(?:~|\$HOME|\$\{HOME\})/.test(rawPath) || scope === 'user') {
     return path.resolve(homeDir);
   }
-  // 绝对路径不再退化为文件系统根(lane finding DR-014:那会使 isPathWithin 恒真,
-  // containment 防线静默失效)。未显式声明 containment_root 的绝对 config_path 一律
-  // 拒绝;确需绝对路径的 target 必须显式申报 containment_root(见函数首分支)。
+  // Absolute paths are no longer degraded to the file system root (lane finding DR-014: that would make isPathWithin always true,
+  // containment (containment silent failure)A config_path absolute path without explicitly declaring containment_root is always
+  // Refusal; if an absolute path is required, the target must explicitly declare containment_root (see the first branch of the function).
   if (path.isAbsolute(rawPath)) return null;
   return path.resolve(repoRoot);
 }
@@ -927,7 +927,7 @@ function acquireConfigLock(options = {}) {
       };
     } catch (error) {
       if (error.code !== 'EEXIST') {
-        try { fs.rmSync(lockPath, { recursive: true, force: true }); } catch (_ignored) { /* 尽力清理 */ }
+        try { fs.rmSync(lockPath, { recursive: true, force: true }); } catch (_ignored) { /* Best-effort cleanup. */ }
         return { ok: false, reason_code: 'host-config-lock-create-failed', error: safeError(error, []) };
       }
       let now = nowFn();
@@ -1043,7 +1043,7 @@ function replaceFile(tempPath, configPath, originalExists, token, options = {}) 
       if (fs.existsSync(configPath)) fs.rmSync(configPath, { force: true });
       renameWithWindowsRetry(displaced, configPath, options, 'restore-displaced-original');
     } catch (restoreError) {
-      // SUP-23 fix: 保留 displaced 路径和恢复失败状态
+      // SUP-23 fix: Retain displaced path and restore failed state
       const recoveryError = new Error('Replacement failed and restore also failed');
       recoveryError.code = 'REPLACE_AND_RESTORE_FAILED';
       recoveryError.displaced_path = displaced;
@@ -1404,7 +1404,7 @@ function applyHostConfig(options = {}) {
       stale_lock_recovered: lock.stale_lock_recovered,
     });
   } catch (error) {
-    // SUP-23 fix: 处理双重失败（位移了但无法安装和恢复）
+    // SUP-23 fix: Handle dual failure (displaced but unable to install or restore)
     const isDoubleFailure = error.code === 'REPLACE_AND_RESTORE_FAILED';
     const displaced = isDoubleFailure ? error.displaced_path : null;
 
@@ -1412,7 +1412,7 @@ function applyHostConfig(options = {}) {
     if (replaced || isDoubleFailure) {
       try {
         if (isDoubleFailure) {
-          // 双重失败：已位移但未恢复，尝试从 displaced 路径恢复
+          // Double failure: Already displaced but not recovered; attempting recovery from the displaced path
           if (displaced && fs.existsSync(displaced)) {
             if (fs.existsSync(target.config_path)) fs.rmSync(target.config_path, { force: true });
             fs.renameSync(displaced, target.config_path);
@@ -1421,7 +1421,7 @@ function applyHostConfig(options = {}) {
             throw new Error('Displaced file not found');
           }
         } else {
-          // 正常替换失败，从 backup 恢复
+          // Normal replacement fails; recover from backup
           restore = restoreOriginal({
             configPath: target.config_path,
             target,
@@ -1474,7 +1474,7 @@ function applyHostConfig(options = {}) {
     const cleanupPaths = preserveBackup ? [tempPath] : [tempPath, backupPath];
     for (const managedPath of cleanupPaths) {
       if (managedPath.includes(`.spec-first.${process.pid}.`) && fs.existsSync(managedPath)) {
-        try { fs.rmSync(managedPath, { force: true }); } catch (_ignored) { /* 尽力清理 */ }
+        try { fs.rmSync(managedPath, { force: true }); } catch (_ignored) { /* Best-effort cleanup. */ }
       }
     }
     let release;

@@ -1,10 +1,6 @@
 id: vague-subject-gate-asks
-title: 无主题的模糊请求应触发 scope 提问而非直接生成
-description: |
-  验证 Subject-Identification Gate：裸词 "给我一些改进建议" 不可识别主题，
-  skill 必须提出 scope 问题（含 Surprise me 类选项概念，语言不限），
-  不得静默把模糊请求解释为"关于本仓库"并直接开始生成想法或产出 artifact。
-  断言锚定行为不变量：出现问句且未进入产出阶段；选项措辞与模板词由 transcript 人工核验。
+title: "Ambiguous requests without a clear topic should trigger a scope inquiry rather than directly generating a response."
+description: "Verify Subject-Identification Gate: The bare phrase \"give me some improvement suggestions\" must not identify a topic; the skill must pose a scope question (including a \"Surprise me\" option concept), with language unrestricted. It must not silently interpret vague requests as \"about this repository\" and immediately generate ideas or artifacts. Assert invariant behavior: when a question appears and no output phase has begun; option phrasing and template words are manually verified against transcript."
 
 input:
   prompt: |

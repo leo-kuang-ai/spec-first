@@ -6,7 +6,7 @@
 # Usage: Create a YAML file matching this schema and pass it to spec-optimize.
 # The agent reads this spec, validates required fields, and uses it to
 # configure the entire optimization run.
-# 兼容性：holdout 为可选增量；旧 spec 沿用单集比较，不自动升级为已确认的泛化收益。
+# Compatibility: holdout is optional incremental; the old spec retains single-set comparison and does not automatically upgrade to generalized gains that have been confirmed.
 
 # ============================================================================
 # REQUIRED FIELDS
@@ -182,7 +182,7 @@ required_fields:
           confirmation_seed:
             type: integer
             default: null
-            description: "独立确认样本的 seed，必须为安全整数且不同于 sample_seed。仅不同 seed 不证明互斥：确认样本须来自 selection 未抽取的 item；不足时使用 measurement.holdout.command 或停止确认。"
+            description: "The seed for the independent confirmation sample must be a secure integer and different from sample_seed. Different seeds do not guarantee mutual exclusivity: samples must originate from items not included in the selection; if insufficient, use measurement.holdout.command or halt validation."
           model:
             type: enum
             values:
@@ -258,11 +258,11 @@ required_fields:
       holdout:
         type: object
         default: null
-        description: "冻结且独立的确认集，仅在 selection 可 keep 后及最终确认时使用，不进入假设或排名。未配置保留旧比较；配置后决定脚本必须接收第二组 baseline/candidate。"
+        description: "Frozen and independent confirmation set, used only after selection can be kept and final confirmation, not entering assumptions or ranking. No retention of old comparison configured; after configuration, the script must receive a second baseline/candidate group."
         required_children:
           command:
             type: string
-            description: "在同一 cwd 运行并输出相同 snapshot 结构的非空确认命令；其执行 envelope 需独立授权。"
+            description: "Run the same non-empty confirmation command within the same CWD to output an identical snapshot structure; the execution envelope requires independent authorization."
       stability:
         type: object
         default: { mode: "stable" }
@@ -577,9 +577,9 @@ optional_fields:
 # ============================================================================
 
 validation_rules:
-  - "measurement.holdout 非空时必须有非空字符串 command；metric.judge.confirmation_seed 非空时须为不同于 sample_seed（默认 42）的安全整数，且 primary.type 为 judge"
-  - "配置 holdout 后 keep 必须由同一目标在独立确认中改善且无其他必需目标退化；重复/ladder 确认使用完整实测样本，不能用 aggregate 或 sample_count 补证"
-  - "holdout 输入、数据、harness 和 item 划分属于 scope.immutable；确认结果不得用于选候选、排名或生成假设，协议变化另起 run"
+  - "A nonempty measurement.holdout requires a nonempty command string. If set, metric.judge.confirmation_seed must be a safe integer distinct from sample_seed (default 42), and primary.type must be judge."
+  - "With a holdout, keep a candidate only if the same objective improves in independent confirmation and no other required objective regresses. Repeated or ladder confirmation requires the full observed samples, not an aggregate or sample_count."
+  - "Holdout inputs, data, harness, and item splits belong in scope.immutable. Never use confirmation results to select or rank candidates or generate hypotheses. Start a new run if the protocol changes."
   - "Reject unknown directions, roles, comparison/aggregation modes, duplicate objective names, nonfinite targets, negative thresholds, and invalid regression bounds; do not silently change the approved protocol"
   - "Paired comparison requires an observed baseline for each candidate sample in the same order; missing pairs cannot be synthesized or replaced by aggregate judge scores"
   - "All required fields must be present"

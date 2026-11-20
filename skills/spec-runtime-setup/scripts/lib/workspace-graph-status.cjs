@@ -310,8 +310,8 @@ function runWorkspaceGraphStatus({
       promotion_cleanup_reason_codes: promotionCleanup.reason_codes,
       configured_refresh_mode: configuredRefreshMode,
       refresh_mode: autoRefreshHooksReady ? configuredRefreshMode : 'explicit',
-      // 消费侧只读事实（R10/U6）：commit 触发的 merged 重建异步执行，此处只报告其在途/失败/成功，
-      // 绝不在消费时触发重建。in-flight 表示图可能落后当前 HEAD；failed 表示后台重建失败需关注。
+      // Consumption-side read-only facts (R10/U6): merged rebuild triggered by commit is asynchronously executed; this record only reports in-transit/failure/success status.
+      // Will not trigger reconstruction during consumption. In-flight representation may lag behind the current HEAD; failed indicates backend reconstruction failure requiring attention.
       async_refresh: asyncRefresh,
       lifecycle,
     },

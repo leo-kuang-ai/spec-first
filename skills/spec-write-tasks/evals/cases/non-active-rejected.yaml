@@ -1,8 +1,6 @@
 id: non-active-rejected
-title: 非 active 计划不得编译为可执行任务包
-description: |
-  验证 Core Rule 10:status: completed 的计划返回 source_plan_non_active,
-  不产可执行 task pack、不路由 spec-work。
+title: "Inactive plans must not be compiled into executable task packages"
+description: "Verify Core Rule 10:status: completed plans return source_plan_non_active, generating no executable task pack and no routing of spec-work."
 
 input:
   prompt: |

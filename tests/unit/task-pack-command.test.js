@@ -246,6 +246,22 @@ describe('spec-first tasks command', () => {
     }));
   });
 
+  test.each(['status: draft\n', 'status: active\n', ''])('评审稿不可因状态或旧正文哈希成为任务来源：%j', (statusLine) => {
+    const original = fs.readFileSync(planPath, 'utf8');
+    const hash = computeSourcePlanHash(planPath).hash;
+    const taskPath = writeTaskPack(tempRoot, hash);
+    const body = original.replace(/^---\n[\s\S]*?\n---\n/, '');
+    fs.writeFileSync(planPath, `---\ntype: design-review\n${statusLine}---\n${body}`);
+    expect(computeSourcePlanHash(planPath).hash).toBe(hash);
+
+    const hashResult = runCli(['tasks', 'hash', planPath, '--json'], tempRoot);
+    expect(hashResult.status).toBe(2);
+    expect(JSON.parse(hashResult.stdout).error.code).toBe('tasks-source-plan-non-active');
+    const validation = runCli(['tasks', 'validate', taskPath, '--repo', tempRoot, '--json'], tempRoot);
+    expect(validation.status).toBe(1);
+    expect(JSON.parse(validation.stdout)).toMatchObject({ deterministic_handoff: false, reason_code: 'source_plan_non_active' });
+  });
+
   test('returns a machine-readable reason when the task pack cannot be read', () => {
     const result = runCli([
       'tasks', 'validate', 'docs/tasks/missing.md', '--repo', tempRoot, '--json',

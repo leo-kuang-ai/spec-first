@@ -102,7 +102,8 @@ docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.md
 | 环境准备 | 当前任务必需的 MCP/helper 缺失或 readiness 需要修复 | `spec-runtime-setup` | readiness facts 与准备结果 |
 | 方向探索 | 比较多个候选方向 | `spec-ideate` | 排序后的方向记录 |
 | 需求定义 | 有想法，但范围和成功标准未定 | `spec-brainstorm` | requirements-only plan |
-| PRD 澄清 | 已有 PRD，需要结合代码澄清 | `spec-prd` | planning-readiness artifact |
+| 需求澄清 | 起草已有产品的增量需求，或结合代码澄清现有 PRD | `spec-prd` | 需求变化、验例及待产品裁决的问题 |
+| 研发评审稿 | 要写一份技术方案给研发、测试讨论 | `spec-plan` | 人读设计稿，不是执行计划 |
 | 文档审查 | 检查需求、计划或 task pack | `spec-doc-review` | 文档 findings；可跨阶段插入 |
 | 实现规划 | 需求确定，但实现方式未定 | `spec-plan` | implementation-ready plan |
 | 任务拆分 | 大型计划需要并行或交接（可选） | `spec-write-tasks` | 从 plan 派生的 task pack |

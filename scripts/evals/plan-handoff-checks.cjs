@@ -1,8 +1,8 @@
 'use strict';
 
-// 只拼接到两个有明确 planner-return 边界的用例，不评价通用交接或规划语义。
+// Only connect cases with two clear planner-return boundary conditions; do not evaluate general handover or planning semantics.
 function checkPlanningReturn(mode) {
-  // 宿主轨迹可能使用 /var，而子进程 cwd 使用 /private/var；不存在的写入目标从最近存在的父目录解析。
+  // The host trajectory may use /var, while the child process's cwd uses /private/var; for non-existent write targets, the most recent existing parent directory is resolved.
   const actualPath = (file) => {
     let parent = path.resolve(file);
     const suffix = [];
@@ -51,7 +51,7 @@ function checkPlanningReturn(mode) {
     return tokens.length === 2 && path.basename(tokens[0]) === 'node'
       && path.resolve(tokens[1]) === path.resolve('prepare-eval.cjs');
   };
-  // 检查全部尝试，不只检查成功且配对的调用；失败或撤销的实施也不可漏掉。
+  // Verify all attempts, not only successful and paired calls; failed or revoked executions must also not be overlooked.
   const attempts = [];
   for (const message of messages) {
     assert.ok(!message.tool_calls && !message.function_call, '不支持嵌套调用，需人工核验');
@@ -65,7 +65,7 @@ function checkPlanningReturn(mode) {
     const name = nameOf(call);
     const args = argsOf(call);
     if (mode === 'blocked' && ['read', 'read_file', 'glob', 'grep'].includes(name)) {
-      // 只检查显式指名的 owner 路径或搜索词；不从普通调研内容推断意图。
+      // Only check explicitly named owner paths or search terms; do not infer intent from general research content.
       const targets = [args.file_path, args.path, args.pattern, args.glob].filter(text);
       assert.ok(!targets.some((target) => /(^|[^a-zA-Z0-9_-])spec-work(?=$|[^a-zA-Z0-9_-])/.test(target)),
         '本用例未授权搜索或加载 spec-work 执行 owner');

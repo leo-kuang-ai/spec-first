@@ -1,17 +1,17 @@
-# 技术方案：研发评审稿
+# Technical Design for Team Review
 
-这份稿子给需要决定设计能不能做、怎么验、能否上线的人。已有方案改排时，先固定权威版本，只移动、合并或解释已有内容；发现漏项就注明「原方案未交代」，不要替原作者作新决定。新设计则以需求和当前源码为依据，标出会影响选择的未知项。
+Use this draft to help engineers, testers, and release owners decide whether to adopt the design. Write the deliverable in the user's language. When reorganizing an existing plan, identify its authoritative version. Move, combine, or explain existing content; mark omissions as gaps in the source rather than making new decisions for its author. For a new design, start from the requirements and current code, and flag unknowns that could change the recommendation.
 
-| 目录 | 读者读完应能回答什么 |
+| Section | Questions the reader should be able to answer |
 |---|---|
-| 背景、目标与范围 | 谁遇到什么问题？直接给推荐做法，点明本次变化和明确不变的行为。不要复制整份 PRD。 |
-| 现状与问题分析 | 从现有入口沿实际调用说明卡在哪里，给能复核的源码或合同位置。分清「缺此能力」和「尚未查到」。 |
-| 总体设计与方案选型 | 用一次完整请求串起推荐做法；只比较真正可行的备选，说明哪个约束决定了选择。图能减少歧义时再画。 |
-| 详细设计 | 按业务流程或模块解释入口、规则、状态归属、接口与错误返回。跨端需求先讲同一场景，再给各端改动，不按文件名单堆章节。 |
-| 影响范围与兼容性 | 谁会受到影响，谁保持原样？遇到新旧版本并存、历史数据或外部调用方时，说明双方实际读取什么。 |
-| 测试与验收 | 用触发条件、预期结果和观察位置区分主路径、旧行为与关键失败。内部函数返回正确，不自动等于用户操作正确。 |
-| 实施与上线 | 先做什么、依赖谁、联调验什么？发布有风险时交代观测、停止与恢复条件。未经验证不写「可回滚」。 |
+| Background, goals, and scope | Who has the problem? What do you recommend, what changes for them, and what stays the same? Link to the PRD instead of repeating it. |
+| Current behavior and problem | Trace a request from its entry point to where the problem occurs. Cite the code or contract. Distinguish a confirmed limitation from a capability you have not found. |
+| Proposed design and alternatives | Walk through one request end to end. What is the strongest case for a feasible alternative, including leaving the system unchanged? Which constraint makes the cost of the recommendation acceptable? Use a diagram when it resolves ambiguity. |
+| Detailed design | Explain entry points, rules, state ownership, interfaces, and errors by business flow or module. For cross-client work, follow the same scenario across clients before listing client-specific changes. |
+| Impact and compatibility | Who must change and who need not? Describe what each side actually reads when old clients, historical data, or external callers coexist with the change. |
+| Tests and acceptance | Which test would catch a violation of each key promise? Reading a disabled preference and failing to read the preference may both require zero sends: trigger each separately and observe the actual send boundary. Distinguish existing coverage, proposed tests, and verified results. |
+| Implementation and rollout | What must happen first, who depends on it, and what needs integration testing? For a risky release, name the signals and stop condition. Stopping new traffic does not undo data already written or notifications already sent. Flag gaps rather than promising rollback. |
 
-章节标题可用业务词细化，例如「详细设计：发送前如何检查通知偏好」。单点改动可合并为「现状与改法、影响、验法」，不为无关章节填「不适用」。编号可用于回查，不能代替结论。
+Use descriptive headings such as “Detailed design: check notification preferences before sending.” For a small change, combine the sections into current behavior and proposal, impact, and verification. Omit irrelevant sections. A section number is a pointer, not a conclusion.
 
-**交付边界。** 只给一份用户要读的评审稿，不默认另存第二份计划。指定既有计划时在稿内注明来源和版本，不覆盖原件；需要改变产品决定时回到权威来源。聊天可直接交稿；要求文件时在指定位置或 `docs/reviews/` 保存为 `*-design-review.md`，头部使用 `type: design-review`、`status: draft`，不要声明统一执行合同、就绪标记或实施授权。此试点文件格式为 Markdown；指定其他格式时不静默替换。交付前按开发、测试、上线负责人各自的问题复查定位，记录缺口；不把作者自查称为独立读者验收。此处结束人读交付，不走执行计划的状态迁移或自动交接。
+**Delivery boundary.** Deliver one review draft, not a second execution plan. If a source plan is specified, cite its path and version; do not overwrite it or change product decisions outside their authoritative source. Deliver in chat unless a file is requested. Save Markdown at the requested path or as `docs/reviews/*-design-review.md` with `type: design-review` and `status: draft`. Do not declare a unified plan contract, execution readiness, or implementation authority. Do not silently substitute Markdown for another requested format. Before delivery, check whether each reader can find the answers they need and name what is missing. Author self-review is not independent reader acceptance. Stop here; do not transition plan status or start execution.

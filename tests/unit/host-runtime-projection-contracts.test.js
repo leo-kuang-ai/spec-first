@@ -129,7 +129,7 @@ describe('host runtime projection contracts', () => {
       const transformed = adapter.transformSkillContent(SETUP_SOURCE, setupTransformContext());
 
       expect(transformed).toContain(
-        '绝不能仅依据 prose 手动选择 `.kiro/settings/mcp.json`、`.qoder/settings.local.json`、`.cursor/mcp.json`、Codex TOML 或 Claude managed/user config。',
+        'Never select `.kiro/settings/mcp.json`, `.qoder/settings.local.json`, `.cursor/mcp.json`, Codex TOML, or Claude managed/user config from prose alone.',
       );
       expect(transformed).toContain(
         'write Kiro MCP config to workspace `.kiro/settings/mcp.json` by default, and to `~/.kiro/settings/mcp.json` only after explicit user-scope opt-in;',

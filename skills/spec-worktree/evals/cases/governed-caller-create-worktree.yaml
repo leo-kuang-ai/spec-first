@@ -1,10 +1,6 @@
 id: governed-caller-create-worktree
-title: governed caller 经 detect 创建 new-work worktree 且主 checkout 不动
-description: |
-  验证核心链路：caller-owned 隔离请求应先经 bundled script 的 detect
-  契约（spec-worktree-detect.v1），ordinary-checkout 下创建
-  .worktrees/<branch>，主 checkout 分支与 HEAD 不被切换，
-  .gitignore 补 .worktrees，汇报含 ready/路径语义。
+title: "governed caller: upon detection, creates a new-work worktree while the main checkout remains unchanged"
+description: "Validate core flow: For caller-owned isolation requests, they must first pass the detect contract of the bundled script (spec-worktree-detect.v1); under ordinary-checkout, a .worktrees/<branch> directory is created, the main checkout branch and HEAD remain unchanged, .gitignore is updated to include .worktrees, and the report includes ready status and path semantics."
 
 input:
   prompt: |

@@ -18,8 +18,8 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // the output contract does not forbid it, so strip one fence layer before parse.
 // Skills whose contract explicitly bans fences still fail on the assertions
 // that follow — this only widens the accepted envelope, never narrows it.
-// 行锚定 fence 配对：```<info> 开栏到下一个 fence 行闭栏。naive 正则会把
-// 非 json 信息串（如 ```yaml）的闭栏误当开栏，吞掉后续真正的 ```json 块。
+// Row anchor fence pairing: ```<info> From opening column to next fence row closing. naive regex will match
+// Misinterpreting a closing delimiter in non-JSON content (such as ```yaml) as an opening delimiter, thereby consuming the subsequent genuine ```json block.
 function fencedBlocks(text) {
   const blocks = [];
   let open = false;
@@ -133,16 +133,16 @@ assert.equal(report.supported_cause, 'credential-source', '不得把路径/关�
 assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产效果');
 assert.ok(Array.isArray(report.source_refs));
 for (const file of ['before.json', 'after.json', 'src/client.cjs']) assert.ok(report.source_refs.includes(file), '缺少核心因果证据');
-// README.md 记载「本仓库是固定合成实验」，直接支撑 scope: synthetic-fixture 的裁决，属合法引用。
-// candidate.md 是被裁决对象，与 README.md（支撑 scope）同理直接支撑 approved:false 的裁决，
-// 属「确实支持裁决的路径」的自然成员（case prompt 自定义）；核心因果证据三文件另有强制项防偷懒。
+// README.md records "This repository is for fixed synthesis experiments," directly supporting the scope: synthetic-fixture decision, and constitutes a legitimate reference.
+// candidate.md is the object under evaluation, analogous to README.md (which supports the scope); it directly supports the decision of approved:false.
+// Members belonging to the "path indeed supporting the ruling" (case prompt customized); core causal evidence from three documents has additional mandatory provisions to prevent laziness.
 assert.ok(report.source_refs.every((file) => ['candidate.md', 'before.json', 'after.json', 'src/client.cjs', 'verify.cjs', 'README.md'].includes(file)), '引用了无关或不存在的证据');
 assert.equal(regular('prepare-eval.cjs').toString(), execFileSync('git', ['show', 'HEAD:prepare-eval.cjs'], { env: cleanEnv, encoding: 'utf8' }));
 const allowed = new Set(["README.md","after.json","before.json","candidate.md","src/client.cjs","verify.cjs","prepare-eval.cjs"]);
 assert.equal(git('ls-files', '-v', '-z'), [...allowed].sort().map((file) => 'H ' + file + '\0').join(''), '索引标志变化');
 function checkTree(directory = '.') {
   for (const name of fs.readdirSync(directory)) {
-    // .git 归评测基线设施；.claude 是评测引擎挂载被测 skill 的安装面，均非被测输出。
+    // .git is the evaluation baseline facility; .claude is the evaluation engine's mounting interface for the tested skill, neither of which constitutes the tested output.
     if (directory === '.' && (name === '.git' || name === '.claude')) continue;
     const file = directory === '.' ? name : directory + '/' + name;
     const stat = fs.lstatSync(file);

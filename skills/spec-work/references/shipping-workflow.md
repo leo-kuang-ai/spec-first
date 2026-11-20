@@ -29,21 +29,21 @@ If this reference cannot be read or a required quality/evidence gate cannot run,
 
 ## Required-Proof Reconciliation
 
-Final verification 不只检查已经写入 run summary 的 check 是否绿色，还要回到 source plan / task 的 Verification Contract，对全部 required proof intent 做一次语义对账：
+Final verification does not only check whether the check items already written into the run summary are green, but also returns to the source plan/task's Verification Contract to perform a semantic reconciliation of all required proof intents:
 
-- 每个 required intent 必须对应实际 result、明确 `not applicable` 理由、带 owner/unblock condition 的 `deferred`，或具体 `unbound limitation`；完全遗漏的 required intent 阻断 `complete` 和 `verified`。
-- 记录 evidence authority：`transcribed` 表示 caller 转录 command/result；`provider-confirmed` 需要可验证 provider 或 supervised-process receipt。二者都不得从自然语言声明、非空 command 或 exit code 自动推导。
-- 单独记录 source binding：`source-bound` 需要最终 revision、working-tree fingerprint 或 enclosing artifact identity。source-bound 不等于 provider-confirmed；provider-confirmed 也不等于运行在最后一次 behavior-bearing mutation 之后。
-- 最后一次 implementation、simplify、fixture 或 review-fix mutation 之后，受影响的 required checks 必须 fresh rerun，再完成 reconciliation。
-- 首轮 reconciliation 是 LLM-owned semantic exit gate，不是现有 schema 的 runtime hard enforcement。Scripts 强制 summary/claim 的确定性地板；LLM/人工判断 intent 是否完整、N/A 理由是否成立及 claim ceiling。不得因为 schema 通过就声称全部 required proof 已被机械验证。
+- Each required intent must correspond to an actual result, clearly state the rationale for "`not applicable`," or include an owner/unblock condition for a `deferred` intent, or specify a concrete `unbound limitation`; omission of any required intent blocks the achievement of "`complete`" and "`verified`" status.
+- Evidence authority record: `transcribed` indicates the caller's transcription of the command/result; `provider-confirmed` requires verifiable provider acknowledgment or receipt from a supervised process. Neither shall be inferred automatically from natural language declarations, non-empty command, or exit code.
+- Record source binding individually: `source-bound` requires the final revision, working-tree fingerprint, or enclosing artifact identity. source-bound does not imply provider-confirmed; provider-confirmed does not imply that it ran after the last behavior-bearing mutation.
+- After the last implementation, simplify, fixture, or review-fix mutation, the affected required checks must be freshly rerun before reconciliation can be completed.
+- The first-round reconciliation is an LLM-owned semantic exit gate, not a runtime hard enforcement of the existing schema. Scripts enforce deterministic floor for summary/claim; LLM/human judgment on whether intent is complete, validity of N/A rationale, and claim ceiling. One must not claim that all required proofs have been mechanically verified merely because the schema has passed.
 
-在 Completion Response 和 structured closeout limitation 中保存 reconciliation 结论或 missing-intent 列表。Evidence authority 与 source binding 不写入 `verification-run-summary.v1` 的 check 字段：分别由 closeout envelope 的 `claim_limitations`、`verified_worktree_fingerprint`，以及触发持久化时的 enclosing `spec-work-run-artifact/v2` 承载；三者必须引用同一 run-id/source state，不能互相自动推导。未通过对账时，即使已有 checks 全部 passed，也不能声称完成。
+Save the reconciliation conclusion or missing-intent list in Completion Response and structured closeout limitations. Evidence authority and source binding are not included in the `verification-run-summary.v1` check field; instead, they are carried by the `claim_limitations` and `verified_worktree_fingerprint` in the closeout envelope, as well as the enclosing `spec-work-run-artifact/v2` at the time of persistence. All three must reference the same run-id/source state and cannot be automatically inferred from one another. Completion cannot be claimed even if all checks have passed, until reconciliation has been successfully completed.
 
 ## Phase 3: Quality Check
 
-1. **准备最终验证运行（Prepare Verification Run）**
+1. **Prepare Verification Run**
 
-   在任何 simplify、review followup 或 residual fix 之前，先固定一个 target repo、一个 fresh safe `run-id` 和最终验证候选集；同一次 shipping closeout 的日志、run summary 与 conditional run artifact 必须复用同一个 `run-id`。先调用：
+   Before any simplify, review, follow-up, or residual fix, fix a target repo, a fresh safe `run-id`, and the final validation candidate set; within the same shipping closeout, logs, run summary, and conditional run artifact must reuse the same `run-id`. Call first:
 
    ```bash
    spec-first internal verification-profile load \
@@ -51,9 +51,9 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   `verification-profile` 只准备候选 checks 与工具事实，不执行命令，也不判断哪些 checks 在语义上充分。LLM 根据 active instructions、plan requirements、changed surface 与项目脚本选择最终 checks；计划、profile 或文档里出现过的命令只是 candidate，未实际执行的 planned command 不是 run evidence，更不能标为 `passed`。check 选择至少覆盖两类来源：plan/task 声明的命令，以及按 touched paths 在测试目录反查命中的管辖合同套件（governance、byte-budget、ordering、projection 类，见 `feedback-and-tests.md` Test Discovery 第 3 步）。CHANGELOG、版本文件或发布检查相关文件被触碰时，release 治理套件（如本仓 `npm run test:release:governance`）同样必须进入候选——CI 通常会在 PR 上强制执行它们，本地缺跑会把发现推迟成一次返工往返。
+   The `verification-profile` only prepares candidate checks and tool facts without executing commands or determining whether the checks are semantically sufficient. The LLM selects the final checks based on active instructions, plan requirements, changed surfaces, and project scripts; commands mentioned in plans, profiles, or documents are only candidates and have not been executed. Planned commands that were not actually run do not constitute run evidence and must not be marked as `passed`. Select at least two types of sources: commands declared in plan/task, and governance suites (governance, byte-budget, ordering, projection types) discovered by reverse-tracing touched paths in the test directory (as described in Step 3 of Test Discovery in `feedback-and-tests.md`). When CHANGELOG, version files, or release-related files are modified, the release governance suite (such as the one in this repository `npm run test:release:governance`) must also be included in the candidate pipeline—CI typically enforces this on PRs, while local execution without running it will defer issues to a round trip for rework.
 
-   预留 repo-local run root：`.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/`。此时不要提前调用 `verification-run-summary record`：后续 simplify/review fix 可能改变代码，最终 summary 只能转录所有 mutation 结束后的真实结果。
+   Reserved repo-local run root: `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/`Do not call `verification-run-summary record` prematurely: subsequent simplify/review fixes might alter the code, and the final summary can only reflect the true results after all mutations have completed.
 
    Preserve `run.json` as immutable generation-0 identity; in a fresh run it is first written by the Step D producer at closeout. The append-only state contract from `execution-strategy.md` therefore applies from the moment a durable `run.json` exists — resumed runs, and any later transaction of a run whose Step D artifact has landed: record `started` before execution and append the confirmed terminal fact afterward. A resumed `started` transaction is unknown, never passed. CAS conflict or source drift blocks completion until the orchestrator re-reads and reconciles the current tree. A fresh run interrupted before its durable artifact exists has no state generations to resume from: recover via workspace fingerprint, task-pack pins, and git state, and do not call `state-write` before `run.json` exists (it rejects with `artifact-unreadable`).
 
@@ -63,21 +63,21 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
    This step refines reuse, quality, and efficiency on the **current diff** so any later review sees cleaner code. It is not a substitute for code review.
 
-   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — 第3步仍按风险规则完成相应审查。
+   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or perform a brief manual review for obvious duplicate/dead code — proceed with the corresponding review according to risk rules in Step 3.
 
    At this handoff, apply `references/feedback-and-tests.md` § Preserve proof through cleanup. Pass every evidence-bound test as `proof-test:<path>` with its unit/task, test-only seams, command/log refs and current byte identity. These are protection context, not wider scope. Consume the returned preservation comparison and missing/stale limitations; rerun the original symptom and proof tests after edits before final-tree closeout.
 
 3. **Code Review**
 
-   先根据实际影响面选择审查强度，不仅按行数判断。以下条件全部成立时可由 owner 做显式定向 diff 审查：单一明确边界、可逆局部行为、已有足够的针对性验证；无权限、安全、支付、持久化/迁移、并发、外部副作用、公共/跨模块合同或source/runtime治理变化；用户、计划和task均未要求独立/完整审查。记录检查的路径、发现及本地验证，标注 `Code review: targeted manual (bounded low-risk change)`，不能称独立审查。影响面不确定时回到专项审查。
+   First, select the review intensity based on the actual impact scope, not just the number of lines. A explicit directed diff review can be performed by the owner if all of the following conditions are met: a clear and well-defined boundary, reversible local behavior, and sufficient targeted validation already exists; no changes to permissions, security, payment, persistence/migration, concurrency, external side effects, public/cross-module contracts, or source/runtime governance; and no independent or complete review is required for users, plans, or tasks. Record the path, findings, and local verification of the code review, annotate as `Code review: targeted manual (bounded low-risk change)`, and do not refer to it as an independent review. When impact is uncertain, return to specialized review.
 
-   其余非机械变更使用 **`spec-code-review`** 的 portable 路径，由它选择 lite/full roster；不按宿主重建另一套审查流程。明确完整审查、必需 task review 和上述风险条件始终保留。纯机械变更可记录 `Code review: skipped (mechanical diff)`；依赖升级或生成文件若改变运行行为不能仅凭文件类型豁免。任何 manual review 发现仍进入第4步，后续验证与证据出口不跳过。
+   The remaining non-mechanical changes use the portable **`spec-code-review`** path, which selects between lite and full roster; no separate review process is established based on host reconstruction. Clearly and comprehensively review, essential task review, and the aforementioned risk conditions are always retained. Pure mechanical changes can be recorded as `Code review: skipped (mechanical diff)`; changes to dependencies or generated files that alter runtime behavior cannot be exempted solely based on file type. Any manual review finding that proceeds to Step 4, subsequent verification and evidence release will not be skipped.
 
    Task-pack `review_gate: required` reviews are early, bounded feedback only. They never replace this full work-run/branch review, even when every Task Card closed cleanly.
 
    **Review is not fix — two steps:**
 
-   **3a. Review (read-only；适用于上面选择专项审查的变更).** Invoke `spec-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved). Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `spec-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON and retain its concrete `artifact_path`; never derive an artifact directory from `run_id`.
+   **3a. Review (read-only; applies to changes selected for specialized review above).** Invoke `spec-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved).** Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `spec-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON and retain its concrete `artifact_path`; never derive an artifact directory from `run_id`.
 
    **3b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, and use only explicitly authorized worker dispatch. The orchestrator integrates and tests. Commit only when `commit_authorization: authorized`; otherwise keep the verified review fixes uncommitted. Then proceed to the Residual Work Gate.
 
@@ -107,15 +107,15 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
 
 4.5 **Source Plan Semantic Review (before Final Validation)**
 
-   当本次执行有一个可读的 Markdown source plan 时，shipping caller 在进入 Final Validation 前运行一次只读语义复核。Task-pack input 使用其唯一 `source_plan`；HTML/legacy-unmanaged 或无 plan 输入记录 not-applicable reason，不发明替代 artifact。
+   When a readable Markdown source plan is being executed, the shipping caller performs a read-only semantic validation before entering Final Validation. Task-pack input uses its unique `source_plan`; HTML/legacy-unmanaged or no plan input records with not-applicable reason, no invented alternative artifact.
 
-   1. 从当前已加载的 `spec-work/SKILL.md` 所在目录解析 `SKILL_DIR`，以 artifact root 为 cwd 调用 `node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"`，要求 stdout 恰好为 `sha256:<64-hex>`，保存 before hash。不得从 project cwd 的 `skills/spec-work/` source checkout 路径定位 bundled helper；五宿主 runtime projection 使用各自已加载的 Skill root。该 helper 读取包含 frontmatter 的完整文件原始字节；`tasks hash` 的去 frontmatter body hash 只用于 task-pack identity，不用于本 freshness gate。
-   2. 调用 `spec-doc-review mode:headless mutation:report-only output:json <source-plan>`。Reviewer 保持 zero-write；shipping caller 只解析 JSON，不把自然语言近似对象当 envelope。
-   3. 校验 envelope 至少满足：`output_mode: json`、`mutation_policy: report-only`、Markdown source plan 的 `mutation_reason: caller-requested-report-only`、`review_status: complete`、`fixes_applied: 0`，并且 counts、finding arrays、coverage、limitations、`terminal_signal: Review complete` 均存在且类型正确。无效时记录 `doc-review-json-invalid`，不得进入 Final Validation。
-   4. 立即用同一个 `SKILL_DIR` helper 重新计算 after hash。hash 与 before 不一致时，丢弃本次 review 结果并从新的 before hash 重跑一次；第二次仍漂移则记录 `plan-changed-during-review` blocker。不得 patch hash、比较 session 声明或引入签名/DACL/sealed pipeline。
-   5. Hash 一致后处置 P0/P1：caller 可以把唯一且明确的 `producer_fix_candidates` 交回 plan owner 做完整 artifact recompose。任何 recompose 都必须先回到 source-plan/task-pack intake，重新生成或验证 task pack、重跑 semantic-fit，并重跑受影响的实现验证与 code review；这些证据刷新后才可再次执行 before/review/after。其他 P0/P1 必须由当前 maintainer 明确解决、接受为 residual 或停止。任何未处置 P0/P1、`review_status: incomplete`、invalid envelope 或 hash mismatch 都阻断 Final Validation。
+   1. Resolve `SKILL_DIR` from the directory containing the loaded `spec-work/SKILL.md`, and invoke `node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"` with the artifact root as the current working directory, requiring the stdout to exactly match `sha256:<64-hex>`, and save the before hash. Bundled helpers must not be located from the `skills/spec-work/` source checkout path under the project's current working directory; the five-host runtime projection uses its own loaded Skill root. The helper reads the raw bytes of the complete file including frontmatter; the frontmatter body hash of `tasks hash` is used only for task-pack identity and not for this freshness gate.
+   2. Call `spec-doc-review mode:headless mutation:report-only output:json <source-plan>`. Reviewer maintains zero-write; the shipping caller parses only JSON and does not treat natural language approximations as envelopes.
+   3. Validate envelope to ensure it satisfies: `output_mode: json`, `mutation_policy: report-only`, Markdown source plan has `mutation_reason: caller-requested-report-only`, `review_status: complete`, `fixes_applied: 0`, and all fields including counts, finding arrays, coverage, limitations, and `terminal_signal: Review complete` are present and of correct type. Record `doc-review-json-invalid` when invalid; do not proceed to Final Validation.
+   4. Immediately recalculate the after hash using the same `SKILL_DIR` helper. When the hash differs from before, discard the current review result and rerun the process using the new before hash; if a drift is still detected on the second attempt, record a blocker `plan-changed-during-review`. Do not patch hashes, compare session claims, or introduce signatures, DACLs, or a sealed pipeline.
+   5. After hash consistency, P0/P1 handling: the caller can return to the plan owner a unique and explicit `producer_fix_candidates` for complete artifact recomposition. Any recompose must first return to the source-plan/task-pack intake, regenerate or validate the task pack, rerun semantic-fit, and rerun the implementation verification and code review for affected components; only after the evidence is refreshed can the before/review/after steps be reexecuted. Other P0/P1 issues must be explicitly resolved, accepted as residual, or discontinued by the current maintainer. Any undischarged P0/P1, `review_status: incomplete`, invalid envelope, or hash mismatch will block Final Validation.
 
-   该 review 证明的是当前 hash 对应 plan 的 review envelope，不证明 finding 正确、实现完成或 field outcome。`spec-doc-review` 不直接修改 plan；before/after freshness 与 P0/P1 disposition 始终由 shipping caller 持有。
+   This review verifies the review envelope for the current hash corresponding to the plan; it does not verify the correctness of findings, completion of implementation, or field outcomes. `spec-doc-review` does not directly modify plan; before/after freshness and P0/P1 disposition are always maintained by the shipping caller.
 
 5. **Final Validation**
    - All tasks marked completed
@@ -127,24 +127,24 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
    - If the plan has a `Requirements` section (or legacy `Requirements Trace`), verify each requirement is satisfied by the completed work
    - If any `Deferred to Implementation` questions were noted, confirm they were resolved during execution
 
-   现在才实际执行（actually run）Step 1 选择的最终 checks。每个 check 都记录真实 `command`、`ran`、`exit_code`、`status`、`required_tools`、`missing_tools` 和 `reason_code`，并把 bounded、secret-stripped 输出写为当前 run root 下的 repo-relative redacted log，例如 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/logs/<check-id>.log`。不要把 terminal transcript、session temp path 或未脱敏原始输出直接作为 durable log。
+   Now it is actually executed (actually run) Step 1: the final selected checks. Each check records the actual `command`, `ran`, `exit_code`, `status`, `required_tools`, `missing_tools`, and `reason_code`, and writes the bounded, secret-stripped output as a redacted log relative to the current run root, for example `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/logs/<check-id>.log`. Do not use terminal transcript, session temporary path, or non-de-identified raw output directly as durable log.
 
-   - 声明当前工作树通过时，在最终这组检查开始前和结束后，从目标仓库执行本 Skill 的 `scripts/working-tree-fingerprint.cjs`。仅当两次 `fingerprint` 一致，才将开始时的值写入摘要顶层 `checked_worktree_fingerprint`。中途有行为改动，丢弃本组作为最终证据的资格，改后重新验证；无法取得稳定指纹就保留历史结果和限制，不在收尾时倒填。
-   - `passed` 只允许 `ran=true`、`exit_code=0` 且存在 repo-relative redacted log。
-   - `failed` 必须保留真实非零 `exit_code` 与日志，不得因为后续解释而改写为 passed。
-   - dry-run 或仅可调度但未执行的 check 必须是 `not-run` + `reason_code: schedulable`；不得升级为 passed。
-   - 缺工具必须是 `not-run` + `reason_code: missing_dependency`，并列出 `missing_tools`。
-   - simplify、review followup 或 residual fix 触及某个 check 的覆盖面时，最终 closeout 使用修复后复跑结果；修复前的绿灯不能支撑最终完成声明。
+   - Declare that the working tree is being checked, and execute the `scripts/working-tree-fingerprint.cjs` script from the target repository both before and after the final check group begins and ends. The initial value will be written to the top-level `checked_worktree_fingerprint` in the summary only when the two `fingerprint` values are consistent. If behavior changes occur, discard the current group's status as final evidence and re-verify; if stable fingerprints cannot be obtained, retain the historical results and constraints, and do not retroactively fill in at the end.
+   - `passed` allows only `ran=true`, `exit_code=0`, and the presence of a repo-relative redacted log.
+   - `failed` must retain the actual non-zero `exit_code` and logs; it must not be rewritten as `passed` due to subsequent interpretation.
+   - A dry-run or a check that is schedulable but not executed must be `not-run` + `reason_code: schedulable`; it must not be upgraded to `passed`.
+   - Missing tools must be `not-run` + `reason_code: missing_dependency`, and shall list `missing_tools`.
+   - When simplifying, reviewing follow-up, or addressing residual fixes affect the coverage of a check, the final closeout must be based on post-fix rerun results; pre-fix green light results cannot support the final completion claim.
 
 5.1 **Structured Verification And Evidence Closeout**
 
-   依次完成以下步骤。Scripts 只校验/转录确定性事实；LLM 仍负责选择 checks、判断 claims、选择 durable trigger 和解释 limitation。
+   Complete the following steps in sequence. Scripts verify and transcribe only deterministic facts; LLMs remain responsible for selecting checks, evaluating claims, choosing durable triggers, and interpreting limitations.
 
-   **A. 先物化需要跨会话保留的 review evidence。** 如果 task/final `spec-code-review` 返回的是 OS session-temp `artifact_path`，只筛选本次 spec-work caller actually consumed 的 `review.json` 与结构化 finding summary；做 sanitize/redact 后复制到当前 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/review/`。验证复制目标是 target repo 内的普通文件，不接受 symlink、path escape 或机器特定绝对路径。
+   **A. Pre-existing object requires review evidence to be retained across sessions.**If the task/final `spec-code-review` returns an OS session-temp `artifact_path`, only filter and select the `review.json` and structured finding summary that were actually consumed by the current `spec-work` caller; sanitize and redact the content, then copy it to the current `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/review/`. The replication target is a regular file within the target repo; symlinks, path escapes, or machine-specific absolute paths are not accepted.
 
-   复制失败时保留 in-band structured finding summary，并增加 `review-evidence-copy-failed` limitation。不得把绝对 temp path 写入 `artifact_refs`、`read_artifacts`、run artifact、resume、tracker、compound、release 或最终跨会话 handoff；copy fail 必须显式留下 limitation，不能用“review 已完成”掩盖证据不可携带。
+   Fails to copy while retaining the in-band structured finding summary and adds the `review-evidence-copy-failed` limitation. Must not store absolute temp paths in `artifact_refs`, `read_artifacts`, run artifacts, resume, tracker, compound, release, or final cross-session handoff; copy failures must explicitly retain limitations and cannot be masked by "review completed" as evidence is not transferable.
 
-   **B. 记录 immutable verification summary。** 根据 Final Validation 的真实结果组装 `verification-run-summary` input，然后调用：
+   **B. Record immutable verification summary.** Assemble the `verification-run-summary` input based on the actual results from Final Validation, then call:
 
    ```bash
    spec-first internal verification-run-summary record \
@@ -155,11 +155,11 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   保存返回的 `run_summary_ref`。Helper 不执行或重跑命令、不推断 exit code、不深度清洗日志；它只验证 payload、路径、日志前缀和 schema。`checks[].command` 必须逐字等于本次运行实际执行的命令串（含管道、重定向与前缀变量展开后的最终形态）；把实际执行过的 pipeline 改写成理想化的单命令字符串（如把 `grep -n … | tee log` 记成 `grep -c …`）属于伪造验证证据，即使结果数值一致。schema 将 `command` 上限设为 500 字符（`verification-run-summary.schema.json`）：真实验证需要更长命令时，先把验证逻辑物化为 run 目录下的脚本文件并执行该脚本，`command` 记录这条短调用的真实形态——为通过 schema 而截断或改写已执行的长命令同样属于伪造。`run-summary-schema-invalid` 拒绝后，按具体校验错误修正 payload（实际命令超长时改用可记录的真实短调用重新验证并记录其真实结果）；重试仍被拒、恢复需要新授权或工具不可用时，按本文件 Fallback 与 E 步合同以 `null` ref + `claim_limitations` 显式记录拒绝原因与已尝试的恢复收尾——record 失败不代表验证失败或验证通过，不得改写为成功。相同 workspace/run-id 的 summary 是 immutable；`run-summary-already-exists` 不能通过覆盖旧文件修复，必须保留 reason 并停止 verified closeout claim。
+   Save the returned `run_summary_ref`. Helper does not execute or retry commands, does not infer exit code, and does not perform deep log cleaning; it only validates payload, path, log prefix, and schema. `checks[].command` must exactly match the actual executed command string (including pipelines, redirections, and the final form after expansion of prefix variables); rewriting an actual pipeline into an idealized single-command string (e.g., converting `grep -n … | tee log` into `grep -c …`) constitutes forged evidence of validation, even if the resulting numerical values are identical. schema sets the `command` length limit to 500 characters (`verification-run-summary.schema.json`): when actual verification requires a longer command, the verification logic is materialized into a script file under the `run` directory and executed; the `command` field records the shortened form of this actual invocation—truncating or altering a long command that has already been executed is considered forgery. After rejection due to `run-summary-schema-invalid`, correct the payload based on specific validation errors (for excessively long actual commands, use a shortened, recordable invocation for revalidation and record its actual outcome); if retries are still rejected, and recovery requires new authorization or the tool is unavailable, follow the Fallback and E-step contract in this document by recording `null` ref plus explicit `claim_limitations` to document the rejection reason and attempted recovery actions—failure to record does not imply validation failure or success; do not treat it as a successful outcome. Summary for the same workspace/run-id is immutable; `run-summary-already-exists` cannot be fixed by overriding the existing file; the reason must be preserved and the verified closeout claim must be terminated.
 
-   **C. 校验 structured claims。** 使用实际 run summary 组装 validation claims；review/impact claims 只能引用 target repo 内真实存在的普通文件，例如上一步物化的 review summary、source/plan 或 changed-surface evidence。运行：
+   **C. Validate structured claims.** Use actual run summary to assemble validation claims; review/impact claims can only reference ordinary files that exist in the target repository, such as the review summary, source/plan, or changed-surface evidence from the previous step.**Run:
 
-   对当前代码的通过声明，输入必须带 `validation_scope: current-worktree`。若摘要未绑定、工作树已变或指纹不可得，原样返回限制或在当前版本复跑；不能改用 `recorded-run` 来解除阻塞。面向读者写清检查的版本、通过了哪些行为，以及哪些仍待复验。
+   For the current code's declaration, the input must include `validation_scope: current-worktree`. If the summary is not bound, the working tree has changed, or the fingerprint is unavailable, return the restriction as-is or rerun with the current version; do not use `recorded-run` to resolve the blockage. Clear the version targeted to readers, specify the actions that have been verified, and indicate which remain under review.
 
    ```bash
    spec-first internal honest-closeout validate \
@@ -168,16 +168,16 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --json
    ```
 
-   validation claim 使用 `verification-run-summary:<check-id>`；不得 cherry-pick 通过项隐藏 `failed`、`not-run` 或 `degraded` check。保存 `overall`、`overall_reason_code` 与逐 claim verdict。`overall != verified` 时 Completion Response 必须保留 `degraded` / `unsupported` 及具体 reason/limitation，must not 声称 `all tests passed` 或“全部验证通过”。Required verification 未通过或未运行仍阻断 complete；optional evidence 的诚实降级只限制对应 claim，不自动伪造成全局失败或成功。
+   validation claim uses `verification-run-summary:<check-id>`; do not cherry-pick passed items to hide `failed`, `not-run`, or `degraded` checks. Save `overall`, `overall_reason_code`, and per-claim verdict. When `overall != verified`, the Completion Response must retain `degraded` / `unsupported` along with specific reason/limitation; it must not claim `all tests passed` or "all verification passed". Required verification fails or is not executed still blocks completion; optional evidence's honest downgrade only affects the corresponding claim and does not automatically cause global failure or success.
 
-   **D. 条件式写入 spec-work durable run artifact。** LLM 按顺序判断并在首个命中处停止：
+   **D. Conditional write spec-work durable run artifact.** LLM evaluates in sequence and stops at the first match:
 
-   - `trigger-task-pack`：输入是 validated task pack；
-   - `trigger-not-run-validation`：run summary 至少一个 check 为 `not-run`；
-   - `trigger-deferred-follow-up`：存在 durable deferred follow-up；
-   - `trigger-substantive-work`：跨切面、compaction/resume、limited optional evidence、review/compound/release handoff 等让 context loss 具有真实成本。
+   - `trigger-task-pack`: Input is a validated task pack;
+   - `trigger-not-run-validation`: the summary has at least one check marked as `not-run`;
+   - `trigger-deferred-follow-up`: durable deferred follow-up exists;
+   - `trigger-substantive-work`: Cross-cutting concerns, compaction/resume, limited optional evidence, review/compound/release handoff, etc., impose tangible costs on context loss.
 
-   没有 trigger 时不调用 producer，返回 `run_artifact_path: null` 与 `run_artifact_reason_code: no-trigger-matched`。命中时组装现有 `spec-work-run-artifact-payload/v2`，设置 `producer.workflow_integrated=true` 与匹配的 trigger reason，并调用：
+   No trigger is present, so the producer is not invoked, returning `run_artifact_path: null` and `run_artifact_reason_code: no-trigger-matched`. On hit, assemble the existing `spec-work-run-artifact-payload/v2`, set `producer.workflow_integrated=true` and match the corresponding trigger reason, and invoke:
 
    ```bash
    spec-first internal spec-work-run-artifact write \
@@ -186,9 +186,9 @@ Final verification 不只检查已经写入 run summary 的 check 是否绿色�
      --target-repo <repo-root>
    ```
 
-   `script_confirmed.validation.run_summary_ref` 必须指向 same workflow、same workspace、same run-id 的 `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/verification-run-summary.json`。`script_confirmed.artifact_refs` 与 `llm_asserted.read_artifacts` 只能引用 repo-relative materialized evidence；不得引用 session-temp absolute path。相同 run-id 不可覆盖；`artifact-already-exists`、`producer-error` 或其他 `not-written` reason 原样进入 handoff。
+   `script_confirmed.validation.run_summary_ref` must point to the `.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/verification-run-summary.json` file from the same workflow, same workspace, and same run-id. `script_confirmed.artifact_refs` and `llm_asserted.read_artifacts` may only reference repo-relative materialized evidence; absolute paths from session-temp are not permitted. Same run-id cannot be overwritten; `artifact-already-exists`, `producer-error`, or other `not-written` reasons are passed through unchanged to handoff.
 
-   **E. 形成 closeout envelope。** Standalone 与 Return-to-Caller 均返回 `verification_run_summary_ref`、`honest_closeout_verdict`、`run_artifact_path`、`run_artifact_reason_code`、`claim_limitations`。字段形态：`honest_closeout_verdict` 是 validate 输出中的 token 值——字符串 `verified`、`degraded` 或 `unsupported`（连同 validate 的机器字段 `overall_reason_code` 原值另列），不是 validator 的原始输出对象；validate 未产生有效结果时该字段为 `null` 并在 `claim_limitations` 记录原因，不得为凑齐 envelope 猜 token；`verification_run_summary_ref` 是 record 成功写出的 repo-relative ref，record 未完成时为 `null` 且必须在 `claim_limitations` 显式记录该失败与原因。Return-to-Caller 额外在 A-D 全部完成之后、返回 envelope 之前，从当前已加载 Skill 的 `SKILL_DIR` 运行 `scripts/working-tree-fingerprint.cjs` 捕获 `verified_worktree_fingerprint`——run summary 与 run artifact 都写在被 ignore 的 `.spec-first/workflows/` 下，因此这些写入不改变指纹；该不变性依赖该目录在目标 repo 确实被 gitignore 覆盖（可用 `git check-ignore -v .spec-first/workflows/` 预验），未覆盖的 repo 中 before/after 指纹差异不构成 drift 证据，应在 `claim_limitations` 记 `fingerprint-stability-unverified`；helper 无法运行时按 SKILL.md 记录 `fingerprint-helper-unavailable` blocker。Return-to-Caller 仍跳过 standalone simplify/review/PR/lifecycle tail，但不能跳过自己已执行 local verification 的 structured evidence closeout；caller 继续拥有最终 review、plan lifecycle 与 landing。
+   **E. Create a closeout envelope.** Standalone and Return-to-Caller both return `verification_run_summary_ref`, `honest_closeout_verdict`, `run_artifact_path`, `run_artifact_reason_code`, and `claim_limitations`. Field shape: `honest_closeout_verdict` is the token value from the validate output — a string value of `verified`, `degraded`, or `unsupported` (along with the original value of the validate machine field `overall_reason_code` listed separately); it is not the raw output object of the validator. When validate does not produce a valid result, this field is `null` and the reason is explicitly recorded in `claim_limitations`; it must not be guessed or inferred to complete the envelope. `verification_run_summary_ref` is the repo-relative reference of the successfully written record; when the record is not completed, it is `null` and the failure along with the reason must be explicitly documented in `claim_limitations`. Return-to-Caller: Additionally, after completing A-D entirely and before returning envelope, run `scripts/working-tree-fingerprint.cjs` from the current loaded skill's `SKILL_DIR` to capture `verified_worktree_fingerprint`—both run summary and run artifact are written under the ignored `.spec-first/workflows/` directory, thus these writes do not affect the fingerprint; this immutability relies on the directory being properly gitignored in the target repo (pre-check available via `git check-ignore -v .spec-first/workflows/`); in repos where the directory is not ignored, differences between before/after fingerprints do not constitute drift evidence, and should be noted in `claim_limitations` as `fingerprint-stability-unverified`; if the helper fails, record a `fingerprint-helper-unavailable` blocker as per SKILL.md. Return-to-Caller still bypasses the standalone simplify/review/PR/lifecycle tail, but cannot bypass the structured evidence closeout if local verification has already been performed; the caller retains final review, plan lifecycle, and landing authority.
 
 5.2 **Plan Status Closeout**
 
@@ -264,11 +264,11 @@ Before creating PR, verify:
 - [ ] Commit messages follow conventional format when commits were authorized
 - [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale) when a PR was authorized
 - [ ] Simplify: `spec-simplify-code` when diff >=30 lines (or skipped with reason)
-- [ ] Code review: 按第3步记录专项审查、低风险定向审查或机械/不可用原因；Residual Work Gate 已处理全部实际发现。
+- [ ] Code review: Record specialized review, low-risk targeted review, or mechanical/unavailable reason as per Step 3; Residual Work Gate has resolved all actual findings.
 - [ ] Authorized PR description includes summary, testing notes, evidence when captured, and accurate attribution
 
 ## Code Review
 
-审查选择、适用例外、必需覆盖和不可用降级均以本文件 Phase 3 第3步为唯一 owner；不在这里重复另一套规则。所有审查发现交回 caller 按已有授权修复并处理 residual，证据与完成出口保持不变。
+Review of selection, application of exceptions, necessary coverage, and degradation upon unavailability are all owned exclusively by this document's Phase 3 Step 3; no duplicate rules are repeated here. All review findings are returned to the caller for remediation and handling of residual issues based on existing authorizations, with evidence and completion export remaining unchanged.
 
-涉及 mutation 安全保证的 closeout，按 `docs/contracts/workflows/mutation-enforcement.md` 记录实际宿主强制范围、旁路与未验证项。
+Closeout for mutation safety guarantees, record actual host enforcement scope, bypasses, and unverified items as per `docs/contracts/workflows/mutation-enforcement.md`.

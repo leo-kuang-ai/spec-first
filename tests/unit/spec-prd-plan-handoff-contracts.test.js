@@ -43,10 +43,10 @@ describe('spec-prd to spec-plan handoff contracts', () => {
 
     expect(template).toContain('- top requirement / acceptance refs:');
     expect(template).toContain('- must-preserve behaviors:');
-    expect(template).toContain('最多三个 load-bearing Requirement / Acceptance Example 引用');
+    expect(template).toContain('up to three load-bearing Requirement / Acceptance Example references');
     expect(template).toContain('Do not put implementation steps, file lists, or task sequencing');
-    expect(PRD_SKILL).toContain('按 `prd-output-template.md` 的 canonical Handoff Context Slice');
-    expect(readiness).toContain('按 `prd-output-template.md` 的 canonical Handoff Context Slice');
+    expect(PRD_SKILL).toContain('canonical Handoff Context Slice');
+    expect(readiness).toContain('canonical Handoff Context Slice');
 
     expect(target).toBeDefined();
     expect(target.input_shape).toContain('top requirement / acceptance refs');

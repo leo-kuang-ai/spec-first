@@ -1,10 +1,6 @@
 id: interrupted-claim-no-state-fabrication
-title: 上游声称有中断会话时,先核实工作区事实,不得在无 durable run artifact 时伪造 run-state
-description: |
-  验证 fresh-run 恢复纪律（shipping-workflow.md :58）：上游口头声称上一会话已开始
-  同一修改但无 durable run artifact 时,应以工作区事实为准（workspace fingerprint /
-  git 状态）,不信任 claim;不得在任何 durable run.json 存在前调用 state-write,
-  也不得手写 run-state;return-to-caller 路径不产生 producer closeout 产物。
+title: "When an upstream claims a session termination, first verify the facts in the workspace; do not fabricate a run state in the absence of a durable run artifact."
+description: "Verify fresh-run recovery discipline (shipping-workflow.md :58): if an upstream verbally claims that the previous session has begun, with the same modification but no durable run artifact, the workspace facts (workspace fingerprint / git state) must take precedence; do not trust the claim. Do not invoke state-write before a durable run.json exists, nor manually write run-state. The return-to-caller path does not produce a producer closeout artifact."
 input:
   prompt: |
     First run `node prepare-eval.cjs` once to prepare this isolated fixture.

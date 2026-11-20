@@ -1,6 +1,6 @@
 'use strict';
 
-// 仅用于固定合成fixture的确定性判据；不判定任意自然语言知识是否充分。
+// Used solely for deterministic criteria in determining fixed synthetic fixture; does not evaluate whether general natural language knowledge is sufficient.
 function checkKnowledgePublication(expected, mode) {
   assert.equal(process.env.EVAL_EXIT_CODE, '0', '缺少engine成功证据');
   const receipt = JSON.parse(regular(baselinePath()));
@@ -39,7 +39,7 @@ function checkKnowledgePublication(expected, mode) {
     assert.equal(report.status, 'applied');
     assert.ok(!fs.existsSync(old), '旧文件尚未按请求移除');
     const current = regular(successor).toString();
-    // 固定任务只允许文末追加该块；不能靠保留几个词掩盖其他内容丢失。
+    // Fixed tasks allow only appending of the block at the end; it is not permissible to conceal content loss by retaining a few words.
     const originalSuccessor = execFileSync('git', ['show', `HEAD:${successor}`], { env: cleanEnv, encoding: 'utf8' });
     assert.equal(current, originalSuccessor + '\n## 离线恢复\n\n离线时保留最后可用凭据，不删除备份。\n', 'successor出现额外修改或知识丢失');
     const originalCatalog = execFileSync('git', ['show', `HEAD:${catalog}`], { env: cleanEnv, encoding: 'utf8' });
@@ -47,13 +47,13 @@ function checkKnowledgePublication(expected, mode) {
     equalPaths(report.changed, [successor, catalog]);
     equalPaths(report.deleted, [old]);
     equalPaths(report.pending, []);
-    // 必须能从固定Git基线恢复原件，不把存在successor当恢复能力。
+    // Must be able to restore the original from a fixed Git baseline, without considering successor as a restoration capability.
     assert.equal(hash(execFileSync('git', ['show', `HEAD:${old}`], { env: cleanEnv })), expected[old]);
   }
   const visit = (directory) => {
     for (const name of fs.readdirSync(directory)) {
-      // Git元数据归评测基线设施；.claude 是评测引擎挂载被测 skill 的安装面，
-      // 不是被测行为输出。两者之外不允许其他项目文件或目录静默越界。
+      // Git metadata belongs to the evaluation baseline facility; .claude is the mounting interface of the evaluation engine for attaching the tested skill.
+      // Not the output of the measured behavior. No other project files or directories are allowed beyond these two.
       if (directory === '.' && (name === '.git' || name === '.claude')) continue;
       const file = directory === '.' ? name : `${directory}/${name}`;
       const stat = fs.lstatSync(file);

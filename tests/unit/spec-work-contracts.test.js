@@ -31,15 +31,15 @@ describe('spec-work current contracts', () => {
     expect(skill).toContain('repeat full intake');
     expect(skill).toContain('Preserve the old plan and old task-pack pins');
     const intake = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-work/references/work-intake-and-task-pack.md'), 'utf8');
-    expect(intake).toContain('旧 pins 不得重绑');
-    expect(intake).toContain('再从 intake 接续');
+    expect(intake).toContain('old pins must not be rebound');
+    expect(intake).toContain('resume from intake');
     const validation = intake.slice(intake.indexOf('## Fallback'), intake.indexOf('## 2. Replay'));
-    expect(validation).toContain('执行第 1 节的 plan owner 接续分支');
+    expect(validation).toContain('execute the handover branch in Section 1 of the plan owner');
     expect(validation).toContain('task-pack-source-plan-non-active');
-    expect(validation).toContain('该交接不视为 validation 成功');
-    expect(validation).toContain('不从非法任务包猜测 source path');
+    expect(validation).toContain('does not constitute a validation success');
+    expect(validation).toContain('not infer a source path from an invalid task package');
     const producer = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-write-tasks/SKILL.md'), 'utf8');
-    expect(producer).toContain('owner 返回有效后继后才');
+    expect(producer).toContain('only after the owner returns a valid successor');
   });
 
   test('clarification answers resolve the question without another approval loop', () => {
@@ -127,17 +127,17 @@ describe('spec-work current contracts', () => {
   test('shipping performs report-only plan review with before/after hash and P0/P1 disposition', () => {
     expect(shipping).toContain('Source Plan Semantic Review (before Final Validation)');
     expect(shipping).toContain('node "$SKILL_DIR/scripts/source-plan-file-hash.cjs" "<source-plan>"');
-    expect(shipping).toMatch(/当前已加载的 `spec-work\/SKILL\.md` 所在目录解析 `SKILL_DIR`/);
-    expect(shipping).toMatch(/不得从 project cwd.*source checkout 路径定位 bundled helper/is);
+    expect(shipping).toMatch(/`SKILL_DIR` from the directory containing the loaded `spec-work\/SKILL\.md`/);
+    expect(shipping).toMatch(/Bundled helpers must not be located from the `skills\/spec-work\/` source checkout path under the project.s current working directory/is);
     expect(shipping).not.toContain('spec-first tasks hash <source-plan> --repo <artifact-root> --json');
     expect(shipping).toContain('spec-doc-review mode:headless mutation:report-only output:json <source-plan>');
     expect(shipping).toContain('doc-review-json-invalid');
     expect(shipping).toContain('plan-changed-during-review');
-    expect(shipping).toMatch(/P0\/P1.*阻断 Final Validation/is);
+    expect(shipping).toMatch(/undischarged P0\/P1.*block Final Validation/is);
     expect(shipping).toContain('fixes_applied: 0');
     expect(shipping).toMatch(/recompose.*source-plan\/task-pack intake/is);
-    expect(shipping).toMatch(/重新生成或验证 task pack.*semantic-fit/is);
-    expect(shipping).toMatch(/重跑受影响的实现验证与 code review/is);
-    expect(shipping).toMatch(/不得 patch hash.*签名\/DACL\/sealed pipeline/is);
+    expect(shipping).toMatch(/regenerate or validate the task pack, rerun semantic-fit/is);
+    expect(shipping).toMatch(/rerun the implementation verification and code review for affected components/is);
+    expect(shipping).toMatch(/Do not patch hashes.*signatures, DACLs, or a sealed pipeline/is);
   });
 });

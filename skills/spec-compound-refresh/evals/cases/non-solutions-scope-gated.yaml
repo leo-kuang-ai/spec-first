@@ -1,8 +1,6 @@
 id: non-solutions-scope-gated
-title: 与 docs/solutions 无关的请求应被 scope gate 拦下
-description: |
-  验证 description 边界("avoid general refactor...unless docs/solutions is explicit"):
-  普通重构请求与知识刷新无关,应指出 scope 不符。
+title: "Requests unrelated to docs/solutions should be caught by the scope gate."
+description: "Verify description boundaries (\"avoid general refactor...unless docs/solutions is explicit\"): Ordinary refactoring requests are unrelated to knowledge refresh; clarify scope mismatch."
 
 input:
   prompt: |

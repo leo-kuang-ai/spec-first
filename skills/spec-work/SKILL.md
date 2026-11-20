@@ -29,7 +29,7 @@ This command takes a work document (plan or specification) or a bare prompt desc
 
 ## Phase Reads
 
-在执行所属阶段前完整读取其必需 owner；同一连续上下文中已完整读取且已确认内容未变化时可以复用，不因阶段编号重复读取。上下文恢复、源码变更、引用不可用或新分支触发时重新读取相关 owner。终止出口明确要求的即时重读仍须执行。 Resolve references from this skill's root. If a required owner is unreadable, preserve artifacts and changed state, return blocked with the missing owner and recovery path, and do not infer completion from existing files.
+Read the required owner completely before executing the phase; reuse the read result if the content has been fully read and verified as unchanged within the same continuous context, without re-reading upon phase number repetition. Context recovery, source code changes, unavailable references, or new branch triggers cause re-reading of the relevant owner. Immediate re-read required by explicit export termination must still be carried out. Resolve references from this skill's root. If a required owner is unreadable, preserve artifacts and changed state, return blocked with the missing owner and recovery path, and do not infer completion from existing files.
 
 ## Reference Trigger Map
 
@@ -100,9 +100,9 @@ One commit boundary remains unconditional: only the orchestrator may stage and c
 
 Standalone only; Return-to-Caller skips this phase. When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow. Do not skip this.
 
-**Code review: one portable path.** 专项审查使用 `spec-code-review`，具体适用范围由 `shipping-workflow.md` 的风险判断持有。单边界、低风险且验证充分的局部变更可做显式定向 diff 审查；机械修改可按该引用记录跳过。显式审查要求、必需 task review、高风险或影响面不明确时不得采用低风险例外。所有代码变更仍保留验证证据和 residual 处置。
+**Code review: one portable path.** Special review uses `spec-code-review`; the specific scope of application is determined by the risk assessment in `shipping-workflow.md`. Single-bounded, low-risk, and thoroughly verified local changes may undergo explicit directional diff review; mechanical modifications may be exempted via the referenced record. Explicit review requirements, mandatory task reviews, high-risk scenarios, or unclear impact scope shall not permit low-risk exceptions. All code changes still retain verification evidence and residual disposal.
 
-**专项审查按以下两步执行；低风险定向审查仍按 shipping owner 进入 residual 和验证出口。** spec-work's `mode:agent` invocation is report-only: it returns JSON findings and does not edit the checkout, commit, or apply fixes. This statement is scoped to the orchestrated invocation below; other explicit `spec-code-review` entry modes retain their own contract.
+Special review is conducted in the following two steps; low-risk targeted review continues to be processed based on shipping owner entering residual and verifying export. ** spec-work's `mode:agent` invocation is report-only: it returns JSON findings and does not edit the checkout, commit, or apply fixes. This statement is scoped to the orchestrated invocation below; other explicit `spec-code-review` entry modes retain their own contract.
 
 1. **Review** — Invoke the `spec-code-review` skill (invocation command in `references/review-findings-followup.md` § Fallback). Use `mode:agent` in orchestrated workflows; pass `plan:<path>` when you have a plan, `base:<ref>` when the merge base is known, and `depth:full` when a deep/thorough review was explicitly requested.
 2. **Apply fixes** — Load `references/review-findings-followup.md`. Filter eligibility on JSON only and batch by file. Use authorized fix workers or inline fallback; the orchestrator integrates and tests. Commit only with `commit_authorization: authorized`.
@@ -120,7 +120,7 @@ If that read fails, preserve every changed file, commit, and workspace. Return o
 
 - Execute settled scope from current source; ask once only when repo/docs cannot resolve a material ambiguity.
 - Reuse the correct owner and keep slices observable. Do not trade evidence, safety, accessibility, observability, or required verification for speed or lower LOC.
-- Track actual task/unit evidence and blockers; commits and plan status are not progress proof. “收尾计划”不单独授权状态迁移。实施阶段不写状态；Return-to-Caller 只返回 `plan_status_completion_candidate`。独立运行中只有实际承担最终收尾的 owner，才按 `references/shipping-workflow.md` §5.2 核对前置条件并处理状态。
+- Track actual task/unit evidence and blockers; commits and plan status are not progress proof. The "closure plan" does not warrant independent status transition. No status is recorded during the implementation phase; Return-to-Caller returns only `plan_status_completion_candidate`. In standalone operation, only the owner actually responsible for final closure shall verify the preconditions as specified in §5.2 of `references/shipping-workflow.md` and manage the status.
 - Finish every in-scope unit and required review/verification before a completion claim. Keep failed/not-run/degraded limitations explicit.
 - Do not widen work into adjacent cleanup, imagined future abstractions, human-time “session phases,” or a new private decomposition. Return scope-changing discoveries to the plan/task owner.
-- 按 shipping owner 的风险条件审查每个非机械 diff，保留低风险定向审查或真实不可用降级的依据；commit 与 landing 始终分别授权。
+- Review each non-mechanical diff according to shipping owner's risk criteria, retaining justification for low-risk targeted reviews or actual downgrade when unavailable; commits and landings must always be separately authorized.

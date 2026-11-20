@@ -159,7 +159,7 @@ function resolveWindowsAgentBrowserExecutable(command, options = {}) {
     try {
       if (fs.statSync(candidate).isFile()) return fs.realpathSync.native(candidate);
     } catch (_error) {
-      // 继续检查下一个无 shell native binary 候选。
+      // Continue checking the next candidate without shell native binary.
     }
   }
   return null;
@@ -253,7 +253,7 @@ function resolveExecutablePath(command, env, platform) {
     try {
       if (fs.statSync(candidate).isFile()) return candidate;
     } catch (_error) {
-      // 继续检查下一个 PATH 候选。
+      // Continue checking the next PATH candidate.
     }
   }
   return null;
@@ -1092,7 +1092,7 @@ function readPreparedManifest(manifestPath, options = {}) {
   if (!runDir.ok || path.dirname(manifestFile.path) !== runDir.path) {
     return { ok: false, reason_code: 'private-run-directory-untrusted' };
   }
-  // SUP-09 fix: runDir 和 manifestFile containment 检查通过后才执行 hardening
+  // SUP-09 fix: Execute hardening only after verifying runDir and manifestFile containment checks pass
   if (runDir.needsHardening) {
     const hardened = hardenPath(manifest.run_dir, true, options);
     if (!hardened.ok) {
@@ -1110,7 +1110,7 @@ function readPreparedManifest(manifestPath, options = {}) {
     if (!inspected.ok || !isInside(runDir.path, inspected.path)) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
     }
-    // SUP-09 fix: containment 检查通过后才执行 hardening
+    // SUP-09 fix: Perform hardening only after containment check is passed
     if (inspected.needsHardening) {
       const hardened = hardenPath(filePath, false, options);
       if (!hardened.ok) {
@@ -1123,7 +1123,7 @@ function readPreparedManifest(manifestPath, options = {}) {
     if (!inspected.ok || !isInside(runDir.path, inspected.path)) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
     }
-    // SUP-09 fix: containment 检查通过后才执行 hardening
+    // SUP-09 fix: Perform hardening only after containment check is passed
     if (inspected.needsHardening) {
       const hardened = hardenPath(dirPath, true, options);
       if (!hardened.ok) {
@@ -1192,14 +1192,14 @@ function inspectPrivateDirectory(dirPath, options = {}) {
     if (entry.isSymbolicLink() || !entry.isDirectory()) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
     }
-    // SUP-09 fix: 与 inspectPrivateFile 保持一致，延迟 hardening
+    // SUP-09 fix: Align with inspectPrivateFile by delaying hardening
     let realPath;
     try {
       realPath = fs.realpathSync.native(dirPath);
     } catch (_error) {
       return { ok: false, reason_code: 'private-run-directory-untrusted' };
     }
-    // 检查所有权（Unix）
+    // Check ownership (Unix)
     if (typeof process.getuid === 'function') {
       const stat = fs.statSync(dirPath);
       if (stat.uid !== process.getuid()) {
@@ -1221,15 +1221,15 @@ function inspectPrivateFile(filePath, options = {}) {
     if (entry.isSymbolicLink() || !entry.isFile()) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
     }
-    // SUP-09 fix: 只解析路径和检查类型/所有权，不修改权限
-    // hardening 延迟到调用者确认 containment 之后
+    // SUP-09 fix: Parse only the path and verify type/ownership, without modifying permissions
+    // hardening delayed until the caller confirms containment afterwards
     let realPath;
     try {
       realPath = fs.realpathSync.native(filePath);
     } catch (_error) {
       return { ok: false, reason_code: 'private-run-file-untrusted' };
     }
-    // 检查所有权（Unix）
+    // Check ownership (Unix)
     if (typeof process.getuid === 'function') {
       const stat = fs.statSync(filePath);
       if (stat.uid !== process.getuid()) {
@@ -1292,7 +1292,7 @@ function reservePrivateJson(filePath, options = {}) {
     error.reason_code = 'private-run-file-collision';
     throw error;
   }
-  // SUP-09 fix: containment 检查通过后才执行 hardening
+  // SUP-09 fix: Perform hardening only after containment check is passed
   if (parent.needsHardening) {
     const hardened = hardenPath(path.dirname(filePath), true, options);
     if (!hardened.ok) {
@@ -1343,7 +1343,7 @@ function discardPrivateJson(reservation) {
   try {
     fs.closeSync(reservation.descriptor);
   } catch (_error) {
-    // 子进程或写入失败后的尽力清理。
+    // Best-effort cleanup after child process or write failure.
     ok = false;
   }
   try {

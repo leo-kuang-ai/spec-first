@@ -1,20 +1,20 @@
-# Mixed / 跨端 Surface 模板
+# Mixed / Cross-end Surface Template
 
-> 与 `00-generic.md` 组合使用。只有真实跨 surface、producer/consumer 或 source-of-truth 变化时加载；单端需求不应因为“可能有关联”而使用 Mixed。
+> Used in combination with `00-generic.md`. Load only when there are real cross-surface, producer/consumer, or source-of-truth changes; do not use Mixed due to a possible association.
 >
-> 所有人类问题只询问当前执行对话的用户。行业 overlay 按明确信号独立加载。
+> All human-related questions are only directed to the currently executing conversation user. Industry overlay loads independently based on explicit signals.
 
-## Mixed 属性确认
+## Mixed property confirmation
 
-| 维度 | 内容 |
+| Dimension | content |
 | --- | --- |
-| 涉及 surface | App / H5-PC / Admin / Backend / CLI / 第三方 |
-| 主业务结果 | |
-| 当前 source-of-truth | |
-| 目标 source-of-truth | |
+| involves surface | App / H5-PC / Admin / Backend / CLI / Third-party |
+| Main business outcomes | |
+| Current source of truth | |
+| Target source-of-truth | |
 | producer | |
 | consumers | |
-| 同步方式 / 时效（产品语义） | |
+| Synchronization method / Timeliness (product semantics) | |
 
 ## Source-Of-Truth Resolution
 
@@ -28,36 +28,36 @@
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-## 跨端一致性矩阵
+## Cross-end Consistency Matrix
 
-| 能力 / 状态 | App | H5-PC | Admin | Backend / CLI | 允许差异 | source |
+| Ability / State | App | H5-PC | Admin | Backend / CLI | Allow differences | source |
 | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | |
 
-每项说明必须一致的内容、允许差异的原因、更新顺序和冲突时以谁为准。
+Each entry must consistently define the content, reasons for allowed variations, update order, and resolution priority in case of conflicts.
 
-## 异步同步与降级
+## Asynchronous Synchronization and Degradation
 
-| 场景 | producer 状态 | consumer 状态 | 用户可见结果 | 恢复 / 补偿 | 最终一致性条件 |
+| Scenario | producer status | consumer status | User-visible results | Restore / Compensate | Eventually consistent condition |
 | --- | --- | --- | --- | --- | --- |
-| 延迟 | | | | | |
-| 丢失 / 失败 | | | | | |
-| 重复 | | | | | |
-| 顺序错乱 | | | | | |
-| 部分 surface 不可用 | | | | | |
+| delay | | | | | |
+| lost / failed | | | | | |
+| Repeat | | | | | |
+| Out of order | | | | | |
+| Some surfaces are unavailable | | | | | |
 
 ## Rollout / Backout
 
-写清各 surface 的发布顺序、兼容窗口、feature flag、旧版本行为、允许的临时不一致和回退后的 source-of-truth。不要把技术部署顺序写成实现任务。
+Clarify the release order, compatibility window, feature flag, behavior of previous versions, allowed temporary inconsistencies, and the source-of-truth after rollback for each surface. Do not list the technical deployment order as a task implementation sequence.
 
-## 端到端验收与回归保护
+## End-to-end acceptance and regression protection
 
-- producer 更新后每个 consumer 的可观察结果。
-- 延迟、重复、失败、部分成功和恢复。
-- 旧客户端 / 旧调用方 / 旧数据兼容。
-- source-of-truth 冲突和负向验收。
-- 回退后不发生双写、错误覆盖或用户不可解释状态。
+- The observable result for each consumer after the producer is updated.
+- Delay, repetition, failure, partial success, and recovery.
+- Compatibility with old clients / old callers / old data.
+- Source-of-truth conflicts and negative acceptance.
+- No double-write, erroneous overwrite, or user-unexplainable states occur after rollback.
 
-## Mixed 待闭合问题候选
+## Mixed pending issues candidate
 
-这里只提示候选缺口，不生成第二套 OQ schema。会改变 source-of-truth、surface 覆盖、允许差异、同步时效、fallback 或 E2E 验收的问题移入 output contract 的 canonical `Outstanding Questions`；协议、消息系统、数据库和部署编排进入 `spec-plan`。
+Here it only prompts candidate gaps and does not generate a second set of OQ schema. Will move issues related to source-of-truth, surface coverage, allowed differences, sync latency, fallback, or end-to-end acceptance into the output contract's canonical `Outstanding Questions`; protocols, messaging systems, databases, and deployment orchestration are moved into `spec-plan`.

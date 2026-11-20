@@ -9,8 +9,8 @@ const {
   extractSourceInputsFromFrontmatterText,
 } = require('./check-prd-artifact');
 
-// reason-code 分类法(receipt-only / checkpoint-input-scan-exempt 子集 + 分类器)的
-// 单一真相源在 ./lib/reason-codes,与 check-prd-artifact.js 共同消费,消除双归属漂移。
+// reason-code classification method (receipt-only / checkpoint-input-scan-exempt subset + classifier)
+// A single truth source in ./lib/reason-codes, jointly consumed with check-prd-artifact.js, eliminates dual-ownership drift.
 const {
   isReceiptOnly,
   isCheckpointInputScanExempt,
@@ -183,9 +183,9 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     !isReceiptOnly(reasonCode)
   ));
-  // ready_receipt_absent 在写入模式不阻断 finalize(写入即补 receipt),但 check-only 预览时保留阻断
-  // (frontmatter ready 或 LLM-owned final intent 缺 receipt 都是不可 closeout 的中间态)。这避免循环依赖:
-  // LLM 先写 final intent,finalize 写模式再原子补 machine receipt。
+  // ready_receipt_absent does not block finalize (write-then-complement receipt) in write mode, but it does block in check-only preview mode.
+  // (frontmatter ready or LLM-owned final intent lacks receipt are all intermediate states that cannot be closed out)This avoids cyclic dependencies:
+  // LLM first defines the final intent, then finalizes the mode, and finally completes the machine receipt at the atomic level.
   const receiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     reasonCode === 'ready_receipt_stale'
     || (options.checkOnly === true
@@ -212,16 +212,16 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
     && blockingReasons.length === 1
     && blockingReasons[0] === 'ready_receipt_stale';
 
-  // 004:把 closeout 许可与 ready finalization 拆开。合法 checkpoint(write_mode=checkpoint-prd
-  // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
-  // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
-  // 与 receipt-only 原因本身不阻断 checkpoint closeout——它们只意味着"还没 ready",而非"非法"。
+  // 004: Separate the closeout permission from ready finalization. Legal checkpoint (write_mode=checkpoint-prd)
+  // + can_enter_spec_plan: no + does not claim ready) is a valid non-ready exit: can_finalize=false
+  // but should_block_closeout=false. Only a true ready contradiction can block closeout. `finalize_required`
+  // Receipt-only reasons do not itself prevent checkpoint closeout—they only indicate "not yet ready," not "illegal."
   //
-  // closeout 豁免只覆盖 checkpoint-prd,不覆盖 ask-owner-first / route-out —— 这是 intended:
-  // ask-owner-first 是进行中的 grill 状态(SKILL.md:133 "keep grilling the highest-risk branch,
-  // not ask one question then stop"),不是 closeout 出口;route-out 是写前 route,不产出 PRD。
-  // 模型若要结束一个 ask-owner-first 运行,应先转 checkpoint-prd 保上下文,再 closeout。
-  // 这避免把"还在问"误当"可以收口"。
+  // closeout exemption applies only to checkpoint-prd and not to ask-owner-first / route-out — this is intended:
+  // ask-owner-first is in progress grill state (SKILL.md:133 "keep grilling the highest-risk branch")
+  // not ask one question then stop"), is not a closeout; route-out means writing before route, without producing a PRD.
+  // To end an ask-owner-first run, the model should first perform a checkpoint-prd to preserve context, then execute a closeout.
+  // This prevents mistaking "still asking" for "can close".
   const isValidCheckpoint = facts.write_mode === 'checkpoint-prd'
     && facts.can_enter_spec_plan === 'no'
     && facts.ready_claim_present !== true;
@@ -431,10 +431,10 @@ function main() {
   }
 
   process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
-  // 004:exit code 由 should_block_closeout 驱动,而非 can_finalize。
-  // exit 0 = closeout 放行(含合法 checkpoint);exit 1 = should_block_closeout(ready 矛盾),
-  //   此时 stdout JSON 必须保留 —— prd-readiness-guard 解析 blocking_reason_codes 拼 block 文案;
-  // exit 2 = usage/runtime 错误(stderr)。Stop hook 同时消费 exit code 与 stdout JSON。
+  // 004: exit code is driven by should_block_closeout, not by can_finalize.
+  // exit 0 = closeout approved (including valid checkpoint); exit 1 = should_block_closeout (ready conflict),
+  //   At this point, stdout JSON must be preserved — the prd-readiness-guard parses blocking_reason_codes to generate the block message.
+  // exit 2 = usage/runtime error (stderr). Stop hook consumes both exit code and stdout JSON simultaneously.
   if (args.verifyReceipt) {
     process.exit(receipt.verified ? 0 : 1);
   }

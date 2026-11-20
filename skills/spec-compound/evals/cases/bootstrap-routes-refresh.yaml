@@ -1,8 +1,6 @@
 id: bootstrap-routes-refresh
-title: 独立 CONCEPTS.md 建库请求应重定向 spec-compound-refresh
-description: |
-  验证 bootstrap 合同:standalone 建库不是 compound 的正常相位,
-  应重定向 spec-compound-refresh。
+title: "Independent CONCEPTS.md database creation request should be redirected spec-compound-refresh"
+description: "Verify bootstrap contract: standalone database setup is not in the normal compound phase; redirect to spec-compound-refresh."
 
 input:
   prompt: |

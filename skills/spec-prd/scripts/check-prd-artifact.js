@@ -1,23 +1,23 @@
 #!/usr/bin/env node
 'use strict';
 
-// 确定性 PRD artifact 检查:只报告 Markdown 结构、frontmatter、trace、占位符等
-// script-owned facts。是否构成 readiness blocker 由 PRD readiness lens 语义裁决。
+// Deterministic PRD artifact check: reports only Markdown structure, frontmatter, trace, placeholders, etc.
+// script-owned facts。Whether it constitutes a readiness blocker is semantically decided by the PRD readiness lens.
 
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-// reason-code 分类法(BLOCKING 阻断码 + closure/receipt/checkpoint 子集分类器)的单一真相源。
-// 本脚本与 finalize-prd-artifact.js 共同消费 ./lib/reason-codes,消除分类法双归属漂移。
+// reason-code classification method (BLOCKING blocking code + closure/receipt/checkpoint subset classifier) with a single source of truth.
+// This script, in conjunction with finalize-prd-artifact.js, consumes ./lib/reason-codes to eliminate classification code double-assignment drift.
 const {
   BLOCKING_REASON_CODES,
   isClosureBlocker,
 } = require('./lib/reason-codes');
 
 const MAX_INPUT_SCAN_BYTES = 5 * 1024 * 1024;
-// inputs 数量软上限:超过不阻塞(避免误杀合法多源),只 emit advisory finding input_scan_input_count_capped
-// 提示 agent 减少 inputs 或提 timeout 预算(配合 prd-readiness-guard 5000ms 超时分支)。
+// inputs number soft upper limit: exceed without blocking (avoiding false kill of legitimate multi-source), only emit advisory finding input_scan_input_count_capped
+// Prompt the agent to reduce input volume or increase timeout budget (in coordination with prd-readiness-guard 5000ms timeout branch).
 const MAX_INPUT_COUNT = 32;
 
 const CORE_SECTIONS = [
@@ -63,8 +63,8 @@ const EVIDENCE_TAGS = [
   'assumption',
 ];
 
-// 004:Outstanding Questions 表的 header-aware 解析。只认下面这张冻结的最小别名表;
-// 扩展别名必须先加 fixture。canonical key -> 允许的 header 文本(小写匹配)。
+// 004: Header-aware parsing of the Outstanding Questions table. Only recognizes the following frozen minimum alias table;
+// An expanded alias must first be prefixed with fixture. canonical key -> allowed header text (case-insensitive match).
 const OQ_HEADER_ALIASES = {
   id: ['id', '编号'],
   question: ['question', '问题'],
@@ -86,7 +86,7 @@ const TRACE_HEADER_ALIASES = {
   closure_state: ['closure_state', 'closure state', '闭合状态'],
 };
 
-// 合法 closure disposition(剃刀的唯一出口)。源类需要形似引用证据,owner 类需要 trace row。
+// Legal closure disposition (The only exit for Razor's closure). The source class requires a reference-like evidence, and the owner class requires trace row.
 const LEGAL_DISPOSITIONS = new Set([
   'source-resolved',
   'owner-answered',
@@ -105,17 +105,17 @@ const WHAT_TOUCHING_KEYWORDS = [
   'analytics', '埋点', '指标',
 ];
 
-// source 类 disposition 的证据 cell 须形似可核查引用:URL / 带扩展名的文件路径 / file:line /
-// 多段路径 / 锚点 id。按 whitespace 切 token 后逐个判,避免散文里的 `and/or`、`input/output`、
-// `n/a` 这类带斜杠词被误判为 ref(那是上一轮 source-ref-shape fix 想堵的廉价伪造)。
+// source class disposition evidence cell must resemble verifiable references: URL / file path with extension / file:line /
+// Multiple path segments / anchor point IDs. Split by whitespace to tokenize and judge one by one, avoiding cases like `and/or` or `input/output` in prose.
+// `n/a` entries with slashes are incorrectly classified as ref (something the previous round's source-ref-shape fix attempted to block as a cheap forgery).
 function looksLikeCheckableRef(text) {
   if (!text) return false;
   const tokens = String(text).trim().split(/\s+/).filter(Boolean);
   return tokens.some((tok) => {
     if (/^https?:\/\/\S+/i.test(tok)) return true; // URL
-    if (/[\w-]+\.[a-z0-9]+(?::\d+)?$/i.test(tok)) return true; // file.ext 或 file.ext:line
-    if (/^#[\w-]+$/.test(tok)) return true; // 锚点 id
-    // 多段路径(>=2 个斜杠,如 src/cli/foo);单斜杠的散文词(and/or)不算
+    if (/[\w-]+\.[a-z0-9]+(?::\d+)?$/i.test(tok)) return true; // file.ext or file.ext:line
+    if (/^#[\w-]+$/.test(tok)) return true; // Anchor ID
+    // Multiple paths (>=2 slashes, e.g. src/cli/foo); single slashes for poetic terms (and/or) do not count
     if ((tok.match(/\//g) || []).length >= 2) return true;
     return false;
   });
@@ -164,9 +164,9 @@ function parseArgs(argv) {
     } else if (!args.target) {
       args.target = arg;
     } else {
-      // 只接受单个位置参数:多余的目标路径会被静默丢弃,反而让错误调用
-      // 对非预期输入返回一份"自信报告",与兄弟脚本 check-glossary-drift.js 的
-      // error+exit-2 行为对齐,把坏调用变成确定性的 exit_code fact。
+      // Accepts only a single positional parameter: additional target paths will be silently discarded, and erroneous calls will be rejected.
+      // Return a "confident report" for unexpected inputs, similar to the sibling script check-glossary-drift.js
+      // error+exit-2 behavior aligned, treat bad calls as deterministic exit_code facts.
       args.error = `unexpected extra argument: ${arg}`;
       break;
     }
@@ -363,7 +363,7 @@ function computeInputsHash(inputPaths, options = {}) {
 
   const entries = inputPaths.map((inputPath) => {
     const input = resolveInputFile(inputPath, projectRoot);
-    // 004:只用可读且在项目根内的输入计算 hash;失败输入由 degraded findings 表达。
+    // 004: Compute hash using only readable and input files located within the project root; failed inputs are expressed through degraded findings.
     if (input.status !== 'ok') {
       return null;
     }
@@ -417,8 +417,8 @@ function isSectionIdComment(line) {
   return /^\s*<!--\s*prd:section=[a-z0-9_-]+\s*-->\s*$/i.test(line);
 }
 
-// 去掉标题前导的序号/标点装饰("一、""(1)""1." 与残留 # 空白),
-// 用于在保留英文锚点的前提下识别本地化标题。
+// Remove leading sequence/punctuation decoration before titles ("一、""(1)""1." and residual # blanks)
+// Used to identify localized titles while retaining English anchor points.
 function stripHeadingDecoration(title) {
   return title
     .replace(/^[#\s]*/, '')
@@ -426,9 +426,9 @@ function stripHeadingDecoration(title) {
     .trim();
 }
 
-// 标题命中 canonical core section 的规则:精确相等,或去装饰后以英文锚点开头
-// 且锚点后是非字母数字边界。这样 `## Summary(文档概要)`、`## 一、Summary 概要`
-// 命中 Summary,而 `## Non-Functional Requirements` 不会被误判为 Requirements。
+// Title matches canonical core section rules: exact equality, or after dedecoration starts with an English anchor point
+// And after the anchor is a non-alphanumeric boundary. Thus `## Summary (Document Overview)`, `## 1. Summary Overview`
+// Hit Summary, while `## Non-Functional Requirements` will not be misjudged as Requirements.
 function matchHeadingTitle(headingTitle, wantedTitle) {
   if (headingTitle === wantedTitle) return true;
   const stripped = stripHeadingDecoration(headingTitle);
@@ -531,9 +531,9 @@ function countSectionRows(lines, headings, title) {
   return section ? tableRows(section.text).length : 0;
 }
 
-// 004:把 Markdown 表按表头别名解析成 {key: value} 行。返回 { headerMap, rows }。
-// headerMap: canonical key -> 列下标;rows: 每行是 canonical key -> cell 文本。
-// 未识别的表头被忽略;识别不到任何 canonical 列时 headerMap 为空。
+// 004: Parse each row of a Markdown table into {key: value} format based on the header aliases. Returns { headerMap, rows }.
+// headerMap: canonical key -> column index; rows: each row is canonical key -> cell text.
+// Unknown headers are ignored; headerMap is empty when no canonical columns are identified.
 function parseHeaderedTable(text, aliasTable) {
   const rawLines = splitLines(text).filter((line) => {
     const t = line.trim();
@@ -574,7 +574,7 @@ function normalizeBool(value) {
   return null;
 }
 
-// 空值归一:none/无/空/n-a/[]/占位 都视为空。
+// Null normalization: none/none/empty/n-a/[]/placeholder are all considered as empty.
 function isEmptyish(value) {
   const v = String(value || '').toLowerCase().trim();
   if (!v) return true;
@@ -648,17 +648,17 @@ function validAcceptanceExamples(sectionText) {
   };
 }
 
-// 一条 Owner Decision Trace 行是否有效:chosen_answer + write target + consequence 三非空。
+// Whether an Owner Decision Trace row is valid: chosen_answer + write target + consequence are all non-empty.
 function isValidTraceRow(row) {
   return !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence);
 }
 
-// F-L1 逐行绑定:一条 owner-* OQ 是否能绑定到一条可核验 trace 行。
-// 仅两条信号(均为 artifact 内部引用一致性,非会话事件):
-// (a) question-match:normalize 后 exact 相等(trim+collapse+lowercase,非 substring);
-// (b) id-reference:oq.id 非空且作为 bounded token 出现在 trace 任一可识别 cell(防 OQ-2 误配 OQ-20)。
-// 硬性不做 write-target-token-overlap:Requirements/Acceptance Examples 等泛目标会让一行重盖无限 OQ,
-// 是全局开关的软重生。语义严格限定为「这条 OQ 是否指向一条真实 trace 行」,不证明 owner 真实决策。
+// F-L1 Row Binding: Can one owner-* OQ be bound to one verifiable trace row?
+// Only two signals (both artifact internal consistency, not session events):
+// (a) question-match: normalize followed by exact equality (trim + collapse + lowercase; not substring);
+// (b) id-reference: oq.id is not null and appears as a bounded token in any identifiable cell of the trace (to prevent misassignment of OQ-2 to OQ-20).
+// Strictly disallowing write-target-token-overlap: Requirements/Acceptance Examples etc. will cause infinite OQ coverage on a single line.
+// Soft resurrection of the global switch. The semantic is strictly limited to "Does this OQ point to a real trace record?" and does not verify the owner's actual decision.
 function traceRowBindsOq(traceRow, oqRow) {
   const normalize = (s) => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
   const oqQuestion = normalize(oqRow.question);
@@ -678,7 +678,7 @@ function traceRowBindsOq(traceRow, oqRow) {
   return false;
 }
 
-// 解析 Owner Decision Trace:返回带 chosen_answer + write target 的非空 row 数。
+// Parse Owner Decision Trace: return the number of non-empty rows containing chosen_answer + write target.
 function parseOwnerDecisionTrace(lines, headings) {
   const section = sectionRange(lines, headings, 'Owner Decision Trace');
   if (!section) return { present: false, validRows: 0, rows: [] };
@@ -698,8 +698,8 @@ function ownerDecisionTraceNeededByOutstandingQuestions(lines, headings) {
   ));
 }
 
-// 004:Outstanding Questions 的剃刀分析。claimsReady 决定矛盾类是否升级为 blocker。
-// 返回 facts + 触发的 reason_codes(blocker 与 advisory 混在一起,由调用方按 BLOCKING set 过滤)。
+// 004: Razor analysis of Outstanding QuestionsclaimsReady determines whether a contradiction type is escalated to a blocker.
+// Return facts + triggered reason_codes (blocker and advisory mixed together, filtered by caller's BLOCKING set).
 function analyzeOutstandingQuestions(lines, headings, options) {
   const claimsReady = Boolean(options.claimsReady);
   const ownerTrace = parseOwnerDecisionTrace(lines, headings);
@@ -724,7 +724,7 @@ function analyzeOutstandingQuestions(lines, headings, options) {
   const { headerMap, rows } = parseHeaderedTable(section.text, OQ_HEADER_ALIASES);
   facts.outstanding_question_rows = rows.length;
 
-  // closure contract 是否齐备:必须能识别到 blocks_planning / closure_disposition / closure_state
+  // Is the closure contract complete: must be able to identify blocks_planning / closure_disposition / closure_state
   const hasClosureContract = ['blocks_planning', 'closure_disposition', 'closure_state']
     .every((k) => k in headerMap);
   facts.outstanding_question_closure_contract_present = hasClosureContract;
@@ -732,12 +732,12 @@ function analyzeOutstandingQuestions(lines, headings, options) {
     reasonCodes.add('outstanding_question_closure_undeclared');
   }
 
-  // 004 修补(bullet-OQ 旁路):OQ 段以非表格形式(bullet / 编号 / 裸 OQ 编号)列出未决
-  // 问题时,parseHeaderedTable 得到 0 行,会整段绕过下面的逐行剃刀,使 load-bearing OQ
-  // 标「非阻塞」散文即可混入 ready。这本身就是「claims-ready 却携带未声明 closure 的
-  // 未决问题」——与逐行剃刀同类的确定性矛盾(段有未决问题内容 + 自称 ready + 无 closure
-  // 表),非 ceremony-presence 检查。复用 outstanding_question_closure_undeclared,不新增
-  // BLOCKING code。只在 claims-ready 时升级 blocker;draft / checkpoint 不触发。
+  // 004 Repair (bullet-OQ detour): List unresolved items in the OQ section in non-table format (bullet / numbering / bare OQ number)
+  // When parseHeaderedTable returns 0 rows, it bypasses the following line-by-line razor, causing the load-bearing OQ to skip entirely.
+  // Marking "non-blocking" allows the piece to be mixed into ready. This is inherently "claims-ready yet carries an undeclared closure"
+  // 'Open Issues' —— Deterministic contradictions similar to the Occam's Razor principle (section contains issue content + claims readiness + no closure)
+  // Table), non-ceremony-presence check. Reuse outstanding_question_closure_undeclared, do not add a new one
+  // BLOCKING code。Upgrade blocker only when claims-ready; draft/checkpoint does not trigger.
   if (rows.length === 0 && claimsReady) {
     const nonTableOpenQuestions = splitLines(section.text).some((line) => {
       const t = line.trim();
@@ -761,11 +761,11 @@ function analyzeOutstandingQuestions(lines, headings, options) {
     const text = `${row.question || ''} ${row.prd_write_target || ''}`.toLowerCase();
     const hitsWhat = WHAT_TOUCHING_KEYWORDS.some((kw) => text.includes(kw));
 
-    // 缺必填声明
+    // Missing required statement
     if (hasClosureContract && (blocks === null || isEmptyish(row.closure_disposition))) {
       facts.outstanding_question_missing_closure_count += 1;
     }
-    // 显式 blocking / 会发明 WHAT / 未闭合
+    // Explicit blocking / Will invent WHAT / Unclosed
     if (blocks === true) {
       facts.blocking_outstanding_question_count += 1;
       if (claimsReady) reasonCodes.add('blocking_outstanding_question_present');
@@ -779,16 +779,16 @@ function analyzeOutstandingQuestions(lines, headings, options) {
       if (claimsReady) reasonCodes.add('unclosed_owner_question_present');
     }
 
-    // 剃刀:非阻塞 open OQ 必须带合法 disposition + 证据
+    // Scissors: Non-blocking open OQ must carry valid disposition + evidence
     if (isNonBlocking) {
       let dispositionOk = LEGAL_DISPOSITIONS.has(disposition);
       if (dispositionOk && SOURCE_DISPOSITIONS.has(disposition)) {
-        // 源类需要形似引用证据(write target / recommended_default 任一形似 ref,或 trace 命中)
+        // The source class needs to resemble a reference evidence (write target / recommended_default, either resembling ref, or trace match).
         const refCandidate = `${row.prd_write_target || ''} ${row.recommended_default || ''}`;
         dispositionOk = looksLikeCheckableRef(refCandidate);
       }
       if (dispositionOk && OWNER_DISPOSITIONS.has(disposition)) {
-        // F-L1:owner 类需要一条【可核验绑定该 OQ】的有效 trace 行,而非任意一条全局有效行。
+        // F-L1: The owner class requires a valid trace row that can be verified and bound to the OQ, not any arbitrary globally valid row.
         dispositionOk = ownerTrace.rows.some((tr) => isValidTraceRow(tr) && traceRowBindsOq(tr, row));
       }
       if (!dispositionOk) {
@@ -806,7 +806,7 @@ function analyzeOutstandingQuestions(lines, headings, options) {
     }
   });
 
-  // asked-owner / answered|capped 依赖 owner answer 时必须有 trace
+  // asked-owner / answered|capped depends on owner answer when trace must be present
   const needTrace = options.clarificationAskedOwner
     || rows.some((r) => ['answered', 'capped'].includes(String(r.owner_status || '').toLowerCase().trim()));
   if (needTrace && !(ownerTrace.present && ownerTrace.validRows > 0)) {
@@ -914,17 +914,17 @@ function detectDesignSourceCoverage(text) {
 }
 
 function detectDesignSourcesRead(text) {
-  // 比 hasConcreteFieldBlock 更严格:只接受 none/n/a 标记或 YAML 列表声明,
-  // 拒绝散文字符串(如"Figma 画布未直接读取")——散文被误判为"已声明"会掩盖 read_undeclared。
+  // more strict than hasConcreteFieldBlock: accepts only none/n/a annotations or YAML list declarations
+  // Rejects prose strings (e.g., "Figma canvas not directly read") — prose misclassified as "declared" will mask read_undeclared.
   const lines = splitLines(stripFencedCode(text));
   const fieldRegex = /^\s*(?:[-*]\s*)?design_sources_read\s*:\s*(.*)$/i;
   for (let i = 0; i < lines.length; i += 1) {
     const match = lines[i].match(fieldRegex);
     if (!match) continue;
     const inline = match[1].trim();
-    if (/^none$|^n\/a$/i.test(inline)) return true; // none/n/a 是合法的"无"声明
-    if (inline) continue; // 行内有散文值 → 不算合法声明,继续找下一行
-    // 无行内值 → 查下一个非空行是否是列表项
+    if (/^none$|^n\/a$/i.test(inline)) return true; // An explicit none/n/a is valid.
+    if (inline) continue; // Inline prose is not a declaration; keep scanning.
+    // No inline value → Check the next non-empty row to see if it is a list item
     for (let j = i + 1; j < lines.length; j += 1) {
       const trimmed = lines[j].trim();
       if (!trimmed) continue;
@@ -941,7 +941,7 @@ function detectDesignSourcesUnread(text) {
   return hasConcreteFieldBlock(text, 'design_sources_unread');
 }
 
-// 004:design_sources_unread 经空值归一后是否仍非空(none/无/空 不算)。
+// 004:design_sources_unread Whether still non-empty after null normalization (none/none/empty not counted)
 function designUnreadNonEmpty(text) {
   const lines = splitLines(stripFencedCode(text));
   const fieldRegex = /^\s*(?:[-*]\s*)?design_sources_unread\s*:\s*(.*)$/i;
@@ -950,7 +950,7 @@ function designUnreadNonEmpty(text) {
     if (!match) continue;
     const inline = match[1].trim();
     if (inline) return !isEmptyish(inline);
-    // 多行 list 形式:看下一非空行是否为实质 list item
+    // Multi-line list format: check if the next non-empty line is a genuine list item
     for (let j = i + 1; j < lines.length; j += 1) {
       const t = lines[j].trim();
       if (!t) continue;
@@ -964,7 +964,7 @@ function designUnreadNonEmpty(text) {
   return false;
 }
 
-// 004:design_source_coverage 是否声明 partial/degraded。
+// 004: design_source_coverage – has partial/degraded been declared?
 function designCoveragePartial(text) {
   const body = stripFencedCode(text);
   return splitLines(body).some((line) => {
@@ -973,7 +973,7 @@ function designCoveragePartial(text) {
   });
 }
 
-// 004:owner 是否明确接受了 degraded/unread design 风险。
+// 004: Has the owner explicitly accepted the risks associated with a degraded/unread design?
 function designDegradedOwnerAccepted(text) {
   const body = stripFencedCode(text);
   const lines = splitLines(body);
@@ -1078,8 +1078,8 @@ function detectFeatureSliceGaps(lines, headings) {
   });
 }
 
-// 阶段一:纯文本解析。接受 target 字符串 + text 字符串,不做任何 I/O,
-// 返回后续阶段所需的全部文本派生结构体。
+// Phase 1: Pure text parsing. Accept target string + text string, perform no I/O.
+// Return the complete text derivation structures required for the subsequent stage.
 function parseStructure(target, text) {
   const normalizedTarget = target.split(path.sep).join('/');
   const prdHash = sha256(normalizeForReceipt(text));
@@ -1156,9 +1156,9 @@ function parseStructure(target, text) {
     'closed', 'degraded', 'blocked', 'missing',
   ]);
   const preflightSweepClosureDeclaredValid = Boolean(preflightSweepClosureValue);
-  // Decision Card 三要素(write_mode 复用既有字段,这里只持久化对话独有的三要素):
-  // highest_risk_gap / next_action / why_no_invention。把 Phase 1 中间产物从"对话语义"
-  // 外化为"artifact 可验证事实",防模型压缩 Phase 1 直接到 Write(R12 天花板内可推一步)。
+  // Decision Card Three Essentials (write_mode reuses existing fields; here only persists the three essentials unique to the conversation):
+  // highest_risk_gap / next_action / why_no_invention。The intermediate product from "dialogue semantics" in Phase 1
+  // Externalized as "artifact verifiable facts", prevent model compression Phase 1 from directly reaching Write (R12 ceiling within one step).
   const decisionCardHighestRiskGap = hasConcreteFieldBlock(text, 'decision_card_highest_risk_gap');
   const decisionCardNextActions = extractDeclarationValues(text, 'decision_card_next_action', [
     'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out',
@@ -1252,9 +1252,9 @@ function parseStructure(target, text) {
   };
 }
 
-// 阶段二:I/O + facts 计算。接受 parseStructure 结果 + inputs 数组,
-// 执行 I/O(input 扫描、hash 计算)和 OQ 分析,返回 { facts, oqAnalysis }。
-// facts 含 ready_claim_present 等 policy 派生布尔,供 gateReadyClaims/deriveFindings 消费。
+// Phase II: I/O + facts computation. Accepts the result of parseStructure plus an inputs array,
+// Perform I/O (input scanning, hash computation) and OQ analysis, returning { facts, oqAnalysis }.
+// facts contain derived boolean values such as ready_claim_present, etc., for consumption by gateReadyClaims/deriveFindings.
 function computeFacts(structure, inputPaths, options) {
   const projectRoot = options.projectRoot || findProjectRootFromTarget(structure.target);
   const frontmatterInputs = structure.frontmatterInputs || { present: false, field: null, inputs: [] };
@@ -1321,7 +1321,7 @@ function computeFacts(structure, inputPaths, options) {
     ready_receipt_inputs_current: readyReceiptInputsCurrent,
     ready_receipt_prd_hash: structure.prdHash,
     ready_receipt_inputs_hash: inputsHash,
-    // blocking_reason_codes / blocking_finding_count:由 buildReport 在 findings 收集后填入
+    // blocking_reason_codes / blocking_finding_count: filled in by buildReport after findings are collected
     design_source_refs_present: structure.designSourceRefsPresent,
     design_source_inventory_declared: structure.designSourceInventoryDeclared,
     design_source_coverage_declared: structure.designSourceCoverageDeclared,
@@ -1365,9 +1365,9 @@ function computeFacts(structure, inputPaths, options) {
   return { facts, oqAnalysis };
 }
 
-// claimsReady-gated findings(阶段三的子段):仅在 artifact 自称 ready 时检查的
-// 矛盾类 blocker。由 deriveFindings 调用,不直接从 buildReport 调用。
-// 读 facts.ready_claim_present 作为闸;claimsReady=false 时直接返回 []。
+// claimsReady-gated findings (sub-phase of Phase III): verified only when the artifact declares itself ready
+// Contradiction type blocker. Called by deriveFindings, not directly by buildReport.
+// Read facts.ready_claim_present as a gate; directly return [] when claimsReady is false.
 function gateReadyClaims(facts, oqAnalysis) {
   if (!facts.ready_claim_present) return [];
   const findings = [];
@@ -1404,12 +1404,12 @@ function gateReadyClaims(facts, oqAnalysis) {
   if (facts.design_coverage_partial && !facts.design_degraded_owner_accepted) {
     findings.push({ reason_code: 'design_partial_coverage_unaccepted' });
   }
-  // checkpoint 自称 ready 是矛盾
+  // A checkpoint calling itself "ready" is contradictory.
   if (facts.write_mode === 'checkpoint-prd') {
     findings.push({ reason_code: 'checkpoint_claims_ready' });
   }
-  // preflight_sweep_closure=closed 却仍有 closure blocker = 自相矛盾。
-  // 子集定义在 ./lib/reason-codes(单一真相源),防漂移。
+  // preflight_sweep_closure=closed yet still has closure blocker = self-contradictory.
+  // Subset defined in ./lib/reason-codes (single source of truth), anti-drift.
   const closureBlockerPresent = findings.some((f) => isClosureBlocker(f.reason_code));
   if (facts.preflight_sweep_closure === 'closed' && closureBlockerPresent) {
     findings.push({ reason_code: 'preflight_closure_contradicted' });
@@ -1461,11 +1461,11 @@ function enrichFinding(finding) {
   return remediation ? { ...finding, ...remediation } : finding;
 }
 
-// 阶段三:findings 构建。接受 facts + structure + oqAnalysis + inputPaths,
-// 返回完整 findings 数组。claimsReady-gated 部分委托给 gateReadyClaims。
+// Phase three: findings construction. Accept facts + structure + oqAnalysis + inputPaths
+// Return the complete findings array. claimsReady-gated portion delegated to gateReadyClaims.
 function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   const findings = [];
-  // 基础结构 findings
+  // Basic structure findings
   if (!structure.frontmatter.present) {
     findings.push({ reason_code: 'frontmatter_missing', line: 1 });
   }
@@ -1515,7 +1515,7 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   structure.machineSectionIdentityMissing.forEach((sectionId) => {
     findings.push({ reason_code: 'machine_section_identity_missing', section: sectionId });
   });
-  // readiness 声明 findings
+  // readiness declaration findings
   if (structure.needsReadinessDeclarations && !structure.writeModeDeclaredValid) {
     findings.push({ reason_code: 'write_mode_undeclared' });
   }
@@ -1536,10 +1536,10 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
     && !structure.preflightSweepClosureDeclaredValid) {
     findings.push({ reason_code: 'preflight_sweep_closure_absent' });
   }
-  // Decision Card 三要素:Phase 1 中间产物持久化为 artifact 可验证字段。
-  // 触发条件收窄到 ready 门槛(claimsReady 或 final-prd):checkpoint 允许还在 grill 中,
-  // Decision Card 可能未完全成型,不强制;只有声称 ready/final 时才要求已落地,
-  // 防模型压缩 Phase 1 直接到 Write 后直接 ready(把 Decision Card 留在对话里不可验证)。
+  // Decision Card Three Essentials: Phase 1 - Persistent intermediate products as artifacts with verifiable fields.
+  // Trigger condition narrowed to ready threshold (claimsReady or final-prd): checkpoint allows to remain in grill.
+  // Decision Card may not be fully finalized; not mandatory. Landing is only required when declared ready/final.
+  // Anti-model compression Phase 1 directly proceeds to Write and immediately becomes ready (leaves the Decision Card in the conversation, unverifiable).
   if ((structure.claimsReady || structure.writeModeIsFinalPrd)
     && !structure.decisionCardPresent) {
     findings.push({ reason_code: 'decision_card_undeclared' });
@@ -1576,16 +1576,16 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   if (facts.input_scan_degraded) {
     findings.push({ reason_code: 'input_scan_degraded' });
   }
-  // inputs 数量软上限(advisory,非 BLOCKING——守 KTD14,不阻塞合法多源)。
+  // inputs quantity soft upper limit (advisory, non-BLOCKING —— guard KTD14, does not block valid multi-source).
   if (inputPaths.length > MAX_INPUT_COUNT) {
     findings.push({ reason_code: 'input_scan_input_count_capped', count: inputPaths.length, limit: MAX_INPUT_COUNT });
   }
-  // claimsReady-gated findings(委托给 gateReadyClaims)
+  // claimsReady-gated findings (assigned to gateReadyClaims)
   findings.push(...gateReadyClaims(facts, oqAnalysis));
   return findings.map(enrichFinding);
 }
 
-// buildReport:三阶段的薄外壳。维持与历史版本相同的公开接口和返回形状。
+// buildReport: Three-stage thin shell. Maintain the same public interface and return shape as in previous versions.
 function buildReport(target, text, options = {}) {
   const structure = parseStructure(target, text);
   structure.frontmatterInputs = extractSourceInputsFromFrontmatterText(text);
@@ -1641,8 +1641,8 @@ function main() {
   };
 
   if (args.stdin) {
-    // --stdin: 从 stdin 读 PRD 内容,target 作为虚拟路径(用于 forbidden_prds_path 等路径校验)。
-    // 写前 dry-run: 模型在正式 Write 前先 pipe draft,一次性拿到全部 findings,避免"写→Stop hook 拦→修一个→再拦"循环。
+    // --stdin: Read PRD content from stdin, target serves as a virtual path (for path validation purposes such as in forbidden_prds_path).
+    // Write before dry-run: The model pipes a draft prior to formal writing, capturing all findings in one go, to avoid the cycle of "write → stop hook blocks → revise → blocked again".
     let data = '';
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', (chunk) => { data += chunk; });
@@ -1676,12 +1676,12 @@ module.exports = {
   extractSourceInputsFromFrontmatterText,
   normalizeForReceipt,
   sha256,
-  // 三阶段函数:供 in-process 单测直接调用,不影响 buildReport 编排。
+  // Three-stage function: Supply in-process unit tests for direct invocation, without affecting buildReport compilation.
   parseStructure,
   computeFacts,
   deriveFindings,
   gateReadyClaims,
-  // 基础纯函数:供 in-process 单测直测 edge case。
+  // Base pure functions: For in-process unit testing and testing edge cases.
   parseHeaderedTable,
   looksLikeCheckableRef,
   traceRowBindsOq,

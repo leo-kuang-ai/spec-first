@@ -68,7 +68,9 @@ Overrides: none
 
 ## Input Paths
 
-当前用户明确要求补完非活跃历史计划时，将 `source_plan_non_active`、已核验来源和剩余范围线索交给 `spec-plan` Phase 0.1。旧计划与旧 task-pack pins 保持不变；owner 返回有效后继后才按本 skill 正常生成和校验新任务包。仅拆分历史材料或只读请求不产生实施授权。
+A `type: design-review` draft is not an executable task source, even with `status: active`. If a formal plan exists, verify its version and the review decisions first. If only the draft exists, return it to `spec-plan`; do not relabel it, rehash it, or invent a source from chat.
+
+When the user explicitly asks to finish an inactive historical plan, return `source_plan_non_active`, the verified source, and evidence of remaining scope to `spec-plan` Phase 0.1. Leave the old plan and task-pack pins untouched. Generate and validate a new pack only after the owner returns a valid successor. Splitting historical material or requesting a read-only review does not authorize implementation.
 
 - Source plan path: read the source plan frontmatter and focused sections: Requirements, Scope Boundaries, Planning Contract (legacy name: Technical Approach), Implementation Units, Files, Test Scenarios, Verification Contract (legacy name: Verification), Definition of Done, Goal Capsule, and Deferred to Implementation.
 - Existing task-pack path: read the task pack, source plan, and `Task Pack Contract`; validate identity/freshness/structure before treating it as executable.
@@ -117,7 +119,7 @@ Required posture:
 - 🔴 GATE (verification): for `semantic_posture: reviewed-existing`, the envelope must carry evidence metadata or a verifiable review-outcome reference; a bare `reviewed-existing` claim without current evidence is not eligible for `next_action: spec-work-task-pack`;
 - 🔴 GATE (handoff): for `dispatch_authorization: authorized`, the envelope must carry a bounded continuation reference or doc-review outcome reference; absent that, report `dispatch_authorization: missing`.
 
-High-risk packs return `next_action: review-task-pack` with one reason and the copy-ready current-host invocation `spec-doc-review mode:headless mutation:report-only output:json roster:full <task-pack-path>`。Consumer 必须把 derived task pack 保持 byte-preserving，并从 `task_pack_outcome` 读取 deterministic intake、semantic review 与 terminal owner；不要仅凭 `Review complete` 推导 `reviewed-existing`。`roster:full` 仍只保留实际 qualified personas，但不会让 high-risk review 因 standard budget 丢失同时成立的 security、scope 或 adversarial lens。Do not auto-dispatch review unless the explicit bounded continuation conditions in [Execution Handoff Contract](references/execution-handoff-contract.md) are met.
+High-risk packs return `next_action: review-task-pack` with one reason and the copy-ready current-host invocation `spec-doc-review mode:headless mutation:report-only output:json roster:full <task-pack-path>`. Preserve the derived pack byte-for-byte. Read deterministic intake, semantic review, and terminal ownership from `task_pack_outcome`; `Review complete` alone does not establish `reviewed-existing`. The full roster keeps only qualified personas but does not discard applicable security, scope, or adversarial perspectives to fit the standard budget. Do not auto-dispatch review unless the explicit bounded continuation conditions in [Execution Handoff Contract](references/execution-handoff-contract.md) are met.
 
 ## Portability Boundary
 

@@ -88,7 +88,7 @@ Question cadence:
 - Use the parent skill Interaction Method for every owner question; its platform blocking question tool requirement applies before the cadence rules below.
 - Ask at most one question at a time.
 - Each question must bind to a `gap id`, a source attempt, a PRD write target, and a progress state: `closed`, `narrowed`, `accepted assumption`, `Outstanding Question`, `blocker`, or `route-out`.
-- Continue relentlessly by default, walking down each branch. A branch stops only at a legal stop point defined in SKILL.md `Canonical: Four Legal Stop Points`. 先应用 Canonical 节的范围相关性判断；明确不影响当前授权需求的范围外问题无需追问，负载缺口不得因低优先级或暂不发布而跳过。 When the owner gives no cap/continue signal, fall back to checkpoint per Canonical, never silently emit ready.
+- Continue relentlessly by default, walking down each branch. A branch terminates only at a legal stop point defined in SKILL.md under `Canonical: Four Legal Stop Points`. First apply the scope relevance judgment as specified in the Canonical section; issues outside the current authorization scope that do not affect the current authorization request need not be pursued, and load gaps must not be overlooked due to low priority or temporary non-release. When the owner gives no cap/continue signal, fall back to checkpoint per Canonical, never silently emit ready.
 - Always give a `recommended_answer` unless there is no defensible default.
 - If the owner says "you decide", use the recommended answer only when evidence supports it or it is safely labeled as an assumption.
 
@@ -164,9 +164,9 @@ For oversized, multi-source, or resume-risk PRDs, load `large-input-checkpoint.m
 
 ### Load-Bearing Gap Triage
 
-Before asking, sort gaps by acceptance impact, behavior/scope irreversibility, number of affected PRD sections, source contradiction, and release/planning consequence. 对通过 Canonical 范围相关性判断的负载缺口，此处只排序、不豁免；范围外且与当前验收、权限和必要依赖无关的问题已在进入循环前排除。 Resolve source/docs/tests/contracts/glossary/prior-PRD-answerable gaps first. Owner questions are for product decisions, not facts already available from source.
+Before raising any questions, sort gaps by impact on acceptance, irreversibility of behavior/scope, number of affected PRD sections, source contradictions, and release/planning consequences. For load gaps relevant to the Canonical scope, sort them here—no exemptions are granted; issues outside the scope and unrelated to current acceptance, permissions, or necessary dependencies have been excluded prior to entry into the cycle. Resolve source/docs/tests/contracts/glossary/prior-PRD-answerable gaps first. Owner questions are for product decisions, not facts already available from source.
 
-Normal PRD authoring/refinement asks load-bearing questions one at a time using the run-local question format above, relentlessly by default. A question is allowed only after a source attempt. A load-bearing gap that does not yet bind to a PRD write target is not dropped — keep grilling to bind it or carry it visibly. If any standard-template section still depends on owner adjudication and the target surface is anchored, load `grill-with-docs-integration.md` and continue one-question-at-a-time. A branch stops only at a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`. If the anchor is missing, the issue is broad product discovery, or no defensible question sequence exists, `route-out` to a prioritized blocker cluster with recommended route, acceptable assumptions when defensible, and affected write targets （范围相关性遵守 Canonical 节；不可把真实负载缺口以低价值或暂不发布为由删除）. Do not mark the PRD `ready-for-planning` until every load-bearing branch reaches a Canonical stop point.
+Normal PRD authoring/refinement asks load-bearing questions one at a time using the run-local question format above, relentlessly by default. A question is allowed only after a source attempt. A load-bearing gap that does not yet bind to a PRD write target is not dropped — keep grilling to bind it or carry it visibly. If any standard-template section still depends on owner adjudication and the target surface is anchored, load `grill-with-docs-integration.md` and continue one-question-at-a-time. A branch stops only at a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`. If the anchor is missing, the issue falls under broad product discovery or no defensible question sequence exists, `route-out` to a prioritized blocker cluster with recommended route, acceptable assumptions when defensible, and affected write targets (scope relevance adheres to Canonical; do not remove genuine load gaps due to low value or temporary non-release). Do not mark the PRD `ready-for-planning` until every load-bearing branch reaches a Canonical stop point.
 
 ### Deep Requirements Grill
 
@@ -196,7 +196,7 @@ In this mode:
 - challenge glossary conflicts immediately
 - sharpen fuzzy terms into canonical project language
 - stress concrete scenarios across happy path, permission/role boundary, state transition, exception/failure, negative acceptance, and cross-context handoff
-- 先按 Canonical 节筛选范围相关性；源码可回答的问题先查事实，纯范围外且不影响当前行为、验收、权限、安全或必要依赖的问题不追问。真实负载缺口不因低价值、暂不发布或尚未绑定写入位置而跳过。
+- First screen for relevance based on Canonical scope; for source code questions, verify facts first; do not probe issues that are entirely out of scope and do not affect current behavior, acceptance, permissions, security, or necessary dependencies. The real load gap is not skipped due to low value, pending publication, or lack of binding to a write location.
 - surface code contradictions with evidence and consequences
 - close project-specific terminology in the PRD-local Glossary or Decision Notes
 - emit a qualified project-level promotion candidate only when it has durable reuse value

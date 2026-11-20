@@ -615,7 +615,7 @@
       "required": true,
       "category": "mcp",
       "host_config_required": true,
-      "description": "动态反思性问题解决，spec-first 全工作流通用依赖",
+      "description": "Dynamic reflective problem-solving, spec-first universally applicable dependency workflow",
       "dependencies": [
         "node",
         "npx"
@@ -763,7 +763,7 @@
       "required": true,
       "category": "mcp",
       "host_config_required": true,
-      "description": "最新框架文档查询，spec-first 全工作流通用依赖",
+      "description": "Latest framework documentation query, spec-first universal workflow dependency",
       "dependencies": [
         "node",
         "npx"
@@ -912,7 +912,7 @@
       "setup_required": true,
       "category": "mcp",
       "host_config_required": true,
-      "description": "标准 Runtime Setup 必备的 code-graph 能力工具；下游消费仍只把其输出当 advisory candidate。",
+      "description": "Standard Runtime Setup includes essential code-graph capability tools; downstream consumers still treat its output as advisory candidates.",
       "dependency_ref": "codegraph",
       "dependencies": [
         "node",
@@ -1669,7 +1669,7 @@
         },
         "review_required": true,
         "install_effect": "global skill",
-        "pin_reassessment": "版本 pin 的重估条件(lane finding DR-002,2026-09-13):需先在联网环境确认 skills CLI 的稳定版本号并验证其支持内容 ref 钉扎(如 ast-grep/agent-skill@<ref>),再以 verified 版本替换 skills@latest 并补 archive 校验;在此之前执行面已由 unpinned-npx(review-required 集合成员)+ review_required 闸住,plan 输出 review-required 且不自动执行,不会静默安装。"
+        "pin_reassessment": "Version pin reevaluation conditions (lane finding DR-002, 2026-09-13): First, confirm the stable version number of the skills CLI in the connected environment and verify its supported features, referencing pinning (e.g., ast-grep/agent-skill@<ref>); then, replace skills@latest with the verified version and perform archive validation. Prior to this, execution was blocked by the unpinned-npx (review-required members) + review_required gate, resulting in plan output showing review-required status and preventing automatic execution; no silent installation will occur."
       },
       "runner_kind": "cross-platform",
       "installation": {

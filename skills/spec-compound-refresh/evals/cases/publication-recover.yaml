@@ -1,5 +1,5 @@
 id: publication-recover
-title: 恢复部分发布时保留人工条目及完整知识
+title: "Retain manual entries and full knowledge during partial release restoration"
 input:
   prompt: |
     先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。

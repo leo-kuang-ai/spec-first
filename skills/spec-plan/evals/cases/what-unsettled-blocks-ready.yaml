@@ -1,9 +1,6 @@
 id: what-unsettled-blocks-ready
-title: WHAT 未定时不得产出 implementation-ready 并应指向 spec-brainstorm
-description: |
-  验证硬出口:产品要做什么都未收敛(0-1 模糊想法)时,
-  不得把计划提升为 implementation-ready;正确行为是指出 WHAT 未定、
-  点名 spec-brainstorm(或以阻塞检查点保持未就绪)。
+title: "WHAT shall not be produced without timing; it must point to spec-brainstorm"
+description: "Verify hard export: When product ideas are still fuzzy and not converging (0-1 stage), do not elevate the plan to implementation-ready; the correct action is to identify that WHAT is still undefined, name spec-brainstorm (or designate a blocking checkpoint to keep it unready)."
 
 input:
   prompt: |

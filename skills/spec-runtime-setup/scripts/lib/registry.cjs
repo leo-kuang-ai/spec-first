@@ -176,8 +176,8 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     });
     if (!matches) throw new SchemaValidationError(location, '不匹配任何允许的 schema');
   }
-  // if/then(/else):条件应用——前提不匹配时静默跳过(2026-09-13 补实现;
-  // 此前被静默忽略,使 pypi 条件必填形同虚设,lane finding DR-017)。
+  // if/then(/else): conditional application — silently skips when prerequisites do not match (implemented on 2026-09-13)
+  // Previously silently ignored, making the pypi condition mandatory effectively useless (lane finding DR-017).
   if (isPlainObject(schema.if)) {
     let preconditionHolds = true;
     try {
@@ -217,7 +217,7 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
     if (schema.minItems !== undefined && value.length < schema.minItems) {
       throw new SchemaValidationError(location, `至少必须包含 ${schema.minItems} 项`);
     }
-    // maxItems/prefixItems(2026-09-13 补实现,此前被静默忽略)。
+    // maxItems/prefixItems (implemented on 2026-09-13, previously silently ignored)
     if (schema.maxItems !== undefined && value.length > schema.maxItems) {
       throw new SchemaValidationError(location, `最多只能包含 ${schema.maxItems} 项`);
     }
@@ -564,8 +564,8 @@ function validateRegistry(registry, schema) {  assertNoIllegalNull(registry);
     for (const entry of [...registry.tools, ...registry.helpers]) {
       if (!entry.readiness_policy) throw new RegistryError('registry_readiness_policy_missing', `缺少 ${entry.id} 的 readiness_policy`);
     }
-    // 覆盖不变量只约束 v11：真实 v10 registry（如 npm 1.15.3）没有 zcode override，
-    // 混合加载时按原始语义在 setup 阶段 fail closed，而不是在加载期拒绝兼容读取。
+    // Coverage invariants constrain only v11: the real v10 registry (e.g. npm 1.15.3) has no zcode override
+    // During mixed loading, fail closed according to original semantics in the setup phase, rather than rejecting compatible reads during loading.
     assertHostOverrideCoverage(registry);
   }
   for (const [collection, entries] of [
@@ -591,9 +591,9 @@ function validateRegistry(registry, schema) {  assertNoIllegalNull(registry);
   assertProviderReadinessMirrorsProvider(registry);
 }
 
-// tools[].provider_readiness 与 providers[] 同 id 条目之间存在有意冗余的共享元数据
-// (lane finding DR-001:双 canonical 段任一单独更新即漂移)。加载期断言共享字段
-// 逐字一致,使漂移在 registry 加载阶段 fail-closed,而不是静默进入运行时。
+// tools[].provider_readiness and providers[] share metadata with the same id entry, intentionally redundant
+// (lane finding DR-001: In either canonical segment, a standalone update causes drift). Assertion sharing field during loading phase
+// Byte-for-byte consistent, ensure drift fails closed during registry loading phase, rather than silently entering runtime.
 function assertProviderReadinessMirrorsProvider(registry) {
   const providersById = new Map((registry.providers || []).map((entry) => [entry.id, entry]));
   for (const tool of registry.tools || []) {
@@ -625,9 +625,9 @@ function assertProviderReadinessMirrorsProvider(registry) {
   }
 }
 
-// validator 方言白名单(lane finding DR-017):schema 演化引入 validator 不认识的
-// 关键字时,校验强度会静默下降。加载期对整个 schema(含 $defs)做关键字审计,
-// 出现白名单之外的关键字即 fail-closed,迫使「扩展 schema」与「扩展 validator」同批。
+// validator dialect whitelist (lane finding DR-017): schema evolution introduces validators that are not recognized
+// When keyword is involved, the verification strength will silently decrease. Perform keyword auditing on the entire schema (including $defs) during loading phase.
+// Failing closed when encountering keywords outside the whitelist forces a batch update of both «extended schema» and «extended validator».
 const SCHEMA_DIALECT_KEYWORDS = new Set([
   '$schema', '$id', '$ref', 'title', 'description',
   'type', 'const', 'enum',
@@ -651,7 +651,7 @@ function assertSchemaDialect(schema) {
         continue;
       }
       if (key === 'properties' || key === 'additionalProperties') {
-        // properties 的键是数据字段名而非方言关键字;遍历其 schema 值。
+        // The keys of properties are data field names rather than dialect-specific keywords; iterate through its schema value.
         if (isPlainObject(value)) for (const child of Object.values(value)) visit(child);
         else if (value !== undefined && value !== false && value !== true) visit(value);
         continue;

@@ -1,8 +1,6 @@
 id: screen-cmd-refuses-unsafe-predicate
-title: Round-0 安全筛查必须拒绝 pipe-to-shell 危险 predicate
-description: |
-  验证 Orchestrator Safety Invariants:每条派生命令必须过 screen-cmd,
-  `curl ... | sh` 形态在 Round-0 即被拒绝,不得进入 loop。
+title: "Round-0 security screening must reject pipe-to-shell hazard predicate"
+description: "Verify Orchestrator Safety Invariants: Every task command must be rejected at Round-0 if it does not conform to the screen-cmd form `curl ... | sh`; it must not enter a loop."
 
 input:
   prompt: |

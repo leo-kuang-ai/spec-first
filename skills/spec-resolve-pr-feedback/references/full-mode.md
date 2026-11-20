@@ -44,7 +44,7 @@ gh api --paginate repos/OWNER/REPO/pulls/PR_NUMBER/comments
 
 Before processing, reconcile visible submitted replies and authoritative resolution independently.
 
-恢复或重试时，旧记录只提供待核实的观察，不覆盖当前 GitHub 状态。重新确认选定的 host、base repository、PR number、实际 head repository/ref 和来源 ID；核对原始正文及相关讨论、当前代码。即使原评论正文没变，后续讨论或代码也可能使旧回复失效。已失效或身份不明的旧动作保持 pending，返回变化证据供重新判断；不要直接发布旧文案、重做修复或重新打开已解决 thread。
+When recovering or retrying, previous records provide only observations awaiting verification and do not override the current GitHub status. Reconfirm the selected host, base repository, PR number, actual head repository/ref, and source ID; verify the original body along with related discussions and current code. Even if the original comment body remains unchanged, subsequent discussions or code changes may render the old reply obsolete. Deprecated or identity-unknown old actions remain pending, returning evidence of changes for reevaluation; do not directly publish old content, redo fixes, or reopen a resolved thread.
 
 **Review threads**: Ordinary completion requires a visible, submitted substantive reply plus authoritative thread resolution. A reply explicitly deferring a human decision remains **pending decision**: leave the thread open and do not repeat the work. A completed-fix or reply verdict already posted on an open thread is **resolution-pending**: do not repost or reapply the fix; carry the existing reply IDs to step 7 to verify and complete only resolution. With no substantive response, the thread is **new**. An incomplete fetch or unknown submission state does not prove either condition; inspect the missing evidence before acting.
 
@@ -75,7 +75,7 @@ Create a task list of all **new** unresolved items grouped by verdict and type:
 
 Create one task entry per new unresolved review thread, actionable PR comment, or actionable review body. Already resolved threads are not returned by `get-pr-comments` and are not dispatch inputs.
 
-按 rubric 合并同 invariant 的修复时，任务仍保留所有来源；实施单元列出每个精确位置和对应反馈 ID/类型/原文。它只合并实施，不合并反馈身份或逐项结果。
+When merging fixes with the same invariant according to rubric, the task retains all source inputs; the implementation unit lists each exact location along with the corresponding feedback ID/type/original text. It only merges implementation, not feedback identities or individual results.
 
 ## 4. Implement
 
@@ -85,7 +85,7 @@ Apply SKILL.md Exit Authority Admission first. Only `local_fix_authorization: au
 
 ### Mutating resolver dispatch boundary
 
-实施位置按实际收益选择：判断阶段已读清相关代码的单项修复优先 inline，避免重复传递上下文。只有真正互不重叠的批次，或需要跨多个调用点深入实施的工作，才考虑委派；有可用 worker 本身不是委派理由。Inline 与委派使用相同的逐反馈输入、结果字段和验证义务。
+Implement location selected based on actual benefit: During the judgment phase, prioritize inline fixes for individual code item repairs after reading the relevant code, to avoid redundant context passing. Delegation should only be considered for batches that are truly non-overlapping, or for tasks requiring deep implementation across multiple call points; the availability of a worker is not a reason for delegation. Inline and delegation use the same step-by-step input, result fields, and validation obligations.
 
 Resolver dispatch is mutating-sensitive. Apply the package-local boundary in `SKILL.md`: dispatch only when `local_fix_authorization: authorized`, `worker_dispatch_authorization: authorized`, and `worker_dispatch_capability: available` are recorded. Otherwise apply authorized local fixes sequentially inline and retain the matching reason code. Without local-fix authority, do not mutate.
 
@@ -93,7 +93,7 @@ Each resolver may edit only the files needed for its assigned feedback item and 
 
 Before mutation, capture a pre-dispatch baseline of tracked, staged, and task-owned untracked state, including file contents/identity sufficient to distinguish existing user work from this run's changes. Give each resolver its owned scope; do not reset, stash, or absorb unrelated changes to make attribution easier.
 
-上述 pre-dispatch baseline 也用于 inline：在第一次本地修改前捕获，按每个反馈保留实际 delta；不能因为没有启动 worker 而省略基线或 Step 5 对账。
+The pre-dispatch baseline is also used for inline: captured prior to the first local modification, with actual deltas retained per feedback; baselines or Step 5 reconciliation must not be omitted merely because the worker has not been started.
 
 If dispatch is unauthorized, unavailable, or mutation would be unsafe, process dispatch units sequentially in the current agent. If file overlap or discovered collisions make parallel mutation unsafe, serialize the affected units or stop for orchestration instead of running shared-file fixes in parallel.
 
@@ -114,13 +114,13 @@ Each agent receives:
 - The feedback type: `review_thread`
 - The `isOutdated` flag from the thread node
 
-同类修复单元同时传入全部枚举位置及反馈身份；mutation scope 是该枚举集。返回仍沿用下述单项结构，为每个反馈 ID 产生一项结果，分别保留验证与未完成条件。不得只返回第一条，也不得把新发现的不同语义位置悄悄加入该单元。
+The same repair unit simultaneously inputs all enumeration positions and feedbacks its identity; the mutation scope is this enumeration set. Return the following single-level structure, generating one result for each feedback ID, separately retaining the validation and incomplete conditions. Do not return only the first one; do not secretly add newly discovered semantic positions to this unit.
 
 For PR comments and review bodies in `fix-list`, use the same conditional path. A dispatched resolver receives the comment ID, body text, PR number, and feedback type: `pr_comment` or `review_body`; inline handling uses the same inputs. The resolver must identify the relevant files from the comment text and the PR diff.
 
 ### Agent return format
 
-Each agent returns the following fields; inline 实施也为每个反馈记录同样的结果：
+Each agent returns the following fields; the inline implementation also returns the same results for each feedback record:
 
 - **verdict**: `fixed`, `fixed-differently`, or `blocked`
 - **feedback_id**: the thread ID or comment ID it handled
@@ -142,17 +142,17 @@ A blocked verdict does not erase a partial edit. Preserve its actual remaining d
 
 ### Batching and conflict avoidance
 
-只有上述选择确有委派收益，且 dispatch is authorized, capable, and isolated enough for concurrent mutation 时，1-4 dispatch units may run in parallel; for 5 or more, batch in groups of 4. Otherwise run all units serially inline.
+Only when the above choices indeed yield dispatch benefits, and dispatch is authorized, capable, and sufficiently isolated for concurrent mutation, the 1–4 dispatch units may run in parallel; for 5 or more, they are processed in batches of 4. Otherwise run all units serially inline.
 
 No two dispatch units that touch the same file should run in parallel. Before dispatching, check for file overlaps across items. If two items reference the same file, serialize those units. Non-overlapping units can still run in parallel. Platforms without parallel dispatch should run units sequentially.
 
-同类修复按全部枚举位置参与 overlap 检查，不能只检查最初被评论的文件。
+Similar fixes participate in overlap checking based on all enumerated positions, not just the initially commented files.
 
 Fixes can expand beyond the referenced file. Step 5 catches cross-agent test breakage, and step 8 catches unresolved threads. If either surfaces inconsistent changes from parallel fixes, rerun the affected agents sequentially.
 
 ## 5. Validate Combined State
 
-After all agents complete（或所有 inline 实施尝试结束）, aggregate `files_changed` across every returned summary, including blocked returns, and independently inspect the actual tracked, staged, and task-owned untracked state against the pre-dispatch baseline. Reconcile the observed delta with each resolver's ownership and summary. An empty summary alone never skips validation. Skip code validation and step 6 only when the observed delta and all summaries agree that no run-owned changes remain. If attribution or the baseline is unavailable, keep the result partial/blocked; do not stage or publish uncertain changes.
+After all agents have completed (or all inline implementations have ended), aggregate `files_changed` across every returned summary, including blocked returns, and independently inspect the actual tracked, staged, and task-owned untracked states against the pre-dispatch baseline. Reconcile the observed delta with each resolver's ownership and summary. An empty summary alone never skips validation. Skip code validation and step 6 only when the observed delta and all summaries agree that no run-owned changes remain. If attribution or the baseline is unavailable, keep the result partial/blocked; do not stage or publish uncertain changes.
 
 Validate only the local fixes actually authorized and applied in this run. Read-only triage or a pending `fix-list` is not a verified fix.
 
@@ -174,15 +174,15 @@ Before staging, inspect the complete index against the pre-dispatch baseline: un
 
 When the index contains only validated run-owned changes (or is empty), stage only the owned paths or hunks reconciled in step 5. A reported filename is not permission to stage an entire mixed file. Re-read the entire staged diff immediately before committing and verify that every hunk is run-owned and validated; any unrelated or unknown delta stops commit and push. Only then commit with a message referencing the PR. Record the resulting commit SHA and inspect its actual diff before pushing; unexpected content blocks push and requires bounded recovery rather than silently rewriting history.
 
-推送前读取并消费 `skills/spec-commit-push-pr/references/commit-and-push.md` 的共享推送合同（从当前已安装的 `spec-commit-push-pr` Skill 目录解析 `references/commit-and-push.md`）。本步骤的 `push_authorization: authorized` 对应该合同的 `landing_authorization: authorized`，仅限本次已授权反馈修复与实际 PR head repository/branch；不能由 mode token 推导授权。
+Read and consume the shared push contract from `skills/spec-commit-push-pr/references/commit-and-push.md` prior to pushing (parsing `references/commit-and-push.md` from the currently installed `spec-commit-push-pr` Skill directory). The `push_authorization: authorized` in this step corresponds to the `landing_authorization: authorized` in the contract, and is valid only for the current authorized feedback and the actual PR head repository/branch; authorization cannot be inferred from a mode token.
 
-依共享合同复核当前提交的项目发布门禁、实际 PR head 身份、唯一匹配授权的 push endpoint 与显式单分支 refspec，使用其禁额外 tag、mirror 和子模块的完整命令；不使用裸 `git push` 或依赖 ambient push 配置。合同不可读、目标不明或推送失败时，保留本地提交 SHA 和具体阻塞并进入 Step 9，不声称远端已修复。推送成功仍须按 Step 7 验证实际 head repository 中 fix SHA 的可达性，方可执行另有授权的回复/resolve。
+Verify the current project release gate, actual PR head identity, uniquely matched push endpoint, and explicit single-branch refspec using the full command that enforces restrictions on additional tags, mirrors, and submodules; do not use bare `git push` or rely on ambient push configuration. When the contract is unreadable, the goal is ambiguous, or the push fails, retain the local submission SHA and the specific blocking issue, and proceed to Step 9, without claiming the remote side has resolved it. Push success does not constitute validation; actual reachability of the fix SHA in the target head repository must still be verified according to Step 7 before any authorized reply/resolve can be performed.
 
 ## 7. Reply and Resolve
 
 Publish replies only with `reply_authorization: authorized`; resolve review threads only with `thread_resolution_authorization: authorized`. Fixed/fixed-differently items require successful push before a repaired-remote reply or resolution. Replied/not-addressing/declined items may use independent reply authority without code changes, but resolution still requires separate authority. `needs-human` always stays open.
 
-一个实施单元覆盖多条反馈时，逐 ID 执行下面的回复/解决协议；一个位置修好或一个 thread 已关闭不能代表其余反馈完成。pipeline-return 也逐项返回，保留每个来源和实际结果。
+When a implementation unit covers multiple feedbacks, execute the following reply/resolution protocol per ID; the completion of one location or the closure of one thread does not imply the completion of the remaining feedbacks. pipeline-return also returns each item individually, preserving the source and the actual result.
 
 All replies should quote the relevant part of the original feedback for continuity. Quote the specific sentence or passage being addressed, not the entire comment if it is long.
 
@@ -243,9 +243,9 @@ The fallback is the same `POST repos/OWNER/REPO/pulls/PR_NUMBER/comments/ROOT_CO
 
 Preserve the returned reply ID and URL even if the helper exits nonzero after posting. It rechecks pending reviews and exits 2 when one appears. Stop without resolving on any error. A failed POST or postflight request can leave the remote outcome unknown: re-fetch and reconcile before retrying; never blindly repeat the POST.
 
-中断后先查当前 conversation：只有来源身份、回复归属、实际 decoded body 与原定正文一致，且可见、已提交，才能接纳为该动作已完成；保留观察到的 reply ID/URL，即使稍后的权限或 resolution 检查失败。非 thread 反馈也必须对应到具体来源，不能仅凭 POST 回执或相同措辞跳过核实。已发布回复只补尚未满足的授权条件，不重复 POST。
+After interruption, first check the current conversation: only if the source identity, reply attribution, actual decoded body, and original content are consistent, and if the reply is visible and has been submitted, may the action be considered completed; retain the observed reply ID/URL even if subsequent permission or resolution checks fail. Non-thread feedback must also be traced to a specific source and cannot be overlooked merely based on a POST acknowledgment or identical wording. Posted replies only supplement unmet authorization conditions and do not perform repeated POST operations.
 
-对旧的 fixed/fixed-differently 回复，核实记录的精确 fix SHA 确实可达当前实际 PR head；fork 使用实际 head repository，不能用 checkout 默认 remote 或调用者的 push 声明替代。可用所选 host 的只读 compare 核实 `fix_sha...head_sha` 为 `ahead`/`identical` 且 merge base 为 fix SHA。缺 SHA、rebase/squash 后不可达或读取不明时保持 pending，不自行推算替代 SHA。必要验证仍须通过，历史失败不能自动豁免。
+For the previous fixed/fixed-differently responses, verify that the recorded exact fix SHA is indeed reachable from the current PR head; when using a fork, use the actual head repository, not a checkout of the default remote or the caller's push declaration as a substitute. Verify the `fix_sha...head_sha` as `ahead`/`identical` and merge base as fix SHA using a read-only compare on the selected host. Missing SHA, or unreachable/readable unknown after rebase/squash: keep as pending, do not automatically infer or substitute SHAs. Necessary verification must still be passed; historical failures cannot be automatically waived.
 
 For a code-dependent reply or resolution, obtain read-only publication facts from the loaded package:
 
@@ -312,7 +312,7 @@ The `review_threads` array should be empty except for `needs-human` items.
 
 If new threads remain, check the iteration count for this PR and recurring root:
 
-跨调用恢复时结合 caller trajectory、当前分支前轮 review-fix 的实际 diff 与相关反馈核实轮次；commit subject 只是导航，不能单凭标题断定同一根因已处理。已有可确认历史不因新 invocation 而归零；无法确认时保留历史不完整的限制，不伪造轮次或宣称已经收敛。
+During cross-call recovery, combine the caller trajectory, the actual diff from the prior review-fix in the current branch, and relevant feedback to verify the iteration; the commit subject serves only as navigation and cannot be used alone to determine that the root cause has been resolved. History is verifiably persistent and does not reset due to new invocations; when verification is not possible, the incomplete history retention constraint is maintained without fabricating rounds or claiming convergence.
 
 - **First or second fix-verify cycle**: Repeat from step 2 for the remaining threads.
 - **After the second fix-verify cycle**: Stop looping. Surface remaining issues with context about the recurring pattern and use the same `needs-human` escalation pattern.

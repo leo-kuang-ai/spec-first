@@ -1,9 +1,6 @@
 id: r2-real-verdict-works
-title: R2正例:真外部候选裁决应正常给出 verdict
-description: |
-  第二轮正例变体:验证 design-question 修复未过度收紧——
-  MySQL→PostgreSQL 是命名外部候选+whether-to-commit,应正常裁决
-  (给 verdict/对比,不拒绝、不路由 brainstorm)。
+title: "R2 Positive: True external candidate rulings should normally produce a verdict."
+description: "Second round of positive variant: Verify design-question fix does not overly tighten — MySQL → PostgreSQL involves named external candidates + whether-to-commit; should normally reach a verdict (for comparison, not rejection, not routing to brainstorm)."
 
 input:
   prompt: |

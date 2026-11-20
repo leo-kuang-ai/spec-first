@@ -203,7 +203,7 @@ function newestScreen() {
 function newestScreenRelativePath() {
   const file = newestScreen();
   if (!file) return null;
-  // SUP-12 fix: 返回相对于 screens 目录的路径（不含文件名），用于 <base> 标签
+  // SUP-12 fix: Return the path relative to the screens directory (excluding the filename), for use with the <base> tag
   const rel = path.relative(screens, path.dirname(file));
   return rel ? '/' + rel.replace(/\\/g, '/') + '/' : '/';
 }
@@ -211,10 +211,10 @@ function render() {
   const file = newestScreen();
   if (!file) return '<!doctype html><html><body><h1>Waiting for a page...</h1></body></html>';
   const html = fs.readFileSync(file, 'utf8');
-  // SUP-12 fix: 注入 <base> 标签，让浏览器基于正确的目录解析相对资源
+  // SUP-12 fix: Inject the <base> tag to let the browser resolve relative resources based on the correct directory
   const basePath = newestScreenRelativePath();
-  if (basePath === '/') return html; // 根目录文件不需要 <base>
-  // 在 <head> 后或 <html> 后注入 <base href="...">
+  if (basePath === '/') return html; // Root-level files do not need <base>.
+  // Inject <base href="..."> after <head> or after <html>
   const baseTag = `<base href="${basePath}">`;
   if (/<head[\s>]/i.test(html)) {
     return html.replace(/<head([\s>])/i, `<head$1${baseTag}`);
@@ -222,7 +222,7 @@ function render() {
   if (/<html[\s>]/i.test(html)) {
     return html.replace(/<html([\s>])/i, `<html$1${baseTag}`);
   }
-  // 没有 <head> 或 <html>，在开头插入
+  // No <head> or <html>, insert at the beginning
   return baseTag + html;
 }
 function safeFile(req, res) {

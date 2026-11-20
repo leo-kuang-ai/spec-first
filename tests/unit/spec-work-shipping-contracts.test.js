@@ -60,10 +60,10 @@ describe('spec-work structured shipping and shared verification contracts', () =
 
   test('session-temp review evidence is sanitized into the current work run or downgraded', () => {
     expect(shipping).toContain('.spec-first/workflows/spec-work/<workspace-slug>/<run-id>/');
-    expect(shipping).toMatch(/actually consumed.*review\.json.*summary/is);
+    expect(shipping).toMatch(/review\.json.*structured finding summary that were actually consumed/is);
     expect(shipping).toMatch(/sanitize|redact/i);
     expect(shipping).toMatch(/copy.*fail.*limitation/is);
-    expect(shipping).toContain('不得把绝对 temp path 写入');
+    expect(shipping).toContain('Must not store absolute temp paths in');
     expect(shipping).toContain('review-evidence-copy-failed');
   });
 

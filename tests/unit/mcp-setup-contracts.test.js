@@ -49,7 +49,7 @@ describe('spec-runtime-setup runner contracts', () => {
     );
 
     expect(reference).toContain(
-      '`--verify-only` / `--refresh-facts` 会重新验证并刷新 setup-owned facts，但不执行安装或 host config 写入。',
+      '`--verify-only` / `--refresh-facts` will re-verify and refresh setup-owned facts, but will not perform installation or host config writes.',
     );
     expect(reference).not.toContain('`--verify-only` only reads facts');
   });
@@ -68,14 +68,14 @@ describe('spec-runtime-setup runner contracts', () => {
     expect(skill).toContain('--only codegraph,graphify');
     expect(skill).toContain('defaults-active');
     expect(skill).toContain('a pure non-Git directory with no child repos becomes the single folder target');
-    expect(skill).toContain('父目录 bare / bare --all-repos / --check 均只读诊断');
+    expect(skill).toContain('Parent directory bare / bare --all-repos / --check are all read-only diagnostics; batch installation uses `--installation-only --all-repos`, batch capability uses `--only codegraph,graphify --all-repos`.');
     expect(skill).toContain('--installation-only --all-repos');
     expect(skill).toContain('`--folder <path>` selects the exact logical project directory and does not require Git');
     expect(skill).toContain('`--repo <path>` must resolve to the exact Git repository root');
     expect(skill).toContain('the folder is never passed to Git-only `init --repo`');
     expect(skill).toContain('`next_action_command={cwd,command,args}`');
     expect(skill).toContain('`first_generation.scope_provenance`');
-    expect(skill).toContain('无 target 时由现有 resolver 区分单目录与多仓父目录，禁止扩大 scope');
+    expect(skill).toContain('When there is no target, the existing resolver distinguishes between single-directory and multi-repo parent directories, and scope expansion is prohibited.');
     expect(registry.providers.filter((entry) => entry.setup_required).map((entry) => entry.id).sort())
       .toEqual(['codegraph', 'graphify']);
     expect(registry.tools.find((entry) => entry.id === 'codegraph')).toMatchObject({ setup_required: true });
@@ -92,10 +92,10 @@ describe('spec-runtime-setup runner contracts', () => {
       'utf8',
     );
 
-    expect(skill).toContain('裸调用收敛 registry 声明的基线');
+    expect(skill).toContain('bare invocation converges the baseline declared in the registry');
     expect(skill).not.toContain('自动携带 `--repair-host-config`');
     expect(skill).toContain('Subset / Repair Flow');
-    expect(skill).toContain('Host conflict 仍需独立 `--repair-host-config` 授权');
+    expect(skill).toContain('Host conflict still requires independent `--repair-host-config` authorization');
     expect(skill).not.toContain('只有用户明确要求自动修复时，才追加 `--repair-host-config`');
   });
 
@@ -129,9 +129,9 @@ describe('spec-runtime-setup runner contracts', () => {
       expect(contents).toContain('git rev-parse --git-path hooks');
       expect(contents).toContain('manual-only');
     }
-    expect(skill).toContain('不运行 hook 命令、不读取外部 hook 内容、不修改 local/global `core.hooksPath`');
-    expect(skill).toContain('不得声称外部 hook 不存在、不会执行或“安装失败”');
-    expect(skill).toContain('不得仅因 unknown 自动追加或执行 `--refresh`');
+    expect(skill).toContain('do not execute hook commands, do not read external hook content, do not modify local/global `core.hooksPath`');
+    expect(skill).toContain('Must not claim that external hooks do not exist, will not be executed, or that "installation failed');
+    expect(skill).toContain('Never append or run `--refresh` solely because the status is unknown');
     expect(manual).toContain('git config --local core.hooksPath .githooks');
     expect(manual).toContain('仓库级 `core.hooksPath` 会覆盖全局值');
     expect(boundary).toContain('不得把它描述成外部 hook 不存在/安装失败');

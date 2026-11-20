@@ -12,6 +12,7 @@
 
 | 路径 | 内容 |
 |---|---|
+| [需求与技术方案模板调研](2026-11-20-prd-design-templates/README.md) | 八组公开一手材料、两份实际提案与可直接填写的中文 PRD、技术评审模板 |
 | [2026-11-03-ai-task-brief-best-practices.md](2026-11-03-ai-task-brief-best-practices.md) | AI 任务交代六项框架、可复制模板、执行验收闭环与官方来源 |
 | [2026-09-24-ai-industry-trends-claude-prompt-shortening.md](2026-09-24-ai-industry-trends-claude-prompt-shortening.md) | AI 业界趋势、Claude 官方提示词方法与 Prompt 大幅缩减原因 |
 | [2026-09-24-skill-directory-architecture-inventory.json](2026-09-24-skill-directory-architecture-inventory.json) | 2026-09-24-skill-directory-architecture-inventory.json |

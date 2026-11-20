@@ -1,8 +1,6 @@
 id: missing-origin-not-run
-title: pipeline 模式缺 origin 应返回 not_run 不推断
-description: |
-  验证 fail-closed 合同:mode:pipeline 无 target-origin 时返回
-  not_run/target-origin-missing,不搜 package scripts、不推断端口、不启动 server。
+title: "In pipeline mode, if origin is missing, return not_run without inference."
+description: "Verify fail-closed contract:mode:pipeline returns not_run/target-origin-missing when target-origin is absent, does not search for package scripts, does not infer ports, and does not start the server."
 
 input:
   prompt: |

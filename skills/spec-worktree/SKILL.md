@@ -62,7 +62,7 @@ bash -c 'if [ -n "${CLAUDE_SKILL_DIR:-}" ]; then exec bash "$CLAUDE_SKILL_DIR/sc
 
 Defaults:
 - `from-branch` defaults to origin's default branch (or `main` if that cannot be resolved)
-- 新分支以本次获取的远端分支提交为起点；获取失败时只允许同名本地 `refs/heads/` 分支。仅有旧的远端缓存不能创建工作树。脚本报告基线并核对新工作树的 HEAD。
+- A new branch starts from the latest commit of the remote branch obtained; if the fetch fails, only a locally existing branch with the same name in `refs/heads/` is allowed. Only the old remote cache can fail to create a working tree. Script reports the baseline and verifies the HEAD of the new work tree.
 - `.env*` files are not copied unless `--copy-env` is passed
 
 Examples:
@@ -145,7 +145,7 @@ This helper accepts only a caller-owned isolation contract: caller identity, tar
 
 `spec-work` may use new-work or existing-ref mode only after `execution-strategy.md` has locked one target repo and recorded mutation authorization. It owns all implementation and recovery state outside this helper. A linked worktree does not enforce Git-index isolation: before a mutation-capable worker starts, the caller still needs a host receipt that denies writes to the exact Git common directory/index path and filters credential environment. Without it, use `worker_git_index_enforcement_unavailable`, do not dispatch that worker, and continue inline/serial. The returned worktree root becomes the snapshot `worktree_identity.repo_root`; any later identity drift routes back to `spec-work` as `run-source-drifted` rather than causing this helper to recreate, reset, or rerun work.
 
-未来 caller 必须先在其 public owner source 中增加 forward invocation 与 intake contract。本 helper 的 reverse claim 不能单独建立 integration edge。
+The future caller must first add a forward invocation and intake contract in its public owner source. This helper's reverse claim cannot independently establish an integration edge.
 
 ## Troubleshooting
 

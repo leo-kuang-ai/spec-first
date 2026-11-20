@@ -88,7 +88,7 @@
               "cryptography",
               null
             ],
-            "description": "验证阶段按实际 claim 分类；敏感 claim 拒绝须有具体反证。"
+            "description": "Verification phase is categorized by actual claim; specific evidence is required to justify rejection of sensitive claims."
           },
           "validation_status": {
             "type": "string",
@@ -97,12 +97,12 @@
               "rejected",
               "unresolved"
             ],
-            "description": "验证阶段可选结果；unresolved 仅报告，不是确认缺陷或修复指令。"
+            "description": "Optional outcome in verification phase; \"unresolved\" indicates reporting only, not confirmation of defect or repair instruction."
           },
           "validation_reason": {
             "type": "string",
             "minLength": 1,
-            "description": "确认或反驳的证据，或未解决所缺证据。"
+            "description": "Evidence of confirmation or refutation, or lack of resolved evidence."
           },
           "suggested_fix": {
             "type": ["string", "null"],

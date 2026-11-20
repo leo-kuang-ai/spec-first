@@ -1,9 +1,6 @@
 id: surprise-me-no-repo-needs-substance
-title: 无仓库时的 Surprise me 必须先索要材料并干净结束
-description: |
-  验证 surprise-me 的确定性路由：CWD 不在 git repo 内时路由到 elsewhere 模式，
-  且必须先收集至少一份材料（URL / 描述 / 粘贴）才能继续；
-  用户提供不了时应说明需要什么并干净结束，不得凭空生成或产出 artifact。
+title: "When there's no warehouse, the Surprise me action must first request materials and end cleanly."
+description: "Verify the determinism of the surprise-me routing: when CWD is not within a git repo, route to the elsewhere mode, and a minimum of one material (URL / description / paste) must be collected before proceeding; if the user fails to provide such material, clearly indicate what is required and cleanly terminate—no artifacts should be generated or produced without explicit input."
 
 input:
   prompt: |

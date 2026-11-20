@@ -1,157 +1,157 @@
 # Feedback And Tests
 
-本 reference 是 `spec-work` 的反馈回路 owner。它负责 smallest loop、vertical slice、proof/characterization、test discovery、scenario completeness、system-wide check，以及无法运行验证时的 replacement evidence。它不决定产品范围，也不把 TDD 变成所有任务的仪式。
+This reference is the owner of the feedback loop for `spec-work`. It is responsible for the smallest loop, vertical slice, proof/characterization, test discovery, scenario completeness, system-wide check, and replacement evidence when verification cannot be executed. It does not determine the product scope, nor does it turn TDD into a ritual for all tasks.
 
 ## Owned
 
-- 为 behavior/CLI/browser/docs-schema/manual-only surface 选择最小可观察 feedback loop。
-- 决定 proof-first、characterization-first、existing-test ownership 与 replacement evidence。
-- 补齐适用 scenarios，检查真实跨层链路、failure/orphan/interface parity。
-- 规定 not-run reason、claim ceiling 与复跑边界。
+- Choose the smallest observable feedback loop for behavior/CLI/browser/docs-schema/manual-only.
+- Determine proof-first, characterization-first, existing-test ownership, and replacement evidence.
+- Complement applicable scenarios, verify real cross-layer links, failure/orphan/interface consistency.
+- Specify the not-run reason, claim ceiling, and retry boundary.
 
 ## Not Owned
 
-- 改变 acceptance、public contract、架构 owner、task scope 或 source/runtime ownership。
-- 把 TDD 变成所有任务的固定仪式，或让脚本裁决语义覆盖是否充分。
-- 运行 shipping closeout、写 work run artifact、授权 commit/landing。
+- Change acceptance, public contract, architecture owner, task scope, or source/runtime ownership.
+- Turn TDD into a fixed ritual for all tasks, or let scripts decide whether semantic coverage is sufficient.
+- Run shipping closeout, write work run artifact, authorize commit/landing.
 
 ## Trigger
 
-- 第一个 behavior-bearing mutation 之前；
-- 当前 unit 的 `Execution note` 指定 proof-first、characterization-first、smoke/runtime 或其他验证方向时；
-- task review、simplify 或 fix 改变了原验证覆盖面，需要重新选择或复跑 loop 时；
-- docs/schema/config/manual-only 任务需要确定什么可观察证据足以支撑完成声明时。
+- Before the first behavior-bearing mutation;
+- When the current unit's `Execution note` specifies a proof-first, characterization-first, smoke/runtime, or other verification direction;
+- task review, simplify, or fix alters the original validation coverage, requiring re-selection or rerun of loop;
+- The task requires determining observable evidence sufficient to support the completion of a declaration at the time of assertion.
 
 ## Fallback
 
-纯文案、changelog-only、无行为变化且已有明确 diff-shape check 的小任务不必加载完整细节；执行最窄已知检查并保持 claim ceiling 即可。
+Pure copywriting, changelog-only, behavior-unchanged, and already has a clear diff-shape check: no need to load full details; perform the narrowest known check and maintain the claim ceiling.
 
 ## Smallest Feedback Loop
 
-在改变行为前，先建立或尝试能观察当前 slice 的最小回路。优先顺序不是固定工具列表，而是“最小、真实、可复跑、能证明当前风险”：
+Before changing behavior, first establish or attempt to observe the smallest loop that can capture the current slice. Priority is not a fixed tool list, but rather "minimal, authentic, reproducible, and capable of proving current risks":
 
-- existing failing test 或最小新增 failing test；
-- characterization test / baseline capture；
-- CLI invocation、HTTP/API call、browser interaction 或 runnable example；
-- trace replay、throwaway harness、property/fuzz loop；
-- docs contract、schema validation、help/render check、generated catalog diff、link/path check；
-- manual-only surface 的明确步骤、可观察信号和 limitation。
+- existing failing test or minimum new failing test;
+- characterization test / baseline capture;
+- CLI invocation, HTTP/API call, browser interaction, or runnable example;
+- trace replay, throwaway harness, property/fuzz loop;
+- docs contract, schema validation, help/render check, generated catalog diff, link/path check;
+- clear steps, observable signals, and limitations of manual-only surface.
 
-如果没有可用 loop，记录 `feedback_loop_not_possible` 与缺失条件。继续只允许使用最窄 replacement evidence，并明确它覆盖什么、不覆盖什么；不能把“没法跑”改写为 passed。
+If no available loop exists, record `feedback_loop_not_possible` along with the missing conditions. Continue to allow only the narrowest replacement evidence, and clearly specify what it covers and what it does not cover; do not rephrase "cannot run" as passed.
 
 ## Vertical Slices
 
-当 scope 可以分成独立行为时，优先 tracer bullet：一个 behavior slice 同时关闭实现、focused verification、必要 docs/handoff evidence，再进入下一个 slice。
+When behaviors are independent, complete one vertical slice at a time: implement it, run focused checks, and record the documentation or handoff evidence it needs before starting the next slice.
 
-不要在多个独立 unit 上先“写完所有测试”，再“写完所有实现”。这会延迟反馈并扩大失败定位面。只有共享 contract/schema 必须先建立、或依赖图要求横向基座时，才先完成共同底层，并在最早可运行处建立反馈。
+Do not first write all tests, then all implementations, on multiple independent units. This will delay feedback and expand the scope of failure diagnosis. Only when sharing a contract/schema must be established beforehand, or when the dependency graph requires a horizontal foundation, should the common underlying layer be completed first, and feedback be established at the earliest runnable point.
 
-Docs-only、config-only 和 generated-catalog 任务使用 docs/schema/help/render/diff-shape 回路；不要强制编造行为测试。
+Docs-only, config-only, and generated-catalog tasks use the docs/schema/help/render/diff-shape loop; do not forcibly invent behavior tests.
 
 ## Slice Selection
 
-- 默认选择 vertical slice：每个可独立观察的行为同时关闭实现、验证与必要 handoff evidence。
-- 只有多个 consumer 共享同一输入/输出/error contract，且不先稳定该 contract 就无法得到最早可运行反馈时，才选择 contract-first；contract 稳定后立即回到 consumer 的 vertical slice。
-- 当最高损失、最高不确定性或最难回滚的假设会决定后续方向时，选择 risk-first，先用最小 proof/characterization 证伪它，不从低风险清理开始。
-- 保持 rollback-friendly：缩小同时变化的行为和状态面，保留可撤销 seam，并在进入下一 slice 前确认失败不会留下 orphan、重复效果或不可解释的中间状态。
+- Default to a vertical slice: implement and verify one independently observable behavior and collect its handoff evidence together.
+- A contract-first approach is chosen only when multiple consumers share the same input/output/error contract, and early runnable feedback is not available until the contract is stabilized; after contract stabilization, immediate transition occurs to the consumer's vertical slice.
+- When the scenario of maximum loss, maximum uncertainty, or the most difficult-to-rollback assumption determines the subsequent direction, choose risk-first: validate it with the minimal proof/characterization to falsify it, rather than starting with low-risk cleanup.
+- Rollback-friendly: Minimize the surface of concurrent behavior and state changes, preserve reversible seam, and ensure that failures before entering the next slice do not leave orphans, duplicate effects, or unpredictable intermediate states.
 
-这三种选择是语义判断，不是文件类型或关键词分类。不要用 contract-first 建一个长期不落地的横向框架，也不要把 risk-first 解释为先做最复杂的实现。
+These three options are semantic judgments, not file type or keyword classifications. Do not build a long-term, generic framework using a contract-first approach, nor equate risk-first with first implementing the most complex solution.
 
 ## Proof / Characterization Strategy
 
-Test discovery 决定证据应该落在哪里：
+Test discovery determines where evidence should be placed:
 
-| 当前情况 | 行动 |
+| Current situation | Action |
 | --- | --- |
-| Existing test 已因目标行为失败 | 直接使用该 red evidence，不新增重复测试。 |
-| Existing test 覆盖 contract 但断言旧/错误结果 | 修改或加强该测试，先观察预期失败，再改 production code。 |
-| Existing test 过度 mock 或没走真实链路 | 窄化重构测试 seam，先证明真实风险可见。 |
-| 没有测试覆盖目标行为 | 添加最小 focused failing test 或 characterization test。 |
-| 当前任务不适合自动测试 | 在 mutation 前记录 no-test exception、原因、replacement verification 和 coverage limitation。 |
+| Existing test has failed due to target behavior failure | Directly use this red evidence without adding redundant tests. |
+| Existing test covers contract but asserts old/incorrect results | Modify or enhance the test to first observe expected failures, then alter the production code. |
+| Existing test involves excessive mocking or fails to traverse the real chain | Narrowing and restructured test seam, first prove that real risks are visible. |
+| No test coverage for the target behavior | Add a minimum focused failing test or characterization test. |
+| The current task is not suitable for automated testing | Record no-test exception, cause, replacement verification, and coverage limitation before mutation. |
 
-Proof-first 时，测试和实现不能在同一步同时完成；必须观察到与目标 root/behavior 对应的失败。Characterization-first 时，baseline 是“当前行为被观察到”，不是“当前行为正确”。
+During proof-first approach, testing and implementation cannot be completed in the same step; a failure corresponding to the target root/behavior must first be observed. In characterization-first approach, the baseline is "current behavior is observed," not "current behavior is correct."
 
-不要为证明纪律而复制测试。已有 test 是正确 owner 时，应 update/strengthen，而不是平行新增一份近似断言。
+Do not copy tests to prove discipline. When a test already has the correct owner, it should be updated or strengthened, rather than parallelly adding a similar assertion.
 
 ## Test Design Quality
 
-测试必须能在所声明的边界行为错误时失败，并在纯实现替换时保持有效；若 expected 直接由被测代码算出、mock/fixture 代替生产层提供了本应验证的结果，或只断言内部互调，则不足以证明该边界。优先通过真实入口验证返回、存储或外发结果；真实入口可驱动时，不为测试专门新增 production export、flag、wrapper 或 hook。已有明确契约 seam 的窄测试仍按其实际覆盖范围报告，不把所有内部断言一概视为无效。
+Tests must fail when boundary behavior errors are declared, and remain valid when pure implementation replacements are applied; if the expected value is directly computed by the tested code, or if mock/fixture provides production-level results for validation, or if only internal intercalls are asserted, such cases are insufficient to prove boundary behavior. Prefer verification, storage, or outbound results via real entry points; when real entry points are active, no additional production export, flag, wrapper, or hook should be introduced for testing purposes. Narrow test cases with explicit seam contracts are still reported based on their actual coverage scope, and not all internal assertions are considered invalid.
 
-- 测试应保持 DAMP（descriptive and meaningful phrases）：名称、setup 与断言直接表达行为和业务状态，允许为可读性保留少量重复，不用隐藏意图的过度 helper 压缩测试。
-- 默认验证 state over interaction：优先断言调用者可观察的返回值、状态转换、持久化结果、事件或错误。只有 interaction itself is the contract（例如协议必须调用一次、顺序本身可见、禁止某个 sink）时，才把调用次数或调用顺序作为主要 proof。
-- test double 选择顺序是 `real implementation -> high-fidelity fake -> stub -> mock`。越靠后越需要解释为什么更真实的 seam 不可用，以及该 double 仍能观察当前风险。
-- No observed RED means no TDD-history claim。最终 diff 里同时存在实现和绿测，只能证明测试当前通过；只有 run-local evidence 在 production change 前观察到与目标行为对应的失败，才能声称 RED/TDD 历史。
-- 一个 fake/mock 若跳过 serialization、middleware、callback、permission、retry 或 error translation，不能作为真实跨层链路的 integration proof；补最窄真实对象或 integration check。
+- Tests should adhere to DAMP (descriptive and meaningful phrases): names, setup, and assertions should directly express behavior and business states, allowing minimal repetition for readability, and avoiding overly complex helper functions that obscure intent.
+- Default verification of state over interaction: prioritize asserting observable return values, state transitions, persistence results, events, or errors observable to the caller. Only when the interaction itself constitutes the contract (e.g., the protocol must be invoked exactly once, the order of invocations is observable, or a specific sink is prohibited) should the number of calls or call order be considered the primary proof.
+- The test double selection order is `real implementation -> high-fidelity fake -> stub -> mock`. The later you get, the more you need to explain why a more realistic seam is unavailable, and how this double still allows current risks to be observed.
+- No observed RED means no TDD-history claim. In the final diff, the presence of both implementation and green testing only proves that the current test passes; only observing a failure matching the expected behavior in run-local evidence prior to a production change can establish a RED/TDD history.
+- A fake/mock that bypasses serialization, middleware, callback, permission, retry, or error translation cannot serve as valid proof of end-to-end integration; a minimal, real-world object or integration check must be provided.
 
 ## Risk-Triggered Proof Strength
 
-只有 named failure mode、invariant 或 load-bearing acceptance 需要更强反证时，才选择以下 proof；不要把它们变成所有任务的固定层级：
+Only select the following proof when a stronger counterexample is required for named failure mode, invariant, or load-bearing acceptance; do not make them a fixed tier for all tasks:
 
-- 明确区分 `source mutation` / `behavior-bearing mutation` 与 `mutation testing` / `mutant`。前者属于文件或行为修改授权，后者是向实现注入受控 plausible fault 来验证测试敏感度；不得只写裸 `mutation`。
-- Mutation testing 必须绑定真实 canonical command identity 或可复跑的 bounded runner，并记录 killed、survivor、error 与 equivalent mutant。Survivor 不能静默算 killed；equivalent mutant 必须给出语义理由；runner error、no tests collected 或未实际注入 mutant 不能算有效 mutation evidence。
-- Changed-line coverage 只能说明目标行被执行，不等于行为证明。没有 meaningful assertion、状态结果、错误结果或真实跨层 proof 时，coverage 百分比不能支撑 behavior-verified claim。
-- Pre-existing baseline 必须把既有失败与 task-introduced failure 分开。允许诚实记录旧失败和 zero-new-failure 边界，但不能声称全绿，也不要求顺手修复 unrelated failure。
-- Anti-gaming / false-green 检查要构造“真实行为仍错误、guard 却变绿”的具体路径，例如 vacuous assertion、过度 mock、错误 working directory、未执行真实 mutant 或只检查代理输出。能通过这种攻击的验证机制不能支持对应 claim。
-- Proof intent 未绑定真实 command/provider 时保留为 unbound limitation，不得生成 synthetic check；已绑定但工具缺失时才按 `not-run` / `missing_dependency` 记录。
+- Clearly distinguish `source mutation` / `behavior-bearing mutation` from `mutation testing` / `mutant`. The former grants authorization for file or behavior modifications, while the latter injects controlled plausible faults to validate test sensitivity; bare `mutation` writing is not permitted.
+- Mutation testing must be bound to a real canonical command identity or a reproducible bounded runner, and must record killed, survivor, error, and equivalent mutants. Survivor cannot be considered killed under silent conditions; equivalent mutants must provide semantic justification; runner errors, no tests collected, or mutants not actually injected cannot count as valid mutation evidence.
+- Changed-line coverage indicates only that target lines were executed; it does not necessarily prove behavior. Coverage percentage cannot support behavior-verified claims in the absence of meaningful assertions, state results, error results, or real cross-layer proofs.
+- Pre-existing baseline must separate existing failures from task-introduced failures. Allows honest recording of previous failures and zero-new-failure boundaries, but does not claim full green status, nor requires fixing unrelated failures.
+- Anti-gaming / false-green verification requires constructing specific paths where "real behavior remains incorrect but the guard turns green", for example: vacuous assertions, excessive mocking, incorrect working directory, failure to execute a real mutant, or only checking proxy output. The validation mechanism can't verify the claim.
+- Proof intent retains an unbound limitation when not linked to a real command/provider; synthetic checks are not generated. Records are marked as `not-run` or `missing_dependency` only when binding exists but the tool is missing.
 
 ## Test Discovery
 
-在修改 implementation file 前：
+Before modifying the implementation file:
 
-1. 从 plan/task 声明的 test files 与 scenarios 开始；
-2. 查找 import/reference/命名对应的 existing tests；
-3. 按断言目标反查：对本次 touched paths 在测试目录内检索（例如 `rg -l "<touched-path>" tests/`），找出按路径或字节断言这些文件的 repo 合同测试——governance、byte-budget、ordering、projection 类合同常不 import 目标文件，import/命名搜索抓不到；命中的套件纳入本次 check 选择；
-4. 找到跨层链路上的 integration/contract/smoke tests；
-5. 确认删除或改变行为时，旧测试是否也应更新/删除；
-6. 只在当前 source 证据不足时扩大搜索，不为“完整感”做无界 archaeology。
+1. Start with the test files and scenarios declared in the plan/task;
+2. Search for existing tests corresponding to import/reference/naming;
+3. Reverse-lookup by assertion target: search within the test directory for files touched in the current test (e.g., `rg -l "<touched-path>" tests/`), identifying repository contract tests that assert on these files via path or byte-level assertions—governance, byte-budget, ordering, and projection contracts typically do not import the target files, so import or naming-based searches may fail to detect them; test suites that match are included in the current check selection.
+4. Find integration/contract/smoke tests on cross-layer links;
+5. Should old tests be updated or deleted when confirming deletion or change of behavior?
+6. Expand search only when current source is insufficient; do not conduct unbounded archaeology for the sake of completeness.
 
 ## Scenario Completeness
 
-对 feature-bearing unit，只补适用类别，不按数量凑场景：
+For feature-bearing units, supplement only with applicable categories, not by padding to meet scene quantity:
 
-| 类别 | 何时适用 | 从哪里派生 |
+| Category | When is it applicable? | From where is it derived? |
 | --- | --- | --- |
-| happy path | 所有 feature-bearing unit | Goal、Approach、真实 input/output contract。 |
-| edge/boundary | 有输入、状态、并发、分页、顺序或生命周期边界 | boundary values、empty/nil、重复/并发、状态转换。 |
-| error/failure | 有 validation、权限、外部调用、I/O、retry/fallback | invalid input、deny path、downstream failure、timeout、partial failure。 |
-| integration | 跨 callback/middleware/service/provider/source-runtime seam | 真实跨层调用链，避免把参与交互的层全部 mock。 |
+| happy path | All feature-bearing unit | Goal, Approach, Actual input/output contract. |
+| edge/boundary | input, state, concurrency, pagination, ordering, or lifecycle boundaries | boundary values, empty/nil, repetition/concurrency, state transitions |
+| error/failure | has validation, authorization, external calls, I/O, retry/fallback | invalid input, deny path, downstream failure, timeout, partial failure. |
+| integration | Cross callback/middleware/service/provider/source-runtime seam | True end-to-end call chains, avoiding mocking all interacting layers. |
 
-Plan scenarios 过于泛化时，从当前 unit 的 source/contract 补足；如果补充会改变 acceptance 或 public contract，停止并返回 plan/task owner，不在 work 阶段发明 WHAT。
+When plan scenarios are overly generalized, supplement them with source/contract information from the current unit; if such supplementation alters acceptance or the public contract, halt and return the plan/task owner—no new WHAT is to be invented during the work phase.
 
 ## System-Wide Check
 
-在 unit closeout 前，用实际代码回答：
+Before unit closeout, respond with actual code:
 
-- 这段行为运行时还会触发什么 callback、middleware、observer、event handler 或 generated consumer？
-- 测试是否走了真实交互链，还是只证明一个 isolated mock？
-- failure/timeout/rollback 会不会留下 orphaned DB row、cache、file、lock、runtime artifact 或 duplicate retry？
-- 是否有 alternate interface（CLI/API/DSL/agent/chat/mobile/web）需要 parity？
-- 多层 retry/rescue/fallback 是否可能 double execution、吞错或改变错误类型？
+- What callbacks, middlewares, observers, event handlers, or generated consumers are triggered during this behavior runtime?
+- Tested whether a real interaction chain was followed, or only proved an isolated mock?
+- Will failure/timeout/rollback leave behind orphaned DB rows, cache entries, files, locks, runtime artifacts, or cause duplicate retries?
+- Are there any alternate interfaces (CLI/API/DSL/agent/chat/mobile/web) that require parity?
+- Can multi-layer retry/rescue/fallback lead to double execution, missed errors, or altered error types?
 
-Leaf-node 且无 callback/state/parallel interface 时，这个检查可以快速得出“不适用”。不要为了存在该章节强行新增 integration test。
+When it is a leaf node and has no callback/state/parallel interface, this check can quickly determine "inapplicable". Do not add integration tests merely because a chapter exists.
 
 ## Verification By Surface
 
-| Surface | 优先 feedback | 完成声明边界 |
+| Surface | Priority feedback | Complete the boundary declaration |
 | --- | --- | --- |
-| behavior/library | focused unit/contract + 必要 integration | 只有真实执行并覆盖目标链路才可声称 passed。 |
-| CLI | 命令、exit code、stdout/stderr contract、help/smoke | 文档中的命令示例不等于已运行。 |
-| browser/UI | runnable route、关键状态、desktop/mobile、console/a11y信号 | 无 browser 时只能声明 code-level/bounded coverage。 |
-| docs/schema/config | parser/schema/render/help/link/diff-shape | 不要求伪 TDD，但需要可观察的 artifact check。 |
-| manual-only/external | 明确步骤、observable signal、owner、limitation | 不得声称 automated coverage。 |
+| behavior/library | focused unit/contract + necessary integration | Only true execution and coverage of the target path can be considered passed. |
+| CLI | commands, exit code, stdout/stderr contract, help/smoke | The command examples in the document do not imply that they have been executed. |
+| browser/UI | runnable route, critical state, desktop/mobile, console/a11y signal | Without a browser, only code-level/bounded coverage can be declared. |
+| docs/schema/config | parser/schema/render/help/link/diff-shape | No requirement for fake TDD, but requires observable artifact check. |
+| manual-only/external | clear steps, observable signal, owner, limitation | Must not claim automated coverage. |
 
 ## Not-Run And Replacement Evidence
 
-- dry-run / schedulable but not executed -> `not-run` + `schedulable`；
-- missing tool -> `not-run` + `missing_dependency` + `missing_tools`；
-- unavailable environment/data/credential -> 记录具体 reason，不用模糊“环境问题”；
-- replacement evidence 必须说明 proof surface、source/log/artifact ref 和 limitation；
-- required verification 没有 replacement evidence 时，unit 不能 complete；optional evidence 缺失只限制对应 claim。
+- dry-run / schedulable but not executed -> `not-run` + `schedulable`;
+- missing tool -> `not-run` + `missing_dependency` + `missing_tools`;
+- unavailable environment/data/credential -> record specific reason, do not use vague "environment issue";
+- replacement evidence must specify proof surface, source/log/artifact reference, and limitations;
+- If required verification cannot run and no adequate replacement evidence exists, the unit is incomplete. Missing optional evidence limits only the corresponding claim.
 
-Fallback 是最窄已知验证，不是零验证。无法确认 system-wide coverage 时，返回 bounded conclusion，不声称 full coverage。
+Fallback is the tightest known verification, not zero-knowledge verification. Returns a bounded conclusion when system-wide coverage cannot be verified, without claiming full coverage.
 
 ## Ownership Boundary
 
-Scripts 可以记录命令、exit code、路径、hash、schema 结果和 reason_code；LLM 决定选择哪些 checks、scenario 是否语义充分、replacement evidence 是否足以支持当前 claim。不要让脚本替代 test design，也不要让自然语言声明冒充脚本事实。
+Scripts can record commands, exit code, paths, hash, schema results, and reason_code; the LLM determines which checks and scenarios are semantically sufficient, and whether replacement evidence is adequate to support the current claim. Do not let scripts replace test design, nor let natural language assertions pretend to be script facts.
 
 ## Preserve proof through cleanup
 

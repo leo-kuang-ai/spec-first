@@ -1,10 +1,8 @@
 # id：无执行入口授权的规划交付反例，与已有 caller 返回正例成对。
 id: implementation-owner-not-authorized
 # title：以授权边界而非未经证明的宿主能力缺失构造阻塞场景。
-title: 执行入口未授权时保留规划并报告交接阻塞
-description: |
-  实现工具保持可用，但本轮没有进入执行 owner 的授权，也没有现有执行 caller。
-  不声称已隔离全局技能；判据只评价这个明确停在规划返回处的用例。
+title: "Retain planning and report handover blockage when unauthorized entry point is executed"
+description: "The tool remains available, but this round did not enter execution due to lack of authorization from the owner or an existing executing caller. Global skill isolation is not claimed; the criterion evaluates only this specific use case that explicitly halts at the planning return point."
 input:
   # prompt：只阻断依赖执行 owner 的动作，仍须给出有用的规划及恢复路径。
   prompt: |

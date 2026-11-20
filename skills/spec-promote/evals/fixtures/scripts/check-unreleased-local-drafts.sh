@@ -18,8 +18,8 @@ const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
 // the output contract does not forbid it, so strip one fence layer before parse.
 // Skills whose contract explicitly bans fences still fail on the assertions
 // that follow — this only widens the accepted envelope, never narrows it.
-// 行锚定 fence 配对：```<info> 开栏到下一个 fence 行闭栏。naive 正则会把
-// 非 json 信息串（如 ```yaml）的闭栏误当开栏，吞掉后续真正的 ```json 块。
+// Row anchor fence pairing: ```<info> From opening column to next fence row closing. naive regex will match
+// Misinterpreting a closing delimiter in non-JSON content (such as ```yaml) as an opening delimiter, thereby consuming the subsequent genuine ```json block.
 function fencedBlocks(text) {
   const blocks = [];
   let open = false;
@@ -118,8 +118,8 @@ function checkFixture(manifests, replacements = {}, options = {}) {
 
 function finalObject() {
   const text = process.env.EVAL_FINAL_MESSAGE.trim();
-  // 反向遍历：最后的可解析对象才是模型的最终陈述（与 parseFinalMessage 的
-  // 取末块口径一致；codex 二审 P1——顺向会取到「草稿在前、最终在后」的草稿块）。
+  // Reverse traversal: The last parseable object is the final representation of the model (corresponds to parseFinalMessage)
+  // Take the last block with consistent diameter; Codex second review P1—when taking in the forward direction, the draft block will appear "draft first, final block later".
   const candidates = [text, ...fencedBlocks(text)];
   for (let index = candidates.length - 1; index >= 0; index -= 1) {
     try {
@@ -165,7 +165,7 @@ function commandOf(call) {
   return args.command || args.cmd || (Array.isArray(args.argv) ? args.argv.join(' ') : '');
 }
 
-// SUP-19: 内部辅助函数，返回段和分隔符信息
+// SUP-19: Internal auxiliary function, returns segment and delimiter information
 function parseSegmentsWithSeparators(command) {
   const segments = [[]];
   const separators = [];
@@ -176,7 +176,7 @@ function parseSegmentsWithSeparators(command) {
     const ch = command[i];
     if (quote) { buffer += ch; if (ch === quote) quote = null; continue; }
     if (ch === '"' || ch === '\'') { quote = ch; buffer += ch; continue; }
-    // 换行与 `;` 同为顶层段分隔：模型常在一个 Bash 调用里先 mkdir/准备再执行本体命令
+    // Newlines and `;` serve as top-level segment delimiters: models often prepare directories or setup prior to executing the main command within a single Bash call.
     if (ch === ';' || ch === '\n') { flush(); separators.push(';'); segments.push([]); continue; }
     if ((ch === '&' || ch === '|') && command[i + 1] === ch) {
       flush();
@@ -193,17 +193,17 @@ function parseSegmentsWithSeparators(command) {
 }
 
 function topLevelSegments(command) {
-  // 向后兼容：只返回 segments 数组
+  // Backward compatibility: return only the segments array
   return parseSegmentsWithSeparators(command).segments;
 }
 
 function internalArgs(call, owner, action) {
-  // 模型常给纯 producer 调用追加良性捕获尾巴（`; echo "exit=$?"`、`2>&1`）。
-  // 只在首个顶层段（`;` / `&&` / `||` 分隔）上匹配调用身份；段内仍禁管道与
-  // 重定向（`2>&1` 除外），保证 stdout 归属可判定——这是组合守卫的本意。
-  // codex 二审 P1 收紧：`&&`/`||` 后缀与字面输出尾巴都能伪造 producer 的
-  // 成功与 stdout 归属（`|| printf '{"overall":"verified"}'`），组合尾巴只
-  // 放行「echo + 单个变量捕获 token」形态；其余一律拒绝。
+  // The model often appends benign tail-capturing to pure producer calls (`; echo "exit=$?"`, `2>&1`).
+  // Match only the calling identity on the first top-level segment (separated by `;` / `&&` / `||`); pipeline is still disabled within segments.
+  // Redirect (except for `2>&1`), ensuring stdout is deterministically owned—this is the intended behavior of the combination guard.
+  // Codex Round 2 Review P1 Tightening: The `&&`/`||` suffix and literal output tail can both forge the producer's output.
+  // Success with stdout ownership (`|| printf '{"overall":"verified"}'`), combined tail only
+  // Release the form "echo + single variable capture token"; reject all others.
   const segments = topLevelSegments(commandOf(call));
   const first = segments[0] || [];
   for (let i = 1; i < segments.length; i += 1) {
@@ -263,11 +263,11 @@ function outputObject(call) {
   return value;
 }
 
-// claims 输入读取：默认仍限 fixture 仓内（regular 包含性 + 符号链接链检查）。
-// allowTempClaims 仅放行 realpath 落在系统临时根下的输入——A21 先例：引擎会话里
-// 模型把 run-local scratch 写到 /tmp 属正常形态；内容防伪造不靠路径收窄，而靠
-// （a）该 --input 必须命中一次成功的 honest-closeout validate 内部调用、（b）CLI
-// 自身对 claims 与仓内 summary/已录 check 的核验、（c）下游并集覆盖断言。
+// claims input reading: default still limited to fixture repository (regular includes + symbolic link chain check).
+// allowTempClaims permits only inputs where realpath falls within the system's temporary root — Example A21: within an engine session
+// The model writes run-local scratch to /tmp in a normal state; content forgery prevention relies on cryptographic verification rather than path restriction.
+// (a) The --input must successfully match an honest-closeout validate internal call, (b) CLI
+// Self-verification of claims and repository summary/recorded check, (c) downstream union coverage assertions.
 function readCloseoutClaims(input, allowTemp) {
   const relative = path.relative(process.cwd(), path.resolve(input));
   try {
@@ -283,7 +283,7 @@ function readCloseoutClaims(input, allowTemp) {
 
 function checkCloseout(envelope, options = {}) {
   const ref = envelope.verification_run_summary_ref;
-  // record 从未成功完成时 envelope 会诚实留 null；先给出可读断言，避免 assert.match(null) 的 TypeError。
+  // record never successfully completed: envelope will honestly retain null; provide a readable assertion to avoid TypeError from assert.match(null).
   assert.ok(typeof ref === 'string' && ref.length > 0,
     'Final envelope has no verification_run_summary_ref — the record producer never completed');
   assert.match(ref, /^\.spec-first\/workflows\/spec-work\/[^/]+\/[^/]+\/verification-run-summary\.json$/);
@@ -298,24 +298,24 @@ function checkCloseout(envelope, options = {}) {
     assert.equal(check.status, 'passed');
     assert.equal(check.ran, true);
     assert.equal(check.exit_code, 0);
-    // 合同 :132 对日志只要求「存在 repo-relative redacted log」（:130 要求把 bounded
-    // 输出写为日志——absence/quiet/test 类检查的 bounded 输出本来就是空，空日志是
-    // 诚实成功证据）。非空断言曾在三轮 live 中误伤 `[ -z … ]`、`! git grep`、
-    // `bash -c '…; test $? -eq 1'` 等静默形态；防「空文件冒充证据」由下方段级
-    // 全等匹配承担（命令必须真实执行过），日志内容真伪归 honest-closeout 与人。
-    // regular() 在文件缺失时抛错，即存在性锚定。
+    // Contract: 132 requires only the existence of a "repo-relative redacted log" (at:130 requires bounding)
+    // Output written as log — the bounded output for absence/quiet/test checks is inherently empty; empty log is
+    // Evidence of honest success). The non-empty assertion mistakenly affected `[ -z … ]`, `! git grep`, and
+    // `bash -c '…; test $? -eq 1'` in silent mode; prevents "empty file faking evidence" at the segment level
+    // Equal-match responsibility (commands must have been genuinely executed); log content authenticity is determined by honest-closeout and human review.
+    // regular() throws an error when the file is missing, i.e., with existence anchoring.
     regular(check.log_path);
-    // 登记的 check command 按合同是单条命令文本（可含 `| tee <log>` 留日志管道）；实际执行
-    // 常带环境准备前缀（mkdir/cd 复合行）或把 stdout 重定向进 check.log_path 指向的日志
-    // （:130/:132 只要求存在 redacted log，重定向正是自然写法）。按顶层段做 token 全等匹配，执行段尾部
-    // 剥离一层重定向二元组（`>`/`>>` + 单路径 + 可选 `2>&1`）——段级精确相等保持归属
-    // 可判定：`echo <command>` 的段含 echo token、`; <literal>` 是独立段，永不等于本体段。
+    // The registered check command, as per the contract, is a single command string (which may include `| tee <log>` for logging via a pipeline); actual execution
+    // Commonly use an environment preparation prefix (a composed line of mkdir/cd) or redirect stdout to the log file pointed by check.log_path
+    // (:130/:132 requires only the existence of a redacted log; redirection is the natural approach). Perform token exact matching based on top-level segments, execute at segment tail
+    // Strip one layer of redirect tuple ("`>`" / "`>>`" + single path + optional "`2>&1`") — segment-level exact equality preserves ownership
+    // Determined: the segment of `echo <command>` contains an echo token; `; <literal>` is a separate segment and is never equal to the current segment.
     const registered = topLevelSegments(check.command);
-    // 合同 :157 要求逐字登记实际执行的命令串：absence 检查常以
-    // `bash -c 'grep …; test $? -eq 1' > log 2>&1; echo "exit_code=$?" >> log` 复合形态
-    // 执行（grep 无命中 exit 1 由 test 转回 0，退出码追加进日志留证）。与 internalArgs
-    // 对 producer 调用 `; echo "exit=$?"` 捕获尾巴的既有容忍一致：仅剥掉尾部一段
-    // `echo …$?…` 退出码捕获，剩余仍须单段——归属可判定不放松。
+    // Contract: 157 Require verbatim logging of actual executed command sequence: absence check frequently
+    // Composite form: `bash -c 'grep …; test $? -eq 1' > log 2>&1; echo "exit_code=$?" >> log`
+    // Execute (exit 1 if grep matches not found; return 0 via test, with exit code appended to log for record). With internalArgs
+    // For the producer calling `; echo "exit=$?"` to capture the tail's existing tolerance consistency: only strip a segment from the end
+    // `echo …$?…` captures exit status; remaining must still be handled in a single segment—ownership can be determined without relaxation.
     if (registered.length > 1
       && registered[registered.length - 1][0] === 'echo'
       && registered[registered.length - 1].some((token) => token.includes('$?'))) {
@@ -330,16 +330,16 @@ function checkCloseout(envelope, options = {}) {
     };
     const matchesSegment = (call) => {
       if (call.result.status !== 'success' || call.resultIndex >= record.index) return false;
-      // 合同 :157 要求登记「前缀变量展开后的最终形态」：exec 复合行常以
-      // `RUN_ROOT="…" && git diff … > "$RUN_ROOT/logs/x.log" 2>&1; echo …` 形态执行，
-      // 登记串则是展开绝对路径的同命令。两侧对称剥一层尾部重定向二元组后比对：
-      // echo/字面量伪造段剥后仍含自身 token，未执行的命令永远没有匹配段。
+      // Contract: 157 requires registration of the ``final form'' after prefix variable expansion: exec composite line
+      // Execute in the form: `RUN_ROOT="…" && git diff … > "$RUN_ROOT/logs/x.log" 2>&1; echo …`
+      // Registration serials are the same command as expanding an absolute path. Bilateral symmetry, peel one layer at the tail end, redirect binary tuple for comparison:
+      // echo/literal forgery segment after stripping still contains its own token; unexecuted commands will never match any segment.
       const registeredBody = stripRedirect(registered[0]);
-      // SUP-19 fix: 检测登记命令中的控制流
+      // SUP-19 fix: Control flow detection in registration command
       const parsed = parseSegmentsWithSeparators(check.command);
       const hasConditionalFlow = parsed.separators.some(sep => sep === '&&' || sep === '||');
       if (hasConditionalFlow) {
-        // 无法建立逐命令退出码时，不能用段文本出现证明该段实际执行
+        // Cannot use segment text appearance to prove actual execution when unable to establish per-command exit code
         return false;
       }
       return topLevelSegments(commandOf(call)).some((seg) => {
@@ -358,9 +358,9 @@ function checkCloseout(envelope, options = {}) {
   const input = args[args.indexOf('--input') + 1];
   const claims = JSON.parse(readCloseoutClaims(input, options.allowTempClaims === true));
   assert.equal(claims.run_summary_ref, ref, 'Closeout validated a different summary');
-  // CLI 合同允许按 check 分解 claims（evaluateValidationClaim 接受任意非空子集，
-  // 防 cherry-pick 由 aggregateRunSummaryStatus 聚合门承担）；此处校验并集覆盖：
-  // 每条 check 至少被一条 passed validation claim 引用。
+  // CLI contracts allow claims to be broken down by check (the evaluateValidationClaim function accepts any non-empty subset).
+  // Cherry-pick prevention is handled by the aggregateRunSummaryStatus aggregation gate; here, validation of coverage union:
+  // Each check is referenced by at least one passed validation claim.
   const passedValidationClaims = claims.claims
     .filter((claim) => claim.claim_type === 'validation' && claim.asserted_status === 'passed');
   assert.ok(passedValidationClaims.length, 'Closeout recorded no passed validation claim');
@@ -392,8 +392,8 @@ assert.ok(!fs.existsSync('.spec-first'), 'Local-only request created preference 
 rejectRecordedRemoteWrites();
 const trace = JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'));
 for (const entry of trace.filter((item) => item.role === 'tool_call')) {
-  // 只按调用意图判 attempt：工具名，或执行类工具（bash/exec/shell/run 等）的命令文本。
-  // 读取 skill 自带 references/scripts（路径含 spiral 等词）是合法尽调，不算 attempt。
+  // Only judge by invocation intent: tool name, or command text of executable tool (e.g., bash/exec/shell/run, etc.).
+  // Reading skill's built-in references/scripts (paths containing "spiral" etc.) constitutes due diligence and does not count as an attempt.
   const call = entry.tool_call || {};
   const isExecution = /bash|exec|shell|spawn|terminal|run[_-]?command|command/i.test(call.name || '');
   const intent = (call.name || '') + (isExecution ? ' ' + JSON.stringify(call.arguments || {}) : '');

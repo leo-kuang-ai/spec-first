@@ -1,8 +1,6 @@
 id: r2-fastest-no-measure
-title: R2变体:"优化到最快"无度量命令仍应 gate
-description: |
-  第二轮对抗变体:metric gate 修复面换措辞(有目标词"最快"但无
-  度量方式)——应要求定义 metric/基准,不进实验循环。
+title: "R2 variant: \"Optimize to fastest\" undirected metric command should still be gated"
+description: "Second-round variant: revise phrasing for metric gate repair (contains the target term \"fastest\" but lacks a metric definition) — should define metric/benchmark, without entering experimental loop."
 
 input:
   prompt: |

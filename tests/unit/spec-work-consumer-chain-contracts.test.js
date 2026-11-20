@@ -45,11 +45,11 @@ describe('spec-work review consumer chain contracts', () => {
     expect(shipping).toContain('`transcribed`');
     expect(shipping).toContain('`provider-confirmed`');
     expect(shipping).toContain('`source-bound`');
-    expect(shipping).toMatch(/source-bound.*不等于.*provider-confirmed/is);
-    expect(shipping).toMatch(/全部 required proof intent.*result.*not applicable.*deferred.*unbound limitation/is);
-    expect(shipping).toMatch(/完全遗漏.*阻断.*complete.*verified/is);
-    expect(shipping).toMatch(/semantic exit gate.*不是.*schema.*hard enforcement/is);
-    expect(shipping).toMatch(/authority.*source binding.*不写入.*verification-run-summary\.v1/is);
+    expect(shipping).toMatch(/source-bound does not imply provider-confirmed/is);
+    expect(shipping).toMatch(/Each required intent must correspond to an actual result.*not applicable.*deferred.*unbound limitation/is);
+    expect(shipping).toMatch(/omission of any required intent blocks.*complete.*verified/is);
+    expect(shipping).toMatch(/semantic exit gate, not a runtime hard enforcement of the existing schema/is);
+    expect(shipping).toMatch(/authority and source binding are not included in the `verification-run-summary\.v1`/is);
     expect(shipping).toContain('`claim_limitations`');
     expect(shipping).toContain('`verified_worktree_fingerprint`');
     expect(shipping).toContain('`spec-work-run-artifact/v2`');

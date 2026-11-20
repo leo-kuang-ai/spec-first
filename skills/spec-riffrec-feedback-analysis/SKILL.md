@@ -12,7 +12,7 @@ Turn raw product feedback into structured evidence for downstream agents. This s
 Route to the matching reference based on the input. Read only the selected mode reference; both analysis modes require the shared analyzer reference before execution.
 
 - **Setup** — user has no recording yet and asks how to install Riffrec, capture a session, or share feedback. Read `references/install-riffrec.md`.
-- **仅转写**：用户只要逐字稿时优先走此出口，不按录制时长改成缺陷报告。有可核实的本地逐字稿就直接交付，保留时间戳及缺段；没有时，只有本次第三方转录授权成立才按 `references/analyzer.md` 在新临时目录运行转录，交付实际返回的文本。没有文本且不能转录时说明缺口并停止，不用事件或截图推测原话。
+- **Transcript only**: When the user wants a transcript, recording length does not change the deliverable into a bug report. Return verifiable local text with its timestamps and gaps. If none exists, follow `references/analyzer.md` in a new temporary directory only with explicit authorization for third-party transcription of this recording. Return the text actually received. If neither route is available, report the gap and stop; do not reconstruct speech from events or screenshots.
 - **Quick bug report** — input is a short recording (under ~60 seconds), the user describes a single specific issue, or asks for "quick" or "small". Read `references/quick-bug-report.md`. Emit one concise bug report; skip the full artifact set and brainstorm handoff. Discovering broader scope returns an escalation handoff and never authorizes a durable extensive rerun.
 - **Extensive analysis** — input is a longer recording, contains multiple issues / requirements / workflow walkthroughs, or the user wants requirements or brainstorm material. Read `references/extensive-analysis.md`. Produce a ready-to-brainstorm handoff; invoke `spec-brainstorm` only when the original request or a new confirmation authorizes that public workflow.
 
@@ -28,7 +28,7 @@ Media transcription is a separate third-party egress. Before analyzer execution,
 
 ## Dispatch Authorization Boundary
 
-在把 recording evidence、transcript、screenshots 或 source-mapping context 交给任何 worker 前，记录：
+Record: before handing over recording evidence, transcript, screenshots, or source-mapping context to any worker:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
@@ -39,10 +39,10 @@ worker_model_override: supported | unsupported | unknown
 worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时才可派发；输入文件、分析规模、工具权限或本 Skill 被调用都不构成授权。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，inline 或 serial 执行并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均 inline 或 serial。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。任何派发还必须遵守 local-only/privacy 边界，只发送完成 bounded unit 所需的最小证据。Inline fallback 不得声称 independent analyst coverage。
+`workflow invocation does not authorize dispatch`. A subagent, delegated work, persona, or parallel work may only be dispatched when the current user or a visible upstream handoff explicitly requests it; input file submission, analysis scale, tool permissions, or invocation of this Skill do not constitute authorization. When authorization is missing, do not perform tool schema probing; fix the value to `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`, execute in inline or serial mode, and record `dispatch_authorization_missing`. Only after authorization does it treat the current-session registry/schema as `provider_untrusted` evidence for inspection: record `subagent_capability_missing` when missing, and record `worker_capability_unproven` when the capability is unavailable, the schema is incomplete, or the candidate is non-unique, either inline or in sequence. Isolation, model coverage, and bounded concurrency only retain live facts; when required isolation is not satisfied, maintain dependency gate open; inherit when model is unknown, and operate sequentially when parallelism is unknown. Record `worker_dispatch_outcome`. Any dissemination must also comply with local-only/privacy boundaries and shall send only the minimum evidence required to complete the bounded unit. Inline fallback must not claim independent analyst coverage.
 
 ## Analyzer Entrypoint
 
-Before either analysis mode runs, read [Shared analyzer](references/analyzer.md). Pass an unpacked Riffrec capture directory itself so synchronized metadata and media remain together. Setup does not run the analyzer. 仅转写且已有本地文本时不运行分析器；需要运行时沿用同一隐私与授权边界。
+Before either analysis mode runs, read [Shared analyzer](references/analyzer.md). Pass an unpacked Riffrec capture directory itself so synchronized metadata and media remain together. Setup does not run the analyzer. The analyzer is not executed when only transcription is performed and local text already exists; when execution is required, it operates within the same privacy and authorization boundaries.
 
 Extensive output under `docs/brainstorms/riffrec-feedback/` remains a documented evidence/kickoff-artifact exception, not a durable brainstorm output. Quick output stays temporary. The extensive artifact format is defined in `references/spec-first-feedback-format.md`.

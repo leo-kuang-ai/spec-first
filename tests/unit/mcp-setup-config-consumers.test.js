@@ -86,11 +86,11 @@ describe('spec-runtime-setup active config consumers', () => {
     expect(plan).toContain('active (non-commented)** `plan_output:`');
     expect(brainstorm).toContain('active (non-commented)** `brainstorm_output:`');
     expect(ideate).toContain('active (non-commented)** `ideate_output:`');
-    expect(setup).toContain('`plan_output`、`brainstorm_output` 和 `ideate_output`');
-    expect(setup).toContain('分别由 `spec-plan`、`spec-brainstorm` 和 `spec-ideate` 读取');
-    expect(setup).toContain('分别回退到 `spec-plan=md`、`spec-brainstorm=md`、`spec-ideate=html`');
-    expect(setup).toContain('Pipeline override 仍由各 consumer 自己决定');
-    expect(setup).toContain('不调用对应 workflow');
+    expect(setup).toContain('`plan_output`, `brainstorm_output`, and `ideate_output` are all active local rendering preferences.');
+    expect(setup).toContain('respectively read by `spec-plan`, `spec-brainstorm`, and `spec-ideate`');
+    expect(setup).toContain('The consumer reads only the uncomments and valid `md` / `html` values; missing, invalid, or still commented values are respectively fallback to `spec-plan=md`, `spec-brainstorm=md`, `spec-ideate=html`.');
+    expect(setup).toContain('Pipeline override is still decided independently by each consumer.');
+    expect(setup).toContain('does not invoke the corresponding workflow');
     expect(setup).not.toContain('reserved future hints');
     expect(template).toContain('# plan_output: html       # active: md | html');
     expect(template).toContain('# brainstorm_output: html # active: md | html');

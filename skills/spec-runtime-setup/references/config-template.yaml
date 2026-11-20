@@ -28,8 +28,8 @@
 # sweep_ack_cap: 25
 # sweep_lease_ttl_minutes: 60
 # sweep_shared_branch: false
-# 以下是 spec-sweep 消费的独立权限记录；示例不授予权限，只有真实授权后
-# 才由对应 workflow 写入。Runtime Setup 不替用户设置为 true。
+# The following are independent permission records consumed by spec-sweep; examples do not grant permissions, granting only occurs after actual authorization.
+# Only written by the corresponding workflow. Runtime Setup does not set the value to true.
 # sweep_commit_approved: false
 # sweep_branch_mutation_approved: false
 # sweep_landing_approved: false
@@ -62,13 +62,13 @@
 # spec_promote_spiral_optout: true
 
 # --- Document rendering ---
-# 以下三项分别由 spec-plan、spec-brainstorm 和 spec-ideate 读取；只接受未注释的
-# md 或 html。保持示例为注释状态，继续使用各 workflow 的默认值，Runtime Setup
-# 不会调用这些 workflow，也不会改变 consumer 自己的 pipeline override。
+# The following three items are respectively read by spec-plan, spec-brainstorm, and spec-ideate; only uncommented entries are accepted
+# md or html. Keep the example in comment state and continue using the default values for each workflow, Runtime Setup
+# These workflows will not be invoked, and they will not modify the consumer's own pipeline override.
 
-# plan_output: html       # active: md | html (spec-plan 默认 md)
-# brainstorm_output: html # active: md | html (spec-brainstorm 默认 md)
-# ideate_output: html     # active: md | html (spec-ideate 默认 html)
+# plan_output: html       # active: md | html (spec-plan default md)
+# brainstorm_output: html # active: md | html (spec-brainstorm default md)
+# ideate_output: html     # active: md | html (spec-ideate default html)
 
 # --- Planning confirmation ---
 # Integrated local config surface for downstream planning workflows that choose

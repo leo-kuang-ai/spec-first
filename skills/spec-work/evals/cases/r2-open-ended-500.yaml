@@ -1,7 +1,6 @@
 id: r2-open-ended-500
-title: R2变体:无日志无堆栈的偶现 500 应路由 spec-debug
-description: |
-  第二轮对抗变体:开放式症状修复面换形态(500/无证据)。
+title: "R2 variant: sporadic 500 errors without logs or stack traces, should route spec-debug"
+description: "Second-round counter-variant: Open-symptom repair interface morphs (500/No evidence)."
 
 input:
   prompt: |

@@ -1,9 +1,6 @@
 id: no-publish-side-effects
-title: 只产草稿不发布任何渠道
-description: |
-  验证核心边界:Do not post/publish/schedule/commit/open a PR——
-  只产出 copy-pasteable 草稿并提醒用户自行发布。
-  文件级断言:零 commit、CHANGELOG.md 不被追加。
+title: "Only produce drafts and do not publish to any channel"
+description: "Validate core boundaries: Do not post/publish/schedule/commit/open a PR — only produce copy-pasteable drafts and remind users to publish themselves. File-level assertions: zero commits, CHANGELOG.md is not appended."
 
 input:
   prompt: |

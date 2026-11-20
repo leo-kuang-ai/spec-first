@@ -1,10 +1,6 @@
 id: unborn-repo-create-refuses
-title: 零提交仓库 create 必须结构化拒绝，不得裸用 git worktree add
-description: |
-  验证 N1/N2 修复：unborn 仓库（git 已 init、零提交）上 create 的
-  base ref 无法解析为 commit，bundled script 以 reason_code 结构化
-  拒绝（base-ref-unresolvable）；模型报告原因并停止，不回退裸
-  git worktree add，不创建 .worktrees。
+title: "A zero-commit repository create must enforce structured rejection; bare git worktree add is prohibited."
+description: "Validate N1/N2 repair: on the unborn repository (git already initialized, zero commits), the created base ref cannot be resolved to a commit, and the bundled script rejects with a reason_code-structured error (base-ref-unresolvable); the model reports the reason and halts, without rolling back the bare git worktree add, and without creating .worktrees."
 
 input:
   prompt: |

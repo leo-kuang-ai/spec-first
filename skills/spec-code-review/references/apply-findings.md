@@ -19,7 +19,7 @@ reverted. Decide by judgment, not a safety checklist:
 Severity, confidence, and cross-reviewer agreement determine priority and
 visibility; they do not replace the Stage 5c admission gate.
 
-`validation_status: unresolved` 或 `rejected` 的项不得应用，即使 confidence 高或有 suggested_fix；保留缺失证据并交由报告/残余风险处理。缺少 validation_status 的旧报告仍按既有验证与当前源码证据规则处理，不自动视为 confirmed。
+Items with `validation_status: unresolved` or `rejected` shall not be applied, even if confidence is high or a suggested_fix is available; retain missing evidence and address through reporting or residual risk handling. Old reports lacking validation_status are still processed according to their existing validation and current source code evidence rules and are not automatically considered confirmed.
 
 ## Scope and verification
 

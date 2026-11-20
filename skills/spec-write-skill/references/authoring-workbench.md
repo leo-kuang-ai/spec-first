@@ -1,24 +1,24 @@
 # Authoring Workbench
 
-只有完成 qualification、确认单一 project-owned source owner，且 `base_operation=create|revise`、`effect=apply` 后才读取本 reference。它是本轮 preview/closeout 的 Markdown semantic envelope，不是持久 schema、通用 Skill IR 或 scaffold writer。
+Reading this reference occurs only after both qualification and confirmation of a single project-owned source owner have been completed, and when `base_operation=create|revise` and `effect=apply` are specified. It is the Markdown semantic envelope for this round of preview/closeout, not a persistent schema, general Skill IR, or scaffold writer.
 
 ## Tier A Short Path
 
-仅当 revision 限于 typo、计数、metadata/术语修正、明确不可达内容删除或等价结构整理，且不改变 trigger、schema、contract、threshold、gate、roster 或 model routing，才可以跳过本 reference 的 Design Record 与 pre-patch eval plan。仍必须确认 owner、当前授权覆盖 exact write set，生成并验证 mutation preview/write-set binding，并运行最窄结构验证。任一承重行为变化立即回到完整 authoring path。
+The Design Record and pre-patch evaluation plan may be waived only if the revision involves typographical errors, counting adjustments, metadata/terminology corrections, or explicit removal of unreachable content or equivalent structural reorganization, and does not alter trigger, schema, contract, threshold, gate, roster, or model routing. It is still necessary to verify the owner, ensure that the current authorization covers the exact write set, generate and validate the mutation preview/write-set binding, and perform the narrowest structure validation. Any change in load behavior immediately returns to the complete authoring path.
 
 ## Minimum Design Record
 
-在大量正文写入前，以最小必要格式记录 `Skill Design Record`：recurring job 与用户可见 outcome、真实 inputs、required outputs/consumer、positive 与 negative/near-neighbor、source owner、authority/side effects、主要 failure mode、first verification target 与 invalidation condition。复用已经确认的事实，不为表格完整性重复抄写；未知项标成风险或问题，不用想象填补。
+Before substantial content writing, record the `Skill Design Record` in the minimal necessary format: recurring job and user-visible outcome, actual inputs, required outputs/consumers, positive and negative/near-neighbor cases, source owner, authority and side effects, primary failure mode, first verification target, and invalidation condition. Reuse already verified facts without redundantly copying them into tables; mark unknown items as risks or issues and do not speculate or fill in assumptions.
 
-只有出现多个 capability owner/consumer/runtime carrier、资源抽取/删除/新增取舍，或高风险/TCO 决策时，才展开 `Desired Capability Map`。只保留会改变决策的列，可从 `capability | owner | consumer | risk | source/runtime carrier | gate/eval | protected behavior | TCO | disposition` 中选择；需要 disposition 时使用 `keep|extract|remove|add`。没有这些信号时不创建 map，也不输出 `not_applicable` 仪式性占位。脚本不解析该记录、更不能替人决定。
+A `Desired Capability Map` should only be developed when there are multiple capability owners/consumers/runtime carriers, resource extraction/ deletion/ addition trade-offs, or high-risk/TCO decision-making scenarios. Only retain columns that affect decisions; select from `capability | owner | consumer | risk | source/runtime carrier | gate/eval | protected behavior | TCO | disposition`; when disposition is needed, use `keep|extract|remove|add`. No map is created and no `not_applicable` placeholder is output when these signals are absent. The script does not parse this record, nor does it make decisions on behalf of anyone.
 
 ## Shape And Module Decision
 
-只有 shape 会改变 resource placement、eval family 或 architecture 时，才显式记录 Skill shape 与 supporting facts；否则采用能解释当前 patch 的最简单形态并继续。可选形态包括 entry governor、knowledge/reference、deterministic setup/validation、artifact-producing workflow、prose/agentic workflow、long-horizon loop 或 multi-agent/hybrid；它们是决策辅助，不是脚本 enum。
+Explicitly record Skill shape together with supporting facts only when the shape causes a change in resource placement, eval family, or architecture; otherwise, use the simplest form that can explain the current patch and proceed. Optional forms include entry governor, knowledge/reference, deterministic setup/validation, artifact-producing workflow, prose/agentic workflow, long-horizon loop, or multi-agent/hybrid; they are decision aids, not script enums.
 
-multi-agent/hybrid 先做 ArchitectureFit：独立子问题是否有不同证据方向、是否能合并、协调开销是否小于可信收益、是否仍保有单一 owner。任何一项不充分时，采用 single-agent + 按需 specialist；不要按用户给出的 agent 数量创建固定 roster。
+multi-agent/hybrid: First perform ArchitectureFit – do the subproblems have different evidence directions? Can they be merged? Is the coordination overhead less than the credible benefit gained? Is a single owner still maintained? When any component is insufficient, use a single agent plus on-demand specialists; do not create a fixed roster based on the number of agents provided by the user.
 
-当 module/resource placement 确实改变时，再分配 `SKILL.md` spine、triggered references、deterministic scripts、output assets、maintainer-only evals、target sidecar 和 project governance。Context topology、measurement、optimization 与 lifecycle 只有在对应信号存在时加载；不会影响 consumer、风险或交付的未选项无需逐项记录。
+When the module/resource placement actually changes, reallocate the `SKILL.md` spine, triggered references, deterministic scripts, output assets, maintainer-only evaluations, target sidecar files, and project governance. Context topology, measurement, optimization, and lifecycle are loaded only when the corresponding signals are present; they do not affect consumers, risks, or delivery for unselected options, and individual entries are not required to be recorded.
 
 ## Eval And Topology Preview
 
@@ -26,25 +26,25 @@ For a restructure, place each moved block in the reference read by the step that
 
 Even a behavior-preserving Tier A restructure must apply the size and pin audit in [Authoring Method](authoring-method.md#size-restructure-checkpoints) and the applicable evaluation guidance in [Evaluation Design](evaluation-design.md#restructure-coverage). This does not require the full Design Record for Tier A.
 
-full apply 在 source patch 前先按 `evaluation-design.md` 形成最小 eval plan。create 至少有 positive、negative/near-neighbor、主要 failure/adversarial 三例；revise 固定旧版 protected behavior 与 before baseline，不能按候选实现反向编写。每个承重行为给出 `protected_behavior → source carrier → contract assertion → semantic eval case`；没有新增 assertion 或 semantic case 时，旧测试全绿不构成覆盖。
+Before applying the source patch, first form the minimal eval plan according to `evaluation-design.md`. create at least three examples: positive, negative/near-neighbor, and main failure/adversarial; revise the fixed old version protected behavior and before baseline, without reversing the implementation of candidate solutions. Each load behavior provides `protected_behavior → source carrier → contract assertion → semantic eval case`; without new assertions or semantic cases, full green passes of existing tests do not constitute coverage.
 
-只有文件集合、resource placement 或 runtime carrier 发生变化时才展开 package topology preview，区分 spine、triggered references、scripts、assets、maintainer-only evals、target sidecar 与 project governance；单文件 revise 只需报告 changed surfaces。新增或变更的 runtime reference 仍要记录 consumer、trigger condition、must-read、fallback 与 eval case；未满足时不得声称 runtime closure。
+Expand the package topology preview only when changes occur in file sets, resource placement, or runtime carrier; distinguish between spine, triggered references, scripts, assets, maintainer-only evals, target sidecar, and project governance; a single-file revise reports only changed surfaces. New or modified runtime references must still record consumer, trigger condition, must-read, fallback, and eval case; runtime closure must not be claimed when conditions are not met.
 
 ## Preview Handoff
 
-把语义 preview 与私有 manifest 分开。manifest 只承载 canonical/authorized root、snapshot、would-change（path、before hash、after hash、collision disposition、可选 `supporting: true`）、preserve/generated/not-touch、planned side effects 和 residual risks；不要把 Design Record 正文写入 machine contract。`supporting: true` 的边界：
+Separate semantic preview from private manifest. manifest carries only the canonical/authorized root, snapshot, would-change (path, before hash, after hash, collision disposition, optionally `supporting: true`), preserve/generated/not-touch, planned side effects, and residual risks; do not include the Design Record body in the machine contract. `supporting: true`'s boundary:
 
-- 声明 authorized root 内、`canonical_source_root` 外的授权支撑路径（tests、docs、根 CHANGELOG 等交付必然触及的 repo 级文件）；
-- 与 canonical 路径同样受 snapshot、write set、dirty-overlap 与 receipt 绑定，仅豁免 canonical containment；
-- snapshot 至少覆盖 canonical `SKILL.md`、所有已存在的声明路径（含 supporting 路径），以及新文件最近现存父目录的 entry hash。
+- Declare authorized root-level paths outside of `canonical_source_root` (e.g., tests, docs, root CHANGELOG, and other repository-level files that are inevitably touched by deliveries).
+- Bound to snapshot, write set, dirty-overlap, and receipt in the same way as canonical paths; exempt only from canonical containment.
+- snapshot must cover the canonical `SKILL.md`, all existing declaration paths (including supporting paths), and the entry hash of the most recent existing parent directory of a new file.
 
-宿主 scope 还要给出 preview-time dirty paths；任何将被改写的 dirty path 必须在 manifest 中逐项记录 current hash、replace/preserve disposition，并说明当前请求已明确覆盖该替换或取得重新确认。
+The host scope must also provide preview-time dirty paths; any dirty path that is to be rewritten must individually record its current hash, replace/preserve disposition in the manifest, and explicitly indicate that the replacement has been acknowledged or reconfirmed by the current request.
 
-在宿主创建的私有临时目录中，以 `0700` directory、`0600` exclusive-create file 保存 run-local manifest/scope/write-set。调用：
+In the host-created private temporary directory, save the run-local manifest/scope/write-set as a directory with permission `0700` and an exclusive-create file with permission `0600`. Call:
 
 ```bash
 node "$SKILL_DIR/scripts/validate-authoring-preview.cjs" <manifest.json> \
   --authorized-root <confirmed-root> --allowed-paths <scope.json> --write-set <write-set.json> --json
 ```
 
-脚本只验证结构、hash、containment、snapshot、collision、scope 与 write-set binding。`authorization_claim` 只是结构字段；宿主必须确认 exact write set 仍在当前授权内，仅在 root/scope 扩大、未覆盖的 dirty overwrite 或新增 external/network/高风险副作用时重新确认。只有通过且宿主能使用原子 conditional patch primitive（expected-old-hash / expected-nonexistence，拒绝 symlink/ancestor substitution）时才可写 canonical source。缺少该 primitive 或精确 pre-write binding 时 mutation readiness 是 `not-ready`，停止 apply；不得用最终 recheck 或 loud convention 掩盖 TOCTOU。写后 receipt 必须携带该 primitive 产出的实际 changed/unchanged paths，再逐 path 核对 after hash；缺少实际清单不得完成声明。partial failure 报告当前 diff、失败原因和 rollback preview，但不自动回滚。
+The script only verifies structure, hash, containment, snapshot, collision, scope, and write-set binding. The `authorization_claim` is merely a structural field; the host must verify that the exact write set remains within the current authorization, and re-verification is required only when the root/scope is expanded, an uncovered dirty overwrite occurs, or new external/network/high-risk side effects are introduced. A canonical source may only be written when both the host can use atomic conditional patch primitives (expected-old-hash / expected-nonexistence) and symlink/ancestor substitution is rejected. Mutation readiness is `not-ready` when the primitive or exact pre-write binding is missing, and application stops; final recheck or loud convention must not mask TOCTOU. The write-after receipt must carry the actual changed/unchanged paths produced by the primitive, and then verify each path individually against the after hash; a missing actual path list shall prevent completion of the declaration. partial failure reports the current diff, failure reason, and rollback preview, but does not automatically rollback.

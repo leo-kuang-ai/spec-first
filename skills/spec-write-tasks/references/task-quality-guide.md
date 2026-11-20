@@ -145,7 +145,7 @@ Bad dependencies:
 - T003 depends on T002 because it feels cleaner to do after it.
 - Every task depends on the previous task even though files and behavior do not overlap.
 
-同一波次不得共享同一目标仓库内的文件。发生重叠时，将任务串行安排到不同波次，或重拆明确的文件所有权后重新校验；备注或显式 overlap 标记不能豁免 validator 的拒绝。不同目标仓库的同名相对路径按实际解析的仓库分别判断，遵守 `task-pack-schema.md`。
+Files cannot be shared among the same target repository within the same batch. When overlaps occur, schedule tasks sequentially across different batches, or redistribute clear file ownership before revalidation; notes or explicit overlap markings cannot override the validator's rejection. Relative paths with the same name for different target repositories are evaluated individually based on actual repository resolution, following `task-pack-schema.md`.
 
 ## Context Compression Rules
 
@@ -183,12 +183,12 @@ Use these field-level checks before handing a task pack to `spec-work`:
 
 ## Assurance Trace Preservation
 
-当 source plan 声明 high-risk assurance 或 required proof intent 时，优先用现有字段无损投射，不新增平行 task schema：
+When the source plan declares high-risk assurance or required proof intent, prioritize field projection from existing fields without introducing a parallel task schema:
 
-- `requirement_refs` 保留对应 R/AE/failure anchor；`test_focus` 写明该 task 负责的 proof intent 与行为类别；`done_signal` 写可观察结果；`risk_note` 保存 largest unproven risk、evidence authority/source-binding 限制；`review_gate` / `review_focus` 指定需要检查的 false-green、baseline 或 claim-ceiling 风险。
-- 同一 requirement fan-out 到多个 tasks 时，required proof intent 不得丢失：每个 intent 都必须有明确 owner task，或者在 `stop_if` / `risk_note` 中留下 deferred/unbound limitation。
-- Unbound intent 保持 limitation，不得用占位 command 或 synthetic check 伪装成 task 已具备可执行 verification。
-- Task card 只保留计划语义和验证焦点；`transcribed`、`provider-confirmed`、`source-bound` 与最终 required-proof reconciliation 结果属于 downstream work/review evidence，不在 task pack 中伪造执行状态。
+- `requirement_refs` retains corresponding R/AE/failure anchor; `test_focus` clearly specifies the proof intent and behavioral category responsible for the task; `done_signal` documents an observable outcome; `risk_note` records the largest unproven risk and evidence authority/source-binding constraints; `review_gate` / `review_focus` designates risks requiring verification, such as false-green, baseline, or claim-ceiling risks.
+- When the same requirement is fan-out to multiple tasks, the required proof intent must not be lost: each intent must have a clearly assigned owner task, or a deferred/unbound limitation must be noted in `stop_if` / `risk_note`.
+- Unbound intent shall maintain limitation and must not use placeholder commands or synthetic checks to falsely appear as executable verification of the task.
+- Task card retains only the planned semantics and verification focus; `transcribed`, `provider-confirmed`, `source-bound`, and the final required-proof reconciliation results belong to downstream work/review evidence and are not fabricated as execution statuses within the task pack.
 
 When the plan names proof tests, characterization coverage or test-only seams, preserve their exact source refs in `context_refs`; carry the protection intent and `session-settled:` structural constraints in `notes`, and the expected observation in `test_focus` / `done_signal`. Include every inherited proof intent in the traceability matrix with an owner task or an explicit unbound limitation. `stop_if` names a missing/stale source binding when it prevents execution. These fields do not expand `files` or claim that any test has run. Preserve external/manual done signals as observed-state requirements rather than converting them to Git completion. No new task-pack schema is needed.
 

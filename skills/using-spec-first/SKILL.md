@@ -9,11 +9,10 @@ description: Standalone entry governor for spec-first. Use before substantial wo
 
 ## Workflow Contract Summary
 
-- **输入：** 当前用户意图、已有 workflow 状态、artifact 类型、失败/环境信号与项目级路由规则。
-- **输出：** 恰好一个 public `spec-*` workflow、standalone skill、terminal command 或 Direct Lane 入口；进入后立即把控制权交给该 owner。两个特殊结果（`runtime-maintenance` 标签、bounded source review）也属本输出合同，归属见 `references/public-route-map.md`。
-- **硬出口：** 入口选择不授权 mutation、verification claim、runtime maintenance、handoff、knowledge promotion、commit 或 landing；低置信且会改变 route 时最多询问一个问题。
-- **权威：** 用户意图与项目 source rules 决定 route；本 skill 只做语义路由，不创建 workflow state 或执行下游工作。
-- **消费者：** 当前用户、所有 public workflow、standalone skill 与 host runtime entrypoint。
+- **Input:** User intent, current workflow, artifact type, failure or environment signals, and project routing rules.
+- **Output:** Hand control to one public workflow, standalone skill, command, or Direct Lane. The route map also defines `runtime-maintenance` and bounded source review.
+- **Authority:** User intent and project source govern routing. Selection authorizes no downstream work, commit, or landing and creates no state.
+- **Consumers:** The user, public workflows, standalone skills, and host entrypoints.
 
 ## Fast Paths
 
@@ -23,15 +22,15 @@ description: Standalone entry governor for spec-first. Use before substantial wo
 
 ## Route Selection
 
-入口规则在独立加载本 Skill 时同样有效，不依赖先读项目 AGENTS.md：存在失败、回归、flake、报错或明确修复意图时进入 `spec-debug`，不得降为 Direct Lane；活跃 workflow 内的失败由当前 owner 处理，超范围时才移交。用户明确点名 workflow 时按对应入口承接；GitHub PR review 反馈、绿 PR 一条龙、外部技术采用裁决、跨会话交接分别对应 `spec-resolve-pr-feedback`、`spec-lfg`、`spec-pov`、`spec-handoff`。
+These rules also apply when loaded standalone. Route failures, regressions, flakes, errors, or explicit fix requests to `spec-debug`, never Direct Lane. In an active workflow, the current owner handles failures and hands off only when they exceed its scope. Honor an explicitly named workflow. Route PR feedback to `spec-resolve-pr-feedback`, a green-PR request to `spec-lfg`, external adoption decisions to `spec-pov`, and cross-session handoffs to `spec-handoff`.
 
-描述列表可能由宿主缩短；完整触发、排除和授权边界以加载后的正文及 route map 为准。描述长度仅是预算观测，不单独证明宿主截断或误选。
+Hosts may shorten descriptions. Use the loaded instructions and route map for triggers, exclusions, and authority; length alone proves neither truncation nor misrouting.
 
 For every request outside the fast paths, and to validate an explicit public route or answer “what next?”, read [Public Route Map](references/public-route-map.md). Select exactly one entrypoint; do not automatically chain the flow. Prefer readiness, failure, or review routes when they match; otherwise use immediate intent and artifact type. **Checkpoint — ask:** at low confidence, ask at most one route-changing question, then stop and wait for the answer before routing further.
 
 For active work, announce one localized line equivalent to `Entering <entrypoint>: <one concrete reason>`, then follow the selected route. If a standalone skill is user-invoked only, recommend it and wait. For recommendation-only requests, return exactly one recommendation and wait:
 
-按用户目标选入口。环境必需能力缺失交给`spec-runtime-setup`，可选能力披露限制后继续；不自动串联需求到执行。
+Route missing required capabilities to `spec-runtime-setup`. If an optional capability is unavailable, disclose the limitation and continue. Do not automatically chain requirements to execution.
 
 ```text
 Recommended entrypoint: <spec-*, standalone skill, or terminal command>
@@ -39,9 +38,9 @@ Reason: <one concrete reason>
 Next action: <one action the user can take now>
 ```
 
-Use the repository's configured user language. **Checkpoint — wait:** 只请求推荐、比较或询问下一步时，给出一个入口与理由后等待。明确要求执行时，选择入口后继续已授权的工作，不再把入口推荐当成一次新的审批；只有缺少影响路由的事实或新增副作用授权时才停下。
+Use the repository's configured user language. **Checkpoint — wait:** For recommendation-only, comparison, or next-step requests, give one entry and reason, then wait. When explicitly requested to execute, continue under existing authorization unless a route-changing fact or new side-effect authorization is missing.
 
-首次实质结果按宿主、target、入口、时间、结果和来源说明完成与未完成范围；欢迎语、入口推荐、setup receipt或文件存在不证明成功。不为示例创建文件，不自动提交、发布或升级为已验证知识；后续由当前owner承接已有授权。
+For the first substantive result, identify host, target, entrypoint, time, outcome, source, and unfinished work. A welcome message, route recommendation, setup receipt, or file alone does not prove success. Do not create example files or automatically commit, release, or promote knowledge. The current owner retains the existing authorization.
 
 ## Exit Boundaries
 

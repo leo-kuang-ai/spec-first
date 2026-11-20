@@ -1,27 +1,27 @@
 'use strict';
 
-// U4 — Workspace merged-graph 异步刷新原语（R7/R8/R9/KTD6）。
+// U4 — Workspace merged-graph asynchronous refresh primitive (R7/R8/R9/KTD6)
 //
-// spec-first 自有子仓 commit hook 在 commit 时触发全部 confirmed child 的 CodeGraph sync，
-// 以及父目录 Graphify 子图/merged graph 重建。刷新昂贵，必须异步（commit 立即返回）、
-// 并发安全（同一 workspace 绝不两个 writer 并行，否则 provider artifacts 可能 corrupt）、
-// 失败可见（后台失败落盘 reason_code 供消费侧读取）。
+// spec-first self-owned child repository commit hook triggers a full CodeGraph sync for all confirmed child repositories at commit time.
+// As well as the parent directory Graphify subgraph/merged graph reconstruction. Refreshing is expensive and must be asynchronous (commit returns immediately)
+// Concurrency safety (never allowing two writers to operate in parallel within the same workspace, as this may corrupt provider artifacts)
+// Failure is visible (background failure persists with reason_code available for consumption side to read).
 //
-// 边界：event coalesce 写 `<workspaceRoot>/graphify-out/` 下的 lock/status/pending；实际
-// build/status writer 另持 `.spec-first/workspace-graph-lifecycle.lock`，与显式 build/clean
-// 串行。路径均做 containment；重建命令由调用方传入 verified 绝对 launcher，本模块不解析 PATH。
+// Boundary: event coalesce writes to ``<workspaceRoot>/graphify-out/`lock/status/pending`; actual
+// build/status writer also holds `.spec-first/workspace-graph-lifecycle.lock`, and explicitly build/clean
+// Serial. All paths are subject to containment; the rebuild command is passed in by the caller, and this module does not parse PATH.
 //
-// 协作契约（coalesce）：
-//   - trigger：先发布 pending，再尝试 `wx` 独占创建带随机 token 的 starting lease。成功后
-//     消费自己的 marker、detached 派发 wrapper 并把 owner 交接为 worker PID；已存在→starting
-//     lease 先保留短 grace，running lease 只在 owner 进程已死时回收，否则返回 coalesced，
-//     表示「有重建在跑，跑完请再来一轮」。
-//   - wrapper（runMergedRebuildForeground）：先用 token claim worker ownership，再执行
-//     do { 清 pending; 跑重建; 写 status } while(pending)；每次写 status 和最终释放前都核对
-//     token/PID。这样连续 commit 只在当前重建结束后再补跑一轮，旧 worker 也不能删除后继锁。
-//   - release handoff：wrapper 退出循环后先释放 owned lock，再检查 pending。释放前到达的
-//     trigger 会写 pending，由旧 worker 重新走 single-flight trigger；释放后到达的 trigger
-//     会自行获得 lock。两条路径竞争时仍只有一个后继 worker，关闭最后一次唤醒丢失窗口。
+// Coalescence Contract (coalesce):
+//   - trigger: First publish a pending state, then attempt to create a starting lease with exclusive `wx` ownership and a randomly generated token. upon success
+//     Consume its own marker, dispatch detached wrapper, and transfer owner to worker PID; if already exists → starting
+//     Please keep the short grace; a running lease is only reclaimed when the owner process has died; otherwise, return coalesced.
+//     Indicates "reconstruction is running; after completion, please start another round."
+//   - wrapper（runMergedRebuildForeground）: First use token to claim worker ownership, then proceed
+//     do { clear pending; run reconstruction; write status } while(pending); verify status on each write and again just before final release
+//     token/PID。This continuous commit will only run a single round after the current rebuild completes, and the old worker cannot delete the subsequent lock.
+//   - release handoff: after the wrapper exits the loop, it first releases the owned lock, then checks pending. reached before release
+//     trigger writes pending, and the old worker re-executes the single-flight trigger; trigger arriving after release
+//     Will automatically acquire the lock. When two paths compete, there is still only one successor worker; closing the final wake-up results in losing the window.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -684,12 +684,12 @@ function recordTriggerFailure({
   } finally {
     if (lifecycle.ok && !lifecycle.inherited) lifecycle.release();
   }
-  // 未取得 writer lease 时禁止写 status；保留 owned event lock，使进程退出后
-  // 自然成为可观察、可回收的 abandoned signal。
+  // Writing of status is prohibited when a writer lease is not obtained; retain the owned event lock to ensure the process is terminated after exit.
+  // Naturally becomes an observable, recoverable abandoned signal.
   return { recorded: false, reason_code: lifecycle.reason_code || 'workspace-graph-lifecycle-busy' };
 }
 
-// 同步执行体：detached 子进程调用（或测试直接调用）。跑重建、写 status、按 pending 合并、释放锁。
+// Synchronous execution entity: detached subprocess call (or direct call during testing). Run reconstruction, write status, merge according to pending, release lock.
 function runMergedRebuildForeground({
   workspaceRoot,
   command,
@@ -885,7 +885,7 @@ function reasonForResult(result) {
   return 'workspace-async-refresh-nonzero-exit';
 }
 
-// 触发：trigger 端。producer-first pending + acquire-or-coalesce，acquired 时 detached 派发 wrapper。
+// Trigger: trigger end. producer-first pending + acquire-or-coalesce, when acquired, dispatches a wrapper if detached.
 function triggerMergedRebuildAsync({
   workspaceRoot,
   command,
@@ -1059,14 +1059,14 @@ if (require.main === module) {
     }
     process.exitCode = 2;
   } else if (argv.includes('--run') && parsed.workspaceRoot && parsed.command) {
-    // Detached wrapper：跑重建、写 status、按 pending 合并、释放锁。
+    // Detached wrapper: triggers rebuild, writes status, merges pending entries, and releases lock.
     try {
       runMergedRebuildForeground({ ...parsed, requireActiveState: true });
     } catch (_error) {
       process.exitCode = 1;
     }
   } else if (argv.includes('--trigger') && parsed.workspaceRoot && parsed.command) {
-    // 子仓 commit hook 入口：acquire-or-coalesce 后立即返回（重建在后台）。
+    // ZiCang commit hook entry: returns immediately after acquire-or-coalesce (reconstruction occurs in the background).
     try {
       const result = triggerMergedRebuildAsync({ ...parsed, requireActiveState: true });
       if (result.status === 'error') process.exitCode = 1;

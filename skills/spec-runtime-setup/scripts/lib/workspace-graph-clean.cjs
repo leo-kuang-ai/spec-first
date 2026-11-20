@@ -13,7 +13,7 @@
 //   - surface a CodeGraph daemon-cleanup action (spec-first does not force-kill
 //     provider daemons; it reports the action).
 //
-// Deleting the requirement folder itself removes everything (per-需求 isolation,
+// Deleting the requirement folder itself removes everything (per-requirement isolation,
 // no machine-global residue). `exec` is injectable for tests.
 
 const fs = require('node:fs');
@@ -171,14 +171,14 @@ function runWorkspaceGraphCleanOwned({
       reason_code: '',
     };
 
-    // 1. 删除 contained 的 per-child .codegraph/。
+    // 1. Remove the per-child .codegraph/ directory.
     const codegraphDir = path.join(repo.git_root, '.codegraph');
     const codegraph = safeRemoveDir(workspaceRoot, codegraphDir);
     entry.codegraph_status = codegraph.status;
     entry.codegraph_removed = codegraph.removed;
     if (!codegraph.ok) entry.reason_code = codegraph.reason_code;
 
-    // 2. 幂等移除自身管理的 exclude block。
+    // 2. Idempotent removal of an exclude block managed by itself.
     const excl = safe(() => removeManagedExclude(repo.git_root, workspaceRoot));
     entry.exclude_status = excl && excl.ok ? (excl.changed ? 'removed' : 'absent') : 'failed';
     entry.exclude_removed = Boolean(excl && excl.ok && excl.changed);
@@ -186,8 +186,8 @@ function runWorkspaceGraphCleanOwned({
       entry.reason_code = excl && excl.reason_code ? excl.reason_code : 'exclude-remove-failed';
     }
 
-    // 3. State 只提供已知 posture；实际 cleanup 还会探测 contained hook marker，
-    //    因而旧/损坏 receipt 也不会让 spec-first managed block 变成孤儿。
+    // 3. State provides only known posture; actual cleanup will also detect contained hook marker.
+    //    Therefore, old or damaged receipts will not cause a spec-first managed block to become an orphan.
     const hooks = resolveHooksPath(repo.git_root);
     let shouldUninstallLegacyHook = false;
     if (!hooks.ok) {
@@ -253,15 +253,15 @@ function runWorkspaceGraphCleanOwned({
     repoResults.push(entry);
   }
 
-  // 4. 只剥离 workspace host 入口文档中的 managed routing block。
+  // 4. Extract only the managed routing block from the workspace host entry documentation.
   let routing = null;
   if (stripRouting) {
     lifecycle.assertOwned('before-routing-clean');
     routing = safe(() => stripRoutingInstruction({ workspaceRoot, hosts }));
   }
 
-  // Legacy hook 清理属于请求的生命周期；containment block 必须返回 partial，
-  // 同时保持外部路径不变。
+  // Legacy hook cleanup belongs to the request lifecycle; containment block must return partial
+  // While keeping the external path unchanged.
   const repoFailed = repoResults.some((repo) => (
     repo.codegraph_status === 'failed'
     || repo.exclude_status === 'failed'
@@ -272,7 +272,7 @@ function runWorkspaceGraphCleanOwned({
     : false;
   const childOrRoutingFailed = repoFailed || routingFailed;
 
-  // 5. 只有 child/routing 已清理成功才删除 state/tree；否则保留 receipt 供裸重试。
+  // 5. Only remove state/tree after successfully cleaning up child/routing; otherwise retain receipt for bare retry.
   const graphifyRoots = [
     path.join(workspaceRoot, 'graphify-out'),
     path.join(workspaceRoot, '.graphify'),

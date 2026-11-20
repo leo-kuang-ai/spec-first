@@ -1,64 +1,64 @@
-# <大需求名称> 总索引模板
+# <Large Requirement Name> Total Index Template
 
-> 仅在当前执行对话用户确认拆分边界后使用。它是导航、范围和跨文档关系视图，不承载具体 Requirements、Acceptance 或实现任务。
+> Use only after the current executing dialog user confirms the split boundary. It provides navigation, scope, and cross-documentation relationship views, without carrying specific Requirements, Acceptance, or implementation tasks.
 >
-> Frontmatter 使用 `references/prd-output-template.md` 的 split-summary contract；不要从本文件自行声明 ready。
+> Frontmatter uses the split-summary contract from `references/prd-output-template.md`; do not declare ready in this file itself.
 
-## 需求全景
+## Demand Panorama
 
-说明整体问题、目标用户、业务结果、涉及 surface、为什么必须拆分，以及哪些规则仍由所有子 PRD 共享。
+Outline the overall issue, target users, business outcomes, involved surface areas, why splitting is necessary, and which rules are shared across all child PRDs.
 
-## 整体边界
+## Overall boundary
 
-| 维度 | 内容 |
+| Dimension | content |
 | --- | --- |
 | In Scope | |
 | Non-Goals | |
-| 共享默认行为 | |
-| 共享术语 source | |
-| 共享数据 / 权限边界 | |
-| 统一发布约束 | |
+| Shared default behavior | |
+| Shared terminology source | |
+| Shared data / Permission boundary | |
+| Unified publication constraint | |
 
-## 子 PRD 清单
+## Child PRD list
 
-| child_id | 文档 | 独立业务结果 | In Scope | Non-Goals | primary surface | 状态 / blocker |
+| child_id | document | Independent business results | In Scope | Non-Goals | primary surface | Status / blocker |
 | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | |
 
-每篇子 PRD 必须能独立进入 `spec-plan`，并拥有自己的 Requirements、Acceptance Examples、Scope Boundaries、Evidence 和 readiness receipt。
+Each child PRD must be able to independently enter `spec-plan`, and must have its own Requirements, Acceptance Examples, Scope Boundaries, Evidence, and readiness receipt.
 
-## 跨文档依赖
+## Cross-document dependencies
 
-| from child | to child | 依赖内容 | 是否改变 WHAT | 未满足影响 | source / 决定 |
+| from child | to child | Dependency content | Whether to change WHAT | Non-satisfied impact | source / decision |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-不要把 task sequencing 或文件级依赖写入这里；这里只记录产品级前置关系和共享 contract。
+Do not record task sequencing or file-level dependencies here; this section only captures product-level precedence relationships and shared contracts.
 
-## Source-Of-Truth 与共享规则
+## Source of Truth and Shared Rules
 
 | item | source-of-truth | consumers | conflict rule | child refs |
 | --- | --- | --- | --- | --- |
 | | | | | |
 
-## 整体验收
+## End-to-end acceptance testing
 
-| AE | 场景 | 涉及 child | 整体可观察结果 | 负向保护 |
+| AE | Scenario | Involves child | Overall observable results | Negative protection |
 | --- | --- | --- | --- | --- |
 | AE-X01 | | | | |
 
-整体验收只覆盖跨 child 结果；单模块验收留在对应子 PRD。
+End-to-end acceptance covers only cross-child results; module-level acceptance remains in the corresponding child PRD.
 
-## 大需求级待闭合问题候选
+## High-demand level pending closure issue candidates
 
-> 这里只提示跨 child 候选缺口，不生成第二套 OQ schema；真正未闭合的问题统一移入 output contract 的 canonical `Outstanding Questions`。
+> Here, only cross-child candidate gaps are indicated, with no generation of a second OQ schema; actual open issues are uniformly moved to the canonical `Outstanding Questions` in the output contract.
 
-| 候选缺口 | 影响 child | 先查 source | 推荐答案 / 待确认原因 |
+| Candidate Gap | Influence child | First check source | Recommended answer / Pending verification reason |
 | --- | --- | --- | --- |
 | | | | |
 
 ## Handoff
 
-- 总索引不是 implementation plan。
-- planning 通常从具体 child PRD 开始，并保留 parent/split trace。
-- 任一 child 仍需 planning 发明 WHAT 时，该 child 不得以总索引为由宣称 ready。
+- The total index is not an implementation plan.
+- Planning typically starts from specific child PRD and retains parent/split trace.
+- Whenever a child needs planning to generate WHAT, that child shall not claim ready on the grounds of total index.

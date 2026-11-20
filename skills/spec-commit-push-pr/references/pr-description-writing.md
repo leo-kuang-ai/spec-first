@@ -212,11 +212,11 @@ This frame becomes the opening. For small+simple PRs, the "after" sentence alone
 
 Use only caller-supplied or already-read plan decisions relevant to this diff. Preserve `user-directed`, `user-approved`, delegated agent judgment and inferred assumptions as distinct provenance; `session-settled:` text is a source annotation, not proof of new approval. Mention the selected decision and source only when it helps review. Carry an actual proceed-under-conflict limitation when supplied; do not invent a rejected alternative or reopen settled choices as a backlog. No plan in hand means no plan hunt.
 
-### 保留贡献者来源
+### Retain contributor attribution
 
-只有本 PR 实际交付了作者之外的人的工作，才补充 contributor credit。已有 PR 以其实际 author 为准；新 PR 以 shipping 人的 Git 身份为线索，并核实其他邮箱别名，不能仅因 email 不同就认定为另一人。证据来自 Pre-A 完整范围内的 commit author、已有 `Co-authored-by` trailer，或本工作继续/替代的明确 PR。模型、harness 或 bot 署名不算人的贡献；独立改写与直接移植的区别沿用 `commit-and-push.md`。
+Contributor credit should only be added if this PR actually delivers work completed by someone other than the author. Existing PRs are determined by the actual author; for new PRs, the shipping person's Git identity is used as the reference, and other email aliases are verified. It is not sufficient to consider two individuals different merely because their emails differ. Evidence comes from the commit author in the complete range of Pre-A, existing `Co-authored-by` trailers, or a clearly stated PR that continues or supersedes this work. Model, harness, or bot signatures do not count as human contributions; the distinction between independent rewriting and direct transplantation follows `commit-and-push.md`.
 
-适用时在正文署名，并链接已知的前序/被替代 PR；重写保留已有 contributor credit。若仓库文档或当前 repo metadata 确认会 squash merge，将其他实际贡献者的 `Co-authored-by: Name <email>` 放在 body 最后一个段落、全部模板章节和 footer 之后，便于进入 squash message；仅 `squashMergeAllowed` 表示允许该方式，不能当作本 PR 必然 squash 的证据。姓名和邮箱精确复制自 commit author 或已有 trailer；被替代 PR 的提交不在当前 range 时，回源其 commits。邮箱缺失或来源不可核实时只作有证据的正文署名，报告缺口，不拼接邮箱、不制造身份或重写历史。
+When applicable, sign the body of the text and link to the known prior/obsolete PR; rewrite preserves existing contributor credit. If repository documentation or current repo metadata confirms a squash merge will be performed, place the `Co-authored-by: Name <email>` entries from other actual contributors at the end of the body, after the last template section and footer, to facilitate inclusion in the squash message; the `squashMergeAllowed` flag only indicates that squash merging is permitted and does not constitute evidence that this PR must be squashed. Name and email are exactly copied from the commit author or existing trailer; when the commits of the replaced PR are outside the current range, they are sourced back. Email missing or source unverifiable: only include signed body content with evidence; report gaps; do not concatenate emails, do not fabricate identities, or rewrite history.
 
 ---
 
@@ -347,7 +347,7 @@ Use the project PR-body contract first. The following order is a fallback for un
 4. **New concepts section** -- only when Step B2 produced one or preserved one from the existing PR body.
 5. **Evidence block** -- only the preserved or freshly captured block from Step B, if one exists. Do not fabricate or placeholder.
 6. **Spec-First footer** -- for a new body use the existing plain-text default only when the project body contract permits it. On rewrite preserve existing branding without duplication; do not add or remove it merely as cleanup. Explicit user/project branding direction takes precedence.
-7. **贡献者 trailers** -- 仅按 Step C 的已核实条件添加，放在 body 最后一个段落；无适用贡献者则省略。
+7. **Contributor trailers** — Add only according to the verified conditions in Step C, placed at the end of the body's last paragraph; omit if no applicable contributors.
 
 **Footer:**
 
@@ -382,7 +382,7 @@ Then apply these cuts:
 - If an optional "Review" or process-oriented section lists how to review, remove it. Move any truly non-obvious review hints inline with the relevant change.
 - If the body has 5+ H3 subsections that each describe one mechanism, consolidate them into a single table row per mechanism under one header. Reserve prose H3 callouts for 2-3 genuine design decisions.
 - If the body exceeds the sizing-table target by more than 30%, compress the longest non-Summary section by half.
-- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove project-required content or permitted preserved teaching/evidence solely to shorten the narrative. Exact-template restrictions override optional footer/teaching defaults. 保留 Step C 核实的 contributor credit 和适用 trailers，不为缩短文案删去真实来源。
+- If any other sentence or section can be cut without lowering reviewer confidence, cut it. Do not remove project-required content or permitted preserved teaching/evidence solely to shorten the narrative. Exact-template restrictions override optional footer/teaching defaults. Retain contributor credit and applicable trailers verified in Step C; do not omit genuine sources to shorten the copy.
 
 **Value-lead check.** Re-read the first sentence of the Summary. If it describes what was moved around, renamed, or added ("This PR introduces three-tier autofix..."), rewrite to lead with what's now possible or what was broken and is now fixed ("Document reviews previously produced 14+ findings requiring user judgment; this PR cuts that to 4-6.").
 

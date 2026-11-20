@@ -109,7 +109,7 @@ promotion_required_fields:
   invalidation_condition:
     type: string
     min_length: 1
-    description: "触发重新核查、修订或退役的具体条件。依赖外部 bug/工具版本/平台行为时，写明该外部变化及不修改仓库的检查来源或方法；移除 workaround 后重跑测试等写入验证放在正文的移除前步骤。字段形态由脚本验证，语义充分性由 owner 判断。"
+    description: "Specific conditions that trigger a re-examination, revision, or retirement. When dependent on external bug/tool version/platform behavior, explicitly document the external change and the source or method for checking without modifying the repository; include verification steps such as rerunning tests after removing workarounds, placed before the removal step in the main body. Field structure is validated by script; semantic completeness is determined by the owner."
 
 # --- Track-specific rules ----------------------------------------------------
 track_rules:

@@ -12,7 +12,7 @@ Run metric-driven iterative optimization. Define a goal, build measurement scaff
 
 Use `scripts/decide.cjs` for numeric multi-objective eligibility, comparison thresholds, and measurement-ladder steps. A required-objective win can be kept even when the primary is unchanged; confirmation and integration must finish before recording `kept`. Completion requires every declared required target or another explicit stop, a verified final log, and an honest account of blocked or unfinished work. `references/example-expensive-benchmark-spec.yaml` illustrates multiple required targets and staged sampling.
 
-可选 holdout 是独立确认集：冻结数据与协议，不用于假设、worker 输入或排名。配置后 `decide.cjs` 在 selection 通过时要求 `next_measurement: holdout`，确认缺失或不支持同一改善目标就不能 keep；详细执行与留证见 measurement、loop 和 experiment log。旧 spec/log 保持兼容，不自动提升为泛化验证。
+Optional holdout is an independent validation set: the data and protocol are frozen and not used for assumptions, worker inputs, or ranking. After configuration, when `decide.cjs` passes the selection, it requires `next_measurement: holdout`; if the holdout is missing or unsupported, the process cannot proceed. Detailed execution and trace records are available in the measurement, loop, and experiment logs. Old spec/log maintains compatibility and is not automatically upgraded to generalized validation.
 
 ## Workflow Contract Summary
 

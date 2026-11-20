@@ -6,10 +6,10 @@ const path = require('node:path');
 
 const CANONICAL_HOSTS = Object.freeze(['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qoder', 'zcode', 'pi']);
 const CANONICAL_HOST_SET = new Set(CANONICAL_HOSTS);
-// 每个宿主登记 spec-runtime-setup 的全部 generated 投射根（相对 repo 根的正斜杠路径）。
-// Claude 以 workflow_command 投射到 managed workflows 根；其余宿主 workflow 根即
-// skills 根。保持与 src/cli adapters 的 skillsRoot/workflowsRoot 同步——
-// tests/unit/mcp-setup-config-consumers.test.js 的 drift-guard 用例强制这一一致性。
+// Each host registers all generated projected roots of spec-runtime-setup (relative paths under the repo root, separated by forward slashes).
+// Claude projects the workflow_command to the root of managed workflows; the roots of other host workflows are accordingly.
+// skills rootSynchronize with src/cli adapters' skillsRoot/workflowsRoot——
+// tests/unit/mcp-setup-config-consumers.test.js"'s drift-guard test case enforces this consistency.
 const HOST_SKILL_SURFACES = Object.freeze({
   claude: Object.freeze(['.claude/spec-first/workflows']),
   codex: Object.freeze(['.agents/skills']),
@@ -21,8 +21,8 @@ const HOST_SKILL_SURFACES = Object.freeze({
   // projects to; resolveLoadedHostSurface returns every host bound to the
   // matched surface so a zcode pin confirms against the shared root.
   zcode: Object.freeze(['.agents/skills']),
-  // Pi 的官方项目级 skills 发现根同样包含共享 .agents/skills（cwd 与祖先目录），
-  // 因此 pi pin 与 codex/zcode 一样经共享根确认。
+  // Pi's official project-level skills discovery also includes shared .agents/skills (current working directory and ancestor directories).
+  // Therefore, pi pin is verified similarly to codex/zcode through shared root confirmation.
   pi: Object.freeze(['.agents/skills']),
 });
 
@@ -152,8 +152,8 @@ function resolveLoadedHostSurface(skillRoot) {
   if (matchedSurfaceId === null) {
     return null;
   }
-  // 共享面（如 `.agents/skills/` 同时绑定 codex 与 zcode）返回绑定到该面的全部
-  // 宿主；不同 surface 后缀互斥，同一路径至多命中一个 surfaceId。
+  // Shared face (e.g. `.agents/skills/` simultaneously binding to codex and zcode) returns all bindings to this face
+  // Host; different surface suffixes are mutually exclusive, and at most one surfaceId can match per path.
   const hosts = Object.entries(HOST_SKILL_SURFACES)
     .filter(([, surfaceIds]) => surfaceIds.includes(matchedSurfaceId))
     .map(([host]) => host);
@@ -180,8 +180,8 @@ function buildInvocationReceipt({
     reason_code: reasonCode,
     host,
     loaded_host: loadedSurface ? loadedSurface.host : null,
-    // 共享面（如 .agents/skills 同时绑定 codex/zcode）时 receipt 必须证明 pin
-    // 宿主确实绑定到该面，否则消费方只能看到 first-match 宿主而误拒 pin。
+    // When a shared face (such as .agents/skills binding both codex/zcode) is involved, the receipt must prove the PIN.
+    // The host is indeed bound to this face; otherwise, the consumer would only see the first-match host and mistakenly reject the pin.
     surface_hosts: loadedSurface && Array.isArray(loadedSurface.hosts)
       ? [...loadedSurface.hosts]
       : [],

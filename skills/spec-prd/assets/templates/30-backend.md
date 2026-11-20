@@ -1,95 +1,95 @@
-# Backend / 中台服务 Surface 模板
+# Backend / Mid-platform Service Surface Template
 
-> 与 `00-generic.md` 组合使用。这里只定义产品可观察的状态、业务契约、一致性、兼容、失败结果和运营准备，不写接口字段、数据库 schema、中间件或服务拆分。
+> Used in combination with `00-generic.md`. Here only defines observable product states, business contracts, consistency, compatibility, failure outcomes, and operational readiness—without specifying interface fields, database schema, middleware, or service decomposition.
 >
-> 所有人类问题只询问当前执行对话的用户。行业规则仅在明确命中后通过对应 overlay 增强。
+> All human-related questions are only directed to the currently executing conversation user. Industry rules are enhanced via corresponding overlay only after explicit matching occurs.
 
-## Backend 属性确认
+## Backend property confirmation
 
-| 维度 | 内容 |
+| Dimension | content |
 | --- | --- |
-| 业务能力 | |
-| 主要 actor / consumer | 用户 / Admin / 其它服务 / 外部系统 |
-| 主要业务对象 | |
-| 调用形态 | 同步 / 异步 / 批处理 / 事件驱动（只描述产品时效） |
-| 兼容范围 | 旧客户端 / 旧调用方 / 旧数据 / 第三方 |
-| 是否涉及资金、隐私或不可逆数据 | |
+| Business capability | |
+| main actor / consumer | User / Admin / Other Services / External Systems |
+| Main business objects | |
+| Invocation pattern | Synchronous / Asynchronous / Batch Processing / Event-driven (describing product timing) |
+| Compatibility Scope | Old client / Old caller / Old data / Third-party |
+| Does it involve funds, privacy, or irreversible data | |
 
-## 状态语义
+## State semantics
 
-| 状态 | 产品含义 | 进入条件 | 可执行动作 | 可离开状态 | 用户 / consumer 可见结果 |
+| Status | Product meaning | Entry conditions | Executable actions | Available state | User / consumer visible results |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-明确终态、可逆性、取消/撤回、过期、失败、重复事件和未知状态的产品语义，不描述内部状态机实现。
+Define the product semantics for final state, reversibility, cancellation/revocation, expiration, failure, duplicate events, and unknown states, without describing the internal state machine implementation.
 
-## 业务原子性与一致性边界
+## Business atomicity and consistency boundary
 
-| 业务动作 | 必须一起成功的结果 | 可部分成功的结果 | 失败后产品状态 | 重试期望 |
+| Business operations | A result that must succeed together | Partially successful result | Product status after failure | Retry expectation |
 | --- | --- | --- | --- | --- |
 | | | | | |
 
-涉及重复请求、并发更新或异步消息时，写产品级幂等期望：重复执行不得产生重复业务结果，且用户/consumer 能识别最终状态。
+For product-level idempotency involving repeated requests, concurrent updates, or asynchronous messages: repeated execution must not produce duplicate business outcomes, and the user/consumer must be able to identify the final state.
 
-## Producer / Consumer 契约期望
+## Producer/Consumer contract expectations
 
-| Producer | Consumer | 业务事件 / 请求 | 成功结果 | 失败结果 | 时效 | 兼容要求 |
+| Producer | Consumer | Business event / Request | Success result | Failure result | Timeliness | Compatibility Requirements |
 | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | |
 
-PRD 可以定义字段的产品含义和必需信息，但不定义具体字段名、类型、协议或版本实现。
+The PRD defines the product meaning and essential information for fields, but does not specify the actual field names, types, protocols, or version implementations.
 
-## 错误与降级语义
+## Errors and degradation semantics
 
-| 场景 | consumer 收到什么 | 用户看到什么 | 是否可重试 | 降级结果 | 是否需要人工处理 |
+| Scenario | What does the consumer receive? | What does the user see | Can it be retried | Degradation result | Does manual processing be required? |
 | --- | --- | --- | --- | --- | --- |
-| 下游不可用 | | | | | |
-| 超时 | | | | | |
-| 重复请求 | | | | | |
-| 状态冲突 | | | | | |
-| 部分成功 | | | | | |
+| Downstream unavailable | | | | | |
+| Timeout | | | | | |
+| Repeated request | | | | | |
+| State conflict | | | | | |
+| Partial success | | | | | |
 
-## 批处理、对账与补偿
+## Batch processing, reconciliation, and compensation
 
-命中批处理或异步一致性时，写明：处理窗口、数据范围、完成判定、重复运行、失败清单、人工介入、补偿后的用户/consumer 可见状态。
+When handling batch processing or asynchronous consistency, specify: processing window, data scope, completion criteria, re-execution, failure list, manual intervention, and consumer-visible status after compensation.
 
-## 配置与生效
+## Configuration and Take Effect
 
-| 配置能力 | 产品含义 | 默认行为 | 生效范围 | 生效时效 | 未配置 / 非法值结果 |
-| --- | --- | --- | --- | --- | --- |
-| | | | | | |
-
-只定义产品行为，不规定配置中心、key 或读取实现。
-
-## 历史版本与存量数据
-
-| 对象 | 旧行为 / 数据 | 新行为 | 是否迁移 | 未迁移时结果 | 回退后结果 |
+| Configuration capabilities | Product meaning | Default behavior | Scope of effect | Effectiveness period | Not configured / Invalid value result |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-## 安全、审计与数据边界
+Define only product behavior, without specifying the configuration center, key, or read implementation.
 
-列出授权、敏感数据、导出、审计、保留和删除的产品约束。涉及专业或监管规则时，引用项目 source 或行业 overlay，并保留未确认项。
+## Historical versions and existing data
 
-## 可用性与运营准备
+| Object | Previous behavior / Data | New behavior | Whether to migrate | Result when not migrated | Result after rollback |
+| --- | --- | --- | --- | --- | --- |
+| | | | | | |
 
-| 维度 | 产品要求 / 可观察口径 |
+## Security, Auditing, and Data Boundaries
+
+List of product constraints for authorization, sensitive data, export, auditing, retention, and deletion. When involving professional or regulatory rules, cite the project source or industry overlay, and retain unconfirmed items.
+
+## Availability and Operations Readiness
+
+| Dimension | Product Requirements / Observable Scope |
 | --- | --- |
-| 关键使用窗口 | |
-| 可接受延迟 | |
-| 降级用户影响 | |
-| 告警后的业务动作 | |
-| 回退 / backfill 影响 | |
-| 支持与人工处置 | |
+| Key Usage Window | |
+| Acceptable delay | |
+| Impact on downgraded users | |
+| Business actions after alarm | |
+| Rollback / backfill impact | |
+| Supports manual handling | |
 
-## Backend 补充验收
+## Backend supplementary acceptance
 
-- 合法状态迁移、非法迁移、重复事件和并发更新。
-- 下游失败、超时、部分成功和重试。
-- 旧调用方、旧数据和回退路径。
-- 批处理重复运行、失败清单和补偿结果。
-- 产品级幂等和可观察最终状态。
+- Legal state transitions, illegal transitions, duplicate events, and concurrent updates.
+- Downstream failure, timeout, partial success, and retry.
+- Old caller, old data, and rollback path.
+- Batch processing re-execution, failure logs, and compensation results.
+- Product-level idempotency and observable final state.
 
-## Backend 待闭合问题候选
+## Backend pending issues for closure candidacy
 
-这里只提示候选缺口，不生成第二套 OQ schema。会改变产品状态、错误结果、compatibility、source-of-truth、默认行为或 consumer 可见契约的问题移入 output contract 的 canonical `Outstanding Questions`；缓存、数据库、消息系统和代码拆分进入 `spec-plan`。
+Here it only prompts candidate gaps and does not generate a second set of OQ schema. Issues affecting product state, error outcomes, compatibility, source-of-truth, default behavior, or consumer-visible contracts should be moved to the output contract's canonical `Outstanding Questions`; caching, databases, messaging systems, and code splitting should be moved to `spec-plan`.

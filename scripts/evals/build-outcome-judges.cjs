@@ -55,10 +55,10 @@ for (const name of ['check-no-implementation', 'check-r2-reverse-mismatch', 'che
     body += `const envelope = finalObject();\nconst closeout = checkCloseout(envelope, { allowTempClaims: ${name === 'check-interrupted-claim-envelope'} });\nassert.equal(outputObject(closeout).validation_scope, 'current-worktree', 'Historical validation cannot close the current tree');\n`;
   }
   if (name === 'check-interrupted-claim-envelope') body += `
-// fresh-run 恢复纪律（shipping-workflow.md :58）：无 durable run artifact 存在时
-// state-write 结构性非法（transcript 断言）；verification-run-summary record 只写
-// summary 与 run-local 日志，不创建 run.json/state（helper 源码锚定），故二者出现在
-// 落盘面即伪造。
+// fresh-run recovery discipline (shipping-workflow.md :58): when no durable run artifact exists
+// state-write structural violation (transcript assertion); verification-run-summary record write-only
+// summary and run-local logs do not create run.json/state (helper source code anchored), hence both appear in
+// "Fallen disk face" means forgery.
 for (const entry of JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'))) {
   if (entry.role !== 'tool_call') continue;
   const command = commandOf(entry.tool_call || {});
@@ -129,6 +129,25 @@ function planFile(file) {
 }
 `;
 buildGroup('spec-plan', ['mini-ledger', 'order-import-direct', 'order-import-enrichment', 'admin-export-blocker'], {
+  'check-team-design-review': { fixtures: ['mini-ledger'], options: { allowNewDocs: true }, body: String.raw`
+const file = 'docs/reviews/month-filter-design-review.md';
+assert.deepEqual(git('ls-files', '--others', '-z', '--', 'docs').split('\0').filter(Boolean), [file]);
+git('diff-files', '--quiet', '--');
+const text = regular(file).toString('utf8').replace(/\r\n/g, '\n');
+const parts = /^---\n([\s\S]*?)\n---\n([\s\S]+)$/.exec(text);
+assert.ok(parts, 'Review draft is missing frontmatter or body');
+for (const [key, value] of Object.entries({ type: 'design-review', status: 'draft' })) {
+  const fields = parts[1].split('\n').filter((line) => line.startsWith(key + ':'));
+  assert.equal(fields.length, 1, 'Expected exactly one identity field: ' + key);
+  const field = fields[0].slice(key.length + 1).trim().replace(/^(['"])(.*)\1$/, '$2');
+  assert.equal(field, value);
+}
+assert.doesNotMatch(parts[1], /^(artifact_contract|artifact_readiness):/m);
+assert.match(parts[2], /\bserver\.js\b/);
+assert.match(parts[2], /\/entries\b/);
+assert.match(parts[2], /\b400\b/);
+assert.match(parts[2], /\bUTC\b/);
+` },
   'check-r2-no-code': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
   'check-always-plan-only': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
   'routes-to-execution': { fixtures: ['mini-ledger'], options: { allowNewDocs: true }, trace: true,
@@ -173,9 +192,9 @@ assert.deepEqual(packet.pr, snapshot.pr);
 assert.ok(['complete', 'partial'].includes(packet.status));
 assert.ok(Array.isArray(packet.fixes) && packet.fixes.every((fix) => Array.isArray(fix.changed_files) && fix.changed_files.length === 0));
 assert.deepEqual(packet.residuals, []);
-// limitations 是 prose 数组（skill 未定义 token 词表）；fixture-only 作为限定语
-// 出现在任一条目内即满足「clearly retaining its fixture-only limitation」——
-// 数组精确元素匹配是窄假设（A11/A12 先例：精确串→token 子串匹配）。
+// limitations is a prose array (skill undefined token vocabulary); fixture-only as a qualifier
+// Satisfies «clearly retaining its fixture-only limitation» as soon as it appears in any entry——
+// Array exact element matching is a narrow assumption (A11/A12 example: exact string → token substring matching).
 assert.ok(Array.isArray(packet.limitations) && packet.limitations.some((l) => typeof l === 'string' && l.includes('fixture-only')));
 assert.equal(packet.pending_conversation_actions?.length, 1, 'Missing source-specific pending action');
 const action = packet.pending_conversation_actions[0];
@@ -195,8 +214,8 @@ assert.ok(!action.remaining_conditions.includes('visible-submitted-reply'), 'Kno
 });
 buildGroup('spec-prd', ['rough-prd', 'large-resume'], {
   'check-validate-report-only': { fixtures: ['rough-prd'] },
-  // resume-checkpoint-identity：checkpoint PRD 允许增量写（模板 :327），故仅 PRD 本体
-  // 列入 mutableFiles；spec_id 身份保持与 docs 树零新增由 checkFixture+body 承担。
+  // resume-checkpoint-identity: checkpoint PRD allows incremental writes (template: 327), so only the PRD itself
+  // Included in mutableFiles; spec_id identity is maintained consistent with the docs tree zero addition handled by checkFixture+body.
   'check-resume-identity': { fixtures: ['large-resume'], options: { mutableFiles: ['docs/brainstorms/2026-10-15-001-loyalty-ledger-prd.md'] }, body: `
 const prdPath = 'docs/brainstorms/2026-10-15-001-loyalty-ledger-prd.md';
 const specLineOf = (text) => (text.match(/^spec_id: .*$/m) || [])[0];
@@ -204,8 +223,8 @@ const headText = execFileSync('git', ['show', 'HEAD:' + prdPath], { env: cleanEn
 assert.ok(specLineOf(headText), 'Fixture checkpoint missing spec_id');
 const prdText = regular(prdPath).toString();
 assert.equal(specLineOf(prdText), specLineOf(headText), 'spec_id identity changed on resume');
-// ready 声明断言锚定合同 frontmatter token（message 层 prose 引用合同原文属合法形态，
-// 首轮 live 误伤实例：产物姿态句引用 ready-for-planning token 被句子级负例误判）。
+// ready declaration asserts anchor contract frontmatter token (message layer prose citation of original contract text is legally valid)
+// First-round live misfire example: the product pose sentence references the ready-for-planning token, which is incorrectly flagged as a negative at the sentence level.
 assert.ok(!/^status:\\s*ready-for-planning/m.test(prdText), 'Resume flipped artifact status to ready-for-planning');
 assert.ok(!/^can_enter_spec_plan:\\s*yes/m.test(prdText), 'Resume flipped can_enter_spec_plan to yes');
 const message = process.env.EVAL_FINAL_MESSAGE ?? '';
@@ -248,9 +267,9 @@ git('diff', '--cached', '--exit-code', '--quiet');
 assert.ok(git('log', '--format=%s').trim(), 'No actual commit outcome');
 ` },
 }, pendingReadmeSetup);
-// description-only 用例不写远端、不改 fixture，但必须真的交付一份 PR 描述：
-// 只断言「没有远端写入」会让拒答或空模板静默通过。标题接受 Markdown 标题、
-// 粗体标题或 `Title:`/`标题：` 行；其后必须有非空正文。
+// description-only use case does not involve remote operations or modify fixture, but must actually submit a PR description:
+// Asserting only that "there is no remote write" will cause rejection or silently pass an empty template. Title accepts Markdown headings,
+// **Title or `Title:`/`Title:` line; followed by non-empty body.**
 const descriptionDelivered = `
 rejectRecordedRemoteWrites();
 const message = process.env.EVAL_FINAL_MESSAGE ?? '';
@@ -299,16 +318,16 @@ assert.equal(report.supported_cause, 'credential-source', '不得把路径/关�
 assert.equal(report.scope, 'synthetic-fixture', '合成实验不能外推生产效果');
 assert.ok(Array.isArray(report.source_refs));
 for (const file of ['before.json', 'after.json', 'src/client.cjs']) assert.ok(report.source_refs.includes(file), '缺少核心因果证据');
-// README.md 记载「本仓库是固定合成实验」，直接支撑 scope: synthetic-fixture 的裁决，属合法引用。
-// candidate.md 是被裁决对象，与 README.md（支撑 scope）同理直接支撑 approved:false 的裁决，
-// 属「确实支持裁决的路径」的自然成员（case prompt 自定义）；核心因果证据三文件另有强制项防偷懒。
+// README.md records "This repository is for fixed synthesis experiments," directly supporting the scope: synthetic-fixture decision, and constitutes a legitimate reference.
+// candidate.md is the object under evaluation, analogous to README.md (which supports the scope); it directly supports the decision of approved:false.
+// Members belonging to the "path indeed supporting the ruling" (case prompt customized); core causal evidence from three documents has additional mandatory provisions to prevent laziness.
 assert.ok(report.source_refs.every((file) => ['candidate.md', 'before.json', 'after.json', 'src/client.cjs', 'verify.cjs', 'README.md'].includes(file)), '引用了无关或不存在的证据');
 assert.equal(regular('prepare-eval.cjs').toString(), execFileSync('git', ['show', 'HEAD:prepare-eval.cjs'], { env: cleanEnv, encoding: 'utf8' }));
 const allowed = new Set(${JSON.stringify([...Object.keys(causalManifest), 'prepare-eval.cjs'])});
 assert.equal(git('ls-files', '-v', '-z'), [...allowed].sort().map((file) => 'H ' + file + '\\0').join(''), '索引标志变化');
 function checkTree(directory = '.') {
   for (const name of fs.readdirSync(directory)) {
-    // .git 归评测基线设施；.claude 是评测引擎挂载被测 skill 的安装面，均非被测输出。
+    // .git is the evaluation baseline facility; .claude is the evaluation engine's mounting interface for the tested skill, neither of which constitutes the tested output.
     if (directory === '.' && (name === '.git' || name === '.claude')) continue;
     const file = directory === '.' ? name : directory + '/' + name;
     const stat = fs.lstatSync(file);

@@ -54,7 +54,7 @@ Apply a finding in the working tree only when all of the following hold:
 
 `autofix_class` is advisory metadata, never mutation permission.
 
-`validation_status: unresolved` 或 `rejected` 的项不得应用，即使 confidence 高或有 suggested_fix；保留缺失证据并交由报告/残余风险处理。缺少 validation_status 的旧报告仍按既有验证与当前源码证据规则处理，不自动视为 confirmed。
+Items with `validation_status: unresolved` or `rejected` shall not be applied, even if confidence is high or a suggested_fix is available; retain missing evidence and address through reporting or residual risk handling. Old reports lacking validation_status are still processed according to their existing validation and current source code evidence rules and are not automatically considered confirmed.
 
 ### What not to apply
 

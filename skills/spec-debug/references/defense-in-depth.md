@@ -10,9 +10,9 @@ Not every bug warrants this. Use when:
 
 Skip when the root cause is a one-off logic error with no realistic recurrence path.
 
-## 先判断能否消除重复犯错的空间
+## First determine whether there is space to eliminate repeated errors.
 
-同根模式跨文件重现时，多加几层检查仍可能让下一个 caller 再犯同样错误。最小修复验证通过后，检查已发现的位置能否复用现有共享入口、值构造/类型约束，或用针对性的 lint/test 阻止同一错误重现；不默认抽 helper 或引入新抽象。只有变更局限于已发现且已授权的位置、不改变 public interface，且有当前证据支持时，才实施这项预防改动，并在 debug summary 中与最小修复区分、验证。否则保持结构，在 Prevention 中记录具体后续建议。提交与发布仍由 handoff owner 决定；下面的分层防护处理结构本身无法消除的风险。
+In root-mode cross-file reexecution, adding more layers of checks may still allow the next caller to commit the same error again. After minimum repair validation passes, verify whether discovered locations can reuse existing shared entry points, value constructors/type constraints, or employ targeted lint/test rules to prevent recurrence of the same error; do not default to extracting helpers or introducing new abstractions. Preventive changes shall only be implemented when modifications are limited to discovered and authorized locations, do not alter the public interface, and are supported by current evidence; they shall be distinguished and verified from minimal fixes in the debug summary. Otherwise retain the structure, record specific follow-up recommendations in Prevention. Submission and release remain under the decision of the handoff owner; the following layered protection handling structure itself cannot eliminate risks.
 
 ## The four layers
 

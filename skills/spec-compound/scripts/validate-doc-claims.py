@@ -319,7 +319,7 @@ def main(argv: list[str]) -> int:
             line_start = body.rfind("\n", 0, m.start()) + 1
             cited = cites_a_commit(body[line_start:m.start()])
             line_number = body_start + body.count("\n", 0, m.start())
-            # 同一编号后续被明确用作提交引用时，保留更强信号及其行号。
+            # When the same identifier is subsequently used as a submission reference, retain the stronger signal along with its line number.
             if sha not in seen_shas or (cited and not seen_shas[sha][1]):
                 seen_shas[sha] = (line_number, cited)
         for sha, (line_number, cited) in seen_shas.items():

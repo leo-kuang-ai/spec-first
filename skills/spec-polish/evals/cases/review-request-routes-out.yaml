@@ -1,7 +1,6 @@
 id: review-request-routes-out
-title: 静态代码审查请求应路由 spec-code-review
-description: |
-  验证 Not To Use:static code review 不属 polish——应点名 spec-code-review。
+title: "Static code review requests should be routed to spec-code-review"
+description: "Verification: static code review is not part of polish—specifically mention spec-code-review."
 
 input:
   prompt: |

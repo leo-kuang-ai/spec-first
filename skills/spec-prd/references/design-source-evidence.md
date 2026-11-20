@@ -111,4 +111,4 @@ When `intent=validate`, design evidence remains read-only. An already available,
 
 ## Route-Out Boundary
 
-`spec-prd` 从设计材料提取需求事实，不负责验证实现是否与 PRD 或 Figma 一致。
+`spec-prd` extracts requirement facts from design materials and is not responsible for verifying whether the implementation aligns with the PRD or Figma.

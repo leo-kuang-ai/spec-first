@@ -315,8 +315,8 @@ function runWorkspaceGraphBuildOwned({
     routing = injectRoutingInstruction({ workspaceRoot: targets.workspace_root, repos: confirmed, hosts });
   }
 
-  // spec-first 自有子仓 commit hook：仅当 build 产出可用图（complete/partial）时安装，
-  // 且只写有效 hooks root 在 child 内的子仓（external/unsafe 绝不写，merged 降级 advisory）。
+  // spec-first self-owned sub-account commit hook: installed only when the build produces a usable graph (complete/partial)
+  // And only write effective hooks for root in child's sub-repos (do not write for external/unsafe; downgrade to advisory if merged).
   let hooks = null;
   if (!executionGuard() && !refreshOnly) {
     const canInstallHooks = installHooks && (build.status === 'complete' || build.status === 'partial');

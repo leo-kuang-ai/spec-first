@@ -103,7 +103,7 @@ function sameSnapshotGeneration(left, right) {
     && left.ctime_ms === right.ctime_ms;
 }
 
-// Graphify 大图不能整份 JSON.parse 进内存；这里仅做完整语法校验，不构造对象。
+// Graphify: Large graphs cannot be fully loaded into memory via JSON.parse; here, we only perform complete syntax validation without constructing objects.
 function createJsonSyntaxValidator() {
   const stack = [];
   let rootState = 'value';

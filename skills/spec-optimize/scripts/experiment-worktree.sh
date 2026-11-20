@@ -128,8 +128,8 @@ realpath_existing() {
 
 realpath_for_new_path() {
   local path="${1:?Error: path required}"
-  # 目标及其中间目录可能尚不存在（SUP-02：containment 校验要先于 mkdir）。解析最深的已存在祖先，
-  # 拼接剩余段；缺少的段若本身是（悬空）符号链接，则跟随一次后继续解析，避免链接指向边界外时被误判为安全。
+  # The target and intermediate directories may not yet exist (SUP-02: containment verification must precede mkdir). Parse the deepest existing ancestor
+  # Concatenate remaining segments; if a missing segment is itself a ( dangling ) symbolic link, follow it once and continue parsing to avoid misjudging it as safe when the link points beyond boundaries.
   node -e '
 const fs = require("fs");
 const path = require("path");
@@ -180,8 +180,8 @@ validate_safe_spec_name() {
 # an invalid number. Displayed indices are zero-padded, so copying one back in is the normal case.
 normalize_experiment_index() {
   local value="${1:?Error: exp_index required}"
-  # 命名契约固定为三位 exp-000..exp-999。先限制字符数，再做 10 进制转换，避免 Bash
-  # 对超大整数算术溢出后回绕并把 cleanup 重定向到另一个合法 worktree。
+  # Name the contract as a three-digit fixed format: exp-000..exp-999. First limit the character count, then perform decimal conversion, avoid Bash
+  # Handle arithmetic overflow of huge integers with wraparound and redirect cleanup to another valid worktree.
   if [[ ! "$value" =~ ^[0-9]{1,3}$ ]]; then
     echo -e "${RED}Error: exp_index must be an integer from 0 to 999: ${value}${NC}" >&2
     return 1
@@ -480,7 +480,7 @@ create_worktree() {
     echo -e "${YELLOW}Environment files not copied by default. Pass --copy-env to opt in.${NC}" >&2
   fi
 
-  # 路径和 secret 边界校验后，再复制显式声明的 shared files。
+  # After validating the path and secret boundaries, copy the explicitly declared shared files.
   for shared_file in "$@"; do
     copy_shared_file "$worktree_path" "$shared_file"
   done
@@ -488,7 +488,7 @@ create_worktree() {
   echo "$worktree_path"
 }
 
-# 清理单个 experiment worktree。
+# Clean a single experiment worktree.
 cleanup_worktree() {
   local discard="false"
   if [[ "${1:-}" == "--discard" ]]; then discard="true"; shift; fi

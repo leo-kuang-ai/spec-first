@@ -62,7 +62,7 @@ function captureSourceSnapshot({ repoRoot, skillRoot = path.resolve(__dirname, '
     sourceKind = 'git';
     sourceHead = git(['rev-parse', '--verify', 'HEAD']);
   } catch (_error) {
-    // Git 不可用和无 Git 是不同事实；只有目录链确实没有 .git 才使用 folder 范围。
+    // Git is unavailable and having no Git are different facts; only when the directory chain indeed lacks a .git directory does the folder scope apply.
     let cursor = root;
     let gitMarker = false;
     while (true) {
@@ -103,7 +103,7 @@ function captureSourceSnapshot({ repoRoot, skillRoot = path.resolve(__dirname, '
   };
 }
 
-// 排除本层生成的证据及缓存，避免发布 facts 自身使 source 失效；local config 仍在范围内。
+// Exclude evidence and cache generated at this layer to prevent the publication of facts from invalidating the source; local configuration remains within scope.
 const GENERATED_SOURCE_ROOTS = [
   '.git', '.spec-first/cache', '.spec-first/audits', '.spec-first/governance',
   '.spec-first/config/tool-facts.json', '.spec-first/config/runtime-capabilities.json',

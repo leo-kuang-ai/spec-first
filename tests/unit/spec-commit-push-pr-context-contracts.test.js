@@ -12,9 +12,9 @@ describe('spec-commit-push-pr context reference contract', () => {
     for (const file of ['skills/spec-commit/SKILL.md', 'skills/spec-commit-push-pr/references/commit-and-push.md']) {
       const source = read(file);
       expect(source).toContain('Co-authored-by: Name <email>');
-      expect(source).toContain('不猜测');
-      expect(source).toContain('独立改写');
-      expect(source).toMatch(/不.*历史重写/);
+      expect(source).toContain('without guessing');
+      expect(source).toContain('independent rewriting');
+      expect(source).toContain('does not authorize rewriting history');
     }
   });
 

@@ -63,7 +63,7 @@ function runVerificationOrMutation(context, repoRoot) {
   let installResults = new Map();
   let helperInstallResults = new Map();
   if (applyInstallMutation) {
-    // Provider 自有的路径/计划约束必须早于任何 baseline、host 或证据写入。
+    // The provider's own path/planning constraints must be written before any baseline, host, or evidence is written.
     for (const id of selectedIds) {
       const plan = providers[id].plan(providerContext(context, repoRoot, id, {
         selected: true,
@@ -110,12 +110,12 @@ function runVerificationOrMutation(context, repoRoot) {
       );
     } else {
       providerResults = applySelectedProviders(context, repoRoot, selectedIds);
-      // 首次 mutation 后对已知可修复的 Graphify provenance 漂移自动刷新并复探针。
+      // After the first mutation, automatically refresh and reprobe known fixable Graphify provenance drifts.
       const graphify = providerResults.find((entry) => entry.provider === 'graphify');
       const graphifyReason = graphify && providerFailureReason(graphify);
       if (graphify && graphifyReason === 'graphify-scope-provenance-artifact-mismatch'
         && selectedIds.includes('graphify')) {
-        // SUP-24 fix: 切换到 graphify-refresh mode 时同步更新 capabilities
+        // SUP-24 fix: When switching to graphify-refresh mode, synchronously update capabilities
         const refreshCapabilities = ['install-tools', 'write-host-config', 'provider-refresh', 'write-setup-facts'];
         const refreshContext = {
           ...context,
@@ -474,8 +474,8 @@ function failureOutcome(reasonCode, fallback = 'setup-action-required') {
   return { reason_code: reasonCode || fallback };
 }
 
-// 暴露给宿主/测试的统一 repair seam；具体 Provider action 必须由 registry
-// 显式提供，未知 reason 不得由模型即兴执行命令。
+// A unified repair seam exposed to the host/test; specific Provider actions must be handled by registry
+// Explicitly provided, unknown reason cannot be executed by the model.
 function runProviderRepairLoop(options = {}) {
   return runBoundedRepairLoop(options);
 }
@@ -650,7 +650,7 @@ function buildHostConfigReceipt(hostConfigResults) {
   }));
 }
 
-// 单一实现抽取至 lib/host-config-repair-command.cjs(lane finding DR-015)。
+// Extract single implementation to lib/host-config-repair-command.cjs (lane finding DR-015).
 function hostConfigRepairCommand(context) {
   return require('./host-config-repair-command.cjs').hostConfigRepairCommand(context);
 }

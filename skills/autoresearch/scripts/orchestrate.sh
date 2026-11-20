@@ -1,8 +1,8 @@
 #!/bin/bash
 # autoresearch orchestrator — deterministic seam.
 #
-# 职责：提取目标关键词候选、按状态确定 next-hop、计算指标及校验安全出口。
-# 目标语义分类由 LLM 负责；classify 输出不是执行路由或副作用授权。
+# Duties: Extract candidate target keywords, determine next-hop based on status, calculate metrics, and verify safe exit.
+# The semantic classification is handled by the LLM; the classify output is not responsible for routing or side-effect authorization.
 #
 # Usage:
 #   orchestrate.sh classify "<goal>"
@@ -25,8 +25,8 @@ fi
 
 cmd="$1"; shift
 
-# 与 spec-riffrec run-python.sh 同型的解释器探测:名字在 PATH 上不代表可运行,
-# Windows 下 python3 常是 Microsoft Store stub。
+# Interpreter detection similar to spec-riffrec run-python.sh: a name in PATH does not imply executability.
+# On Windows, python3 is often a Microsoft Store stub.
 resolve_python() {
   local candidate
   for candidate in python3 python; do
@@ -58,7 +58,7 @@ cmd, args = sys.argv[1], sys.argv[2:]
 
 # --- classify -------------------------------------------------------------
 
-# 候选词表只提供匹配事实，顺序不表示语义优先级。
+# The candidate word list provides only matching facts; the order does not indicate semantic priority.
 ARCHETYPES = [
     ("ship-ready", "loop", ["ship", "release", "deploy", "publish", "production-ready", "merge"]),
     ("fix-broken", "loop", ["fix", "broken", "failing", "error", "crash", "bug", "can't run", "tests fail"]),
@@ -258,7 +258,7 @@ def cmd_verdict(state):
 
 VALID_MODES = {"loop", "dispatch"}
 VALID_TERMINAL = {"stop-at-verified", "proceed-to-ship"}
-# SUP-15 修复：约束 stop_reason 只能是中断原因，不能是成功收敛
+# SUP-15 Fix: Restrict stop_reason to only be interruption reasons, not successful convergence
 VALID_STOP_REASONS = {"EXTERNAL-STOP", "USER-INTERRUPT", "ERROR"}
 
 def cmd_validate_state(state):
@@ -286,7 +286,7 @@ def cmd_validate_state(state):
             issues.append("last_handoff.untested_gaps: must be an array when present")
     if not isinstance(state.get("cycle_count"), int) or state.get("cycle_count", -1) < 0:
         issues.append("cycle_count: required non-negative integer")
-    # SUP-15 修复：校验 stop_reason 只能是合法的中断原因
+    # SUP-15 Fix: Validate that stop_reason can only be a valid stop reason.
     if "stop_reason" in state:
         if not isinstance(state["stop_reason"], str):
             issues.append("stop_reason: must be a string when present")

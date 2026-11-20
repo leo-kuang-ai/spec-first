@@ -1,9 +1,6 @@
 id: ambiguous-input-no-blocking-prompt
-title: 信息不足的审查请求不得阻断提问，推断意图并在 Coverage 披露不确定性
-description: |
-  验证 "No blocking prompts" 硬边界：模糊审查请求（无 base、无 PR
-  元数据、无 plan）下不使用阻塞式提问，从 git 状态推断范围完成
-  review，把不确定性记入 Coverage/verdict 而不是停下来要输入。
+title: "Review requests with insufficient information shall not block questions; infer intent and account for uncertainty in coverage disclosure"
+description: "Enforce the \"no blocking prompts\" hard boundary: under ambiguous review requests (without base, without PR metadata, without plan), avoid using blocking questions; instead, infer the scope from git state to complete the review, and record uncertainty in Coverage/verdict rather than halting to request input."
 
 input:
   prompt: |

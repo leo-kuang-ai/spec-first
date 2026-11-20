@@ -57,7 +57,7 @@ const TIER_A_FAMILIES = {
 const TIER_BC_FAMILIES = {
   // Review has additional evidence applicability rules; preserve its intentional variant.
   'learnings-researcher.md': {
-    'skills/spec-code-review/references/personas': 'db367e51a73c52018dbe852be65bf9313bf3db7f777c5c49c7fc36883e859ca3',
+    'skills/spec-code-review/references/personas': 'e5b1c4a9d6b8f2bc1ffb6b759daf6736e9daaed4f8fb3efcb3d8a33efd717b97',
     'skills/spec-ideate/references/agents': '7c355f1163ef167efd7b724f7d52b4defde37fab3b774c648024a63013272085',
     'skills/spec-optimize/references/agents': 'd0161176aec31d84a307c9b4b528393c037a57445e76957d152e541de3b8c982',
     'skills/spec-plan/references/agents': 'fc6f523cc5c597c49e007b88de3dd0f465bfcef88f6f9fe7070032f1f2caf399',

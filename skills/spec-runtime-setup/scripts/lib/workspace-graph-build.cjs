@@ -3,7 +3,7 @@
 // U2 — Eager two-layer graph build orchestration.
 //
 // Given the resolved child repos (U1), build:
-//   - per-child CodeGraph tactical graph (工程N/.codegraph/), then add the
+//   - per-child CodeGraph tactical graph (engineering N/.codegraph/), then add the
 //     managed `.git/info/exclude` line so `git status` stays clean;
 //   - per-child Graphify subgraph, out-of-tree at <ws>/graphify-out/<repo_id>;
 //   - one workspace merged Graphify graph at <ws>/graphify-out/merged-graph.json;
@@ -83,9 +83,9 @@ function buildWorkspaceGraphs({
     reason_code: refreshOnly ? 'workspace-refresh-only' : null,
   };
   if (!executionGuard() && !refreshOnly) {
-    // 与 runProvider/runMerge 的 runner-missing 契约对齐(lane finding DR-018):
-    // 非 refresh 路径缺少全局安装 runner 时显式失败,不再静默视为 ready,
-    // 否则 build 可在缺少该步骤的情况下 complete,削弱可测试性保证。
+    // Aligned with the runner-missing contract of runProvider/runMerge (lane finding DR-018):
+    // Fails explicitly instead of silently considering ready when global-installed runner is missing from non-refresh paths.
+    // Otherwise, the build may complete without this step, weakening the assurance of testability.
     if (typeof runners.codegraphInstallGlobal !== 'function') {
       globalInstall = { ok: false, reason_code: 'codegraph-install-runner-missing' };
     } else {
@@ -350,7 +350,7 @@ function runFreshCodegraph(fn, repoRoot, workspaceRoot) {
     if (backupCreated) fs.rmSync(backup, { recursive: true, force: true });
     return result;
   } catch (error) {
-    // SUP-26/32 修复：只删除本次调用成功创建的 target
+    // SUP-26/32 Fix: Delete only the target successfully created in the current call
     if (targetCreated) safe(() => fs.rmSync(target, { recursive: true, force: true }));
     if (backupCreated) safe(() => fs.renameSync(backup, target));
     return { ok: false, reason_code: error.reason_code || 'codegraph-refresh-failed' };

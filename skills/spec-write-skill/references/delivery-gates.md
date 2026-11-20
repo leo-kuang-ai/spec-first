@@ -1,99 +1,99 @@
 # Delivery Gates
 
-**trigger_condition：** `validate-only`、写入前验证、package readiness、closeout，或 package/source/target risk signal 命中时读取。
-**purpose：** 将 bundled validator、preview、风险匹配证据与五轴 readiness 连接到对应 claim。
-**fallback_if_unread：** 未完成本 reference 所需的检查时，只能报告 `not-run` / degraded；不得以 fixture、自检或 target-provided validator 伪造 readiness。
+**trigger_condition:** `validate-only`, validation before write, package readiness, or read when a package/source/target risk signal is triggered.
+**purpose:** Connect the bundled validator, preview, risk-matching evidence, and five-axis readiness to the corresponding claim.
+**fallback_if_unread:** When the required checks for this reference are not completed, only report `not-run` / degraded; no readiness shall be forged via fixture, self-check, or target-provided validator.
 
-Gate 随实际风险增长，不按固定 maturity 标签堆叠文件。
+Gate stacks files based on actual risk levels, not on fixed maturity labels.
 
 ## Base Mechanical Gate
 
-所有 package 先运行 bundled validator。先从当前已加载 `SKILL.md` 解析 package root 的绝对路径并记作 `SKILL_DIR`；不要依赖宿主预设同名环境变量：
+All packages will first run the bundled validator. First, parse the absolute path of the package root from the currently loaded `SKILL.md` and record it as `SKILL_DIR`; do not rely on any host-predefined environment variable with the same name:
 
 ```bash
 node "$SKILL_DIR/scripts/validate-skill.cjs" <skill-dir> --json
 ```
 
-它只确认可机械判断的事实：路径 containment、no-follow inventory、frontmatter subset、名称/长度、引用、symlink/special file、资源和脚本清单。结果：
+It only verifies facts that can be mechanically determined: path containment, no-follow inventory, frontmatter subset, name/length, references, symlink/special file, and resource/script list. Result:
 
-- `pass` / exit 0：未发现 blocking mechanical finding；
-- `fail` / exit 1：确认 package mechanically invalid；
-- `incomplete` / exit 2：输入不可读、超预算或 YAML/文件类型超出 validator 能力。
+- `pass` / exit 0: No blocking mechanical finding detected;
+- `fail` / exit 1: confirm package mechanically invalid;
+- `incomplete` / exit 2: Input is unreadable, exceeds budget, or YAML/file type is beyond the validator's capabilities.
 
-`pass` 不等于语义正确、安全或 package-ready。
+`pass` does not imply semantic correctness, safety, or package-readiness.
 
 ## Apply Preview Gate
 
-create/revise apply 在写前生成 run-local preview manifest、host scope 与 exact candidate write set，并运行 `validate-authoring-preview.cjs`。它验证 hash/snapshot、path set、collision、source/runtime boundary 和 host binding；它不证明真实用户授权、Design Record 质量或 patch 语义。宿主检查 exact write set 是否仍被当前轮明确 create/revise 请求覆盖，仅在 root/scope 扩大、未覆盖的 dirty overwrite 或新增 external/network/高风险副作用时重新确认。写入仍使用原子 expected-old-hash / expected-nonexistence conditional patch primitive；没有该能力时 mutation readiness 必须为 `not-ready`，不可 apply 或声明确定性 gate 已关闭。写后 receipt 必须逐 path 核对 after hash；partial failure 只报告当前 diff、changed/unchanged 和 rollback preview，不自动回滚。
+create/revise apply generates a run-local preview manifest, host scope, and exact candidate write set beforehand, and executes `validate-authoring-preview.cjs`. It verifies hash/snapshot, path set, collision, source/runtime boundary, and host binding; it does not prove real-user authorization, Design Record quality, or patch semantics. Host check whether the exact write set is still covered by the current round's explicit create/revise request; re-verify only if the root/scope is expanded, dirty overwrite remains uncovered, or new external/network/high-risk side effects are introduced. Write operations continue to use atomic expected-old-hash / expected-nonexistence conditional patch primitive; when this capability is absent, mutation readiness must be `not-ready`, and no apply or deterministic gate can be asserted. The write receipt must be verified path by path after hashing; partial failures will only report the current diff, changed/unchanged items, and rollback preview, and will not automatically rollback.
 
-交付必须触及 `canonical_source_root` 之外的 repo 级文件（tests、docs、根 `CHANGELOG.md`、governance 记录）时，把这些路径作为 would_change 的 authorized supporting paths 声明：条目加 `supporting: true`，路径仍须位于 authorized root 内、仍受 snapshot、exact write set、dirty-overlap 与 receipt 逐项绑定，只有 canonical containment 要求被显式豁免。相邻未标记路径照旧被 `path_outside_canonical_source_root` 拒绝；不得用扩大 `canonical_source_root` 的方式绕开该合同。
+Delivery must touch repo-level files outside of `canonical_source_root` (tests, docs, root `CHANGELOG.md`, governance records); declare these paths as would_change authorized supporting paths: entry with `supporting: true`, paths must still reside within authorized root, and remain bound individually by snapshot, exact write set, dirty-overlap, and receipt; only canonical containment requirements are explicitly exempted. Adjacent unmarked paths are still rejected by `path_outside_canonical_source_root`; it is not permitted to bypass this constraint by expanding `canonical_source_root`.
 
 ## Risk-Triggered Checks
 
 | Signal | Additional evidence |
 | --- | --- |
-| description / route 变化 | realistic positive、negative、near-neighbor fixtures；需要声明行为充分性时运行 fresh-source semantic sample，runner 不可用则记录 `not_run` 与原因 |
-| persona、few-shot、输出合同或 agent loop 变化 | good/bad/why 或等价边界样例；成功路径、近邻错误、主要 failure mode 的 fresh-source sample；完成/停止声明与直接证据对应 |
-| 新增或移动 reference | 每个 runtime reference 有明确 pointer；validator 引用检查通过 |
-| 新增 script/shell | syntax/unit test、输入/输出/权限/失败行为；确认不读取 secret、不越出授权 root |
-| 外部或未知 package | validate-only、no-follow inventory、零 package-code execution；无法确认 provenance 的 validator 不运行 |
-| same-repo migration | 每个未知文件有 disposition；写前后 realpath containment 复核 |
-| target-specific metadata | 读取 target profile，记录 source、核对日期、limitations 和实际 target evidence |
-| project governance/catalog/runtime | 读取 project profile；先改 source/governance，再运行 generator/init，不手改派生物 |
-| 高权限/network/外发/不可逆行为 | explicit-only intent、最小权限、允许数据/目的地、secret redaction、确认点与 rollback |
-| 可分发 package | 实际 target payload smoke；确认 runtime 不依赖 `evals/`、reports 或 repo-local docs |
+| description / route change | realistic positive, negative, near-neighbor fixtures; run fresh-source semantic sample when behavior sufficiency needs to be declared; if runner is unavailable, record `not_run` along with the reason |
+| persona, few-shot, output contract or agent loop changes | good/bad/why or equivalent boundary examples; success path, near-miss errors, and primary failure mode with fresh-source samples; completion/stop declaration with direct evidence correspondence |
+| Add or move reference | Each runtime reference has a clear pointer; the validator's reference check passes. |
+| Add script/shell | syntax/unit test, input/output/permissions/failure behavior; confirm no reading of secret, no escalation beyond authorized root |
+| External or unknown package | validate-only, no-follow inventory, zero package-code execution; validators unable to confirm provenance are not executed |
+| same-repo migration | Each unknown file has a disposition; verify realpath containment before and after. |
+| target-specific metadata | Read the target profile, record the source, verify the date, limitations, and actual target evidence |
+| project governance/catalog/runtime | Read project profile; modify source/governance first, then run generator/init, do not manually edit the biotech section. |
+| High-privilege/network/external transmission/irreversible action | explicit-only intent, principle of least privilege, allow data/destination, secret redaction, checkpoint and rollback |
+| Distributable package | Actual target payload smoke; verify runtime does not depend on `evals/`, reports, or repo-local docs |
 
 ## Trusted Validator Boundary
 
-只运行以下 validator：
+Run only the following validator:
 
-- 本 Skill bundled 的 `scripts/validate-skill.cjs`；
-- 来源、版本和调用方式已固定并可回源的官方工具；
-- 用户明确授权且经过 trust review 的其他工具。
+- This Skill bundle's `scripts/validate-skill.cjs`;
+- Official tools with fixed sources, versions, and invocation methods that support source traceability.
+- User explicitly authorized and reviewed by trust.
 
-不得因为目标 package 内存在 `quick_validate.py`、`validate.sh`、package script 或 hook 就执行。未知工具只记录路径和 `not_checked_with_reason`。
+Execution shall not be performed merely because the target package contains `quick_validate.py`, `validate.sh`, a package script, or a hook. Unknown tools only record the path and `not_checked_with_reason`.
 
 ## Eval Evidence
 
-按实际证据类型报告，不维护 maturity 等级：
+Report by actual evidence type, without maintaining maturity level:
 
-- `not_run`：没有执行对应评测，附原因；
-- `structural-only`：fixture/schema/contract test，只证明结构与期望被消费；
-- `fresh-semantic`：fresh-source 单版本真实请求样例；
-- `comparative`：与固定 baseline/previous version 的对照；
-- `field-outcome`：代表性真实任务与用户结果。
+- `not_run`: The corresponding evaluation was not executed, with reason provided;
+- `structural-only`: fixture/schema/contract test, verifies only the structure and ensures it matches the expected consumption;
+- `fresh-semantic`: a single-version real request example from fresh-source;
+- `comparative`: Comparison with a fixed baseline/previous version;
+- `field-outcome`: Representative real-world tasks and user outcomes.
 
-Route fixture 至少覆盖 positive、negative/near-neighbor、只读边界和一个主要 failure mode。复杂 prose 的输出评测应检查真实 artifact/response 是否满足判据，不接受“我已遵守指令”、隐藏自检或 checklist 勾选作为通过依据。没有 model runner 时不能把 structural-only 写成触发率或行为改善。
+Route fixture must cover at least the following: positive, negative/near-neighbor, read-only boundary, and one primary failure mode. Evaluation of complex prose outputs should verify whether the generated artifact/response meets the specified criteria; acceptance of statements such as "I have followed the instruction," hidden self-checks, or checkbox markings shall not constitute valid justification. Without a model runner, structural-only metrics cannot be expressed as trigger rates or behavioral improvements.
 
 ## Five-Axis Readiness
 
-Closeout 分别报告，不能合成模糊总分：
+Closeout reports are issued separately and cannot be synthesized into a vague overall score:
 
-- `portable`：portable package 结构和行为合同；
-- `target`：指定宿主 metadata、invocation、packaging；
-- `project`：本地规则、治理、catalog、source/runtime；
-- `semantic`：route/output 行为证据；
-- `mutation`：授权、containment、preview/diff 与 rollback。
+- `portable`: portable package structure and behavioral contract;
+- `target`: specifies the host metadata, invocation, and packaging;
+- `project`: local rules, governance, catalog, source/runtime
+- `semantic`: evidence of route/output behavior;
+- `mutation`: authorization, containment, preview/diff, and rollback.
 
-每轴使用 `ready|degraded|not-ready|not-applicable`，并附直接证据或限制。
+Each axis uses `ready|degraded|not-ready|not-applicable`, along with direct evidence or constraints.
 
 ## Spec-First Project Closeout
 
-只有目标项目确认为 spec-first 时应用：
+Applies only when the target project is confirmed as spec-first:
 
-1. 修改 `skills/`、governance、templates/tests/docs 等 source。
-2. Runtime catalog 由 `npm run docs:runtime-catalog` 生成；它不是 source-owned consumer。
-3. Host runtime 只通过 `spec-first init` 投影；不得手改 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/`、`.qoder/`。
-4. 运行与影响面匹配的聚焦 Jest、`npm run lint:skill-entrypoints`、`git diff --check`，再按需扩大。
-5. Source 变更更新 `CHANGELOG.md`；用户可见定位变化再更新 README/docs。
+1. Modify `skills/`, governance, templates/tests/docs etc. source.
+2. Runtime catalog is generated by `npm run docs:runtime-catalog`; it is not a source-owned consumer.
+3. Host runtime projects only via `spec-first init`; no manual modifications to `.claude/`, `.codex/`, `.agents/skills/`, `.cursor/`, `.kiro/`, or `.qoder/`.
+4. Run focused Jest, `npm run lint:skill-entrypoints`, and `git diff --check`, then expand as needed.
+5. Update `CHANGELOG.md` with source changes; update README/docs with visible feature changes.
 
 ## Closeout Envelope
 
-- `base_operation`、`effect`、`modifier`、`layer_result` 和 target/source owner；
-- `changed_surfaces` 与明确未修改 surfaces；
-- `deterministic_checks`；
-- `eval_adequacy` 与实际 semantic/comparative evidence；
-- five-axis readiness；
-- generated catalog/runtime 状态；
-- `not_checked_with_reason`；
-- residual risks 和下一步。
+- `base_operation`, `effect`, `modifier`, `layer_result`, and target/source owner;
+- `changed_surfaces` and explicitly unmodified surfaces
+- `deterministic_checks`;
+- `eval_adequacy` and actual semantic/comparative evidence
+- five-axis readiness;
+- generated catalog/runtime status;
+- `not_checked_with_reason`;
+- residual risks and next steps

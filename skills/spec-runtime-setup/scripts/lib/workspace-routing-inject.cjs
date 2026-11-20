@@ -19,8 +19,8 @@ const {
   stripRoutingBlock,
 } = require('./workspace-routing-instruction.cjs');
 
-// entry doc(AGENTS.md/CLAUDE.md)读取上限,对齐 source-snapshot 的 4MiB 常规文件上限
-// (lane finding DR-023):超限按 failed + reason_code 记录,不整体载入做字符串 upsert。
+// entry doc(AGENTS.md/CLAUDE.md) read limit, aligned with the 4MiB regular file limit of source-snapshot
+// (lane finding DR-023): Record overflow according to failed + reason_code; do not load entire data, perform string upsert only.
 const MAX_ENTRY_DOC_BYTES = 4 * 1024 * 1024;
 
 function readEntryDoc(abs) {

@@ -53,7 +53,7 @@ groups small.
 When exactly one plan unit is already known for a commit, append its U-ID,
 such as `(U3)`. Do not hunt for a plan or label a mixed-unit commit as one unit.
 
-在已有提交之上追加，不通过 squash/重写丢失他人的 author 或 trailers。直接移植他人分支、PR 或 patch 且该贡献不会另以原作者名义落地时，精确复制原 author 与已有 `Co-authored-by` 身份，逐人添加 `Co-authored-by: Name <email>`；邮箱缺失只在 body 署名，不猜测。仅参考思路或独立改写不等于直接移植，按真实来源记录；此规则不产生历史重写授权。
+Preserve the authors and trailers on existing commits. If you port a branch, PR, or patch without landing it under its original author, copy the source author and existing co-author identities into `Co-authored-by: Name <email>` trailers. If an email is unavailable, credit the name in the body without guessing. Distinguish a direct port from a reference or independent rewriting; reading upstream material does not establish co-authorship. This rule does not authorize rewriting history.
 
 Re-check the current branch, remote, and existing PR immediately before pushing. **Project publishing gate:** before the push, resolve every applicable pre-push or review-ready requirement from the project's active instructions and conventions already in context, plus any scoped instructions governing the committed paths; only evidence valid for the exact commit state being sent satisfies them — a check that passed an earlier tree does not carry over. Stop before the external write and report what is missing or failing; if no requirement applies, proceed. **Release-surface reconciliation:** when the staged paths touch CHANGELOG, version, or release-check files, the publishing gate explicitly includes the repo's release-governance checks (in this repo, `npm run test:release:governance`); report `release_governance_status: confirmed-by-caller | unconfirmed` in the push report — `unconfirmed` is a visible gap for the caller, never a permission to skip the gate or to run new suites from this helper. Push the live `HEAD` only after the caller's landing gate is still satisfied:
 
@@ -68,6 +68,6 @@ working-tree diff as proof that all intended commits are already published.
 If push fails, retain the actual local commit SHA and reason, report the
 publication blocker, and do not claim the remote changed or start a watch.
 
-`remote.<push-remote>.mirror=false` 仅覆盖本次命令，不改仓库配置；某些 Git 版本在读取 remote 配置时会重新启用 mirror，单独 `--no-mirror` 不足以与显式 refspec 并用。将已确认的 remote 名作为该 `-c` 参数的一部分传入，不拼接可执行 shell 文本。
+`remote.<push-remote>.mirror=false` only overrides the current command and does not modify the repository configuration; some Git versions re-enable mirroring when reading remote configuration, so using `--no-mirror` alone is insufficient when used in conjunction with explicit refspecs. Pass the confirmed remote name as part of the `-c` parameter, without concatenating executable shell text.
 
 For caller-owned feedback fixes, return the actual created commit SHA(s), selected push target, push exit/result and current remote PR/head identity. Preserve partial facts if pushing or reading back fails. Do not report publication merely because a commit exists. The caller verifies exact fix-SHA reachability in the actual head repository before any repaired-remote reply; this helper does not reply to or resolve review feedback.

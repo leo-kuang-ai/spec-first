@@ -10,9 +10,9 @@ Read at Stage 3 together with `references/persona-catalog.md`, only after Stage 
 
 **Cross-cutting conditional (per diff):**
 
-- `security-reviewer` — auth、tenant/resource authorization、untrusted model/tool/web output、dangerous sinks、reachable dependency risk
-- `performance-reviewer` — 查询形态、复杂度、大规模转换、批处理/fan-out 或缓存策略有具体资源影响
-- `api-contract-reviewer` — 外部消费的 route/request/response、serializer、event schema、API version 或 public package signature
+- `security-reviewer` — auth, tenant/resource authorization, untrusted model/tool/web output, dangerous sinks, reachable dependency risk
+- `performance-reviewer` — Queries specific resource impacts for morphological, complexity, large-scale transformation, batch/fan-out, or caching strategies
+- `api-contract-reviewer` — route/request/response, serializer, event schema, API version, or public package signature consumed externally
 - `frontend-quality-reviewer` — user-visible state, semantic/a11y, focus/contrast, responsive and presentation/data boundaries
 - `data-migration-reviewer` — migration files / schema dumps / backfills (see spawn gate in Stage 3)
 - `reliability-reviewer` — error handling, retries, timeouts, background jobs
@@ -48,9 +48,9 @@ Read the diff and file list from Stage 1, and the `SIGNALS` / `EXEC_LINES` from 
 
 Skip it for standalone branch reviews with no associated PR, and skip it for PRs with no prior feedback yet -- there is nothing for the persona to verify, and a spawned subagent that returns empty findings still costs the full subagent startup overhead (persona spec, diff, schema, plus its own gh calls).
 
-领域触发须有具体证据：async/concurrent 或缓存结构本身不额外选择 performance，纯正确性/失败语义仍由 correctness/reliability 承担；模块内部 export 本身不额外选择 api-contract，先核对其外部消费者。领域不确定时继续读取实际调用关系，不以文件类型替代判断。
+Domain triggers must be supported by concrete evidence: the async/concurrent or caching structure itself does not inherently optimize for performance; correctness and failure semantics remain the responsibility of correctness/reliability. The internal export of a module does not inherently define an API contract—external consumers must be validated first. Continue reading the actual call relationships when the domain is uncertain, without using file type as a substitute criterion.
 
-按实际 runtime 行为叠加 stack reviewer；例如 Hotwire UI 可触发 `julik-frontend-races`，外部消费的 TypeScript API 改动可触发 `api-contract` 与 `reliability`。
+Overlay stack reviewer with actual runtime behavior; for example, Hotwire UI can trigger `julik-frontend-races`, and changes to externally consumed TypeScript APIs can trigger `api-contract` and `reliability`.
 
 **`data-migration` spawn gate.** Select `data-migration-reviewer` only when the diff includes at least one migration or schema artifact: `db/migrate/*`, `db/schema.rb`, `db/structure.sql`, Alembic/Flyway/Liquibase migration paths, or explicit backfill/data-transform scripts (rake tasks, one-off data migration classes). **Do not spawn** for model-only changes, query-only refactors, serializers/controllers that reference columns without a migration or schema dump in the diff, or migration tests alone.
 

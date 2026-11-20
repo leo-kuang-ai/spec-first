@@ -88,6 +88,6 @@ Return a structured list, one entry per claim checked:
 
 ## Reporting
 
-存在外部失效依赖时，一并检查候选 `invalidation_condition` 是否给出可观察变化和不修改仓库的核查方法；来源不可达则记录该条件尚未核实，不能把远端合并、发布或本地采用混为同一事实。需要改仓库的移除前验证步骤留在正文，不作为调查授权。只检查字段非空的脚本结果不证明条件语义充分。
+When external failure dependencies exist, concurrently verify that the candidate `invalidation_condition` provides observable changes and a method to validate without modifying the repository; if the source is unreachable, record that the condition has not been verified and must not treat remote merges, releases, or local adoption as equivalent facts. Need to keep the pre-removal verification steps for the repository in the main text, not as investigation authorization. Only the script result checking field non-emptiness does not prove the sufficiency of conditional semantics.
 
 Summarize the phase in one line of the run output (headless report's `Grounding:` line; interactive success output): flags adjudicated (fixed / annotated / confirmed), claims checked, claims softened or corrected, and `degraded — merge-state claims unverified offline` when applicable.

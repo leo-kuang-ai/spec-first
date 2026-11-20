@@ -1,8 +1,6 @@
 id: mcp-unavailable-stops
-title: XcodeBuildMCP 不可用应停止并给安装指引
-description: |
-  验证 Phase 0 前置:MCP server 不可用(当前沙箱无 XcodeBuildMCP)时
-  停止并输出安装指引,不继续 build/test。
+title: "XcodeBuildMCP is unavailable; stop and provide installation guidance"
+description: "Verify Phase 0 prerequisite: If the MCP server is unavailable (XcodeBuildMCP is not present in the current sandbox), halt and output installation instructions; do not proceed with build or test."
 
 input:
   prompt: |

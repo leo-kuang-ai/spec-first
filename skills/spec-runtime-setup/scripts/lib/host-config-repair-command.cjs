@@ -2,9 +2,9 @@
 
 const { renderCommand } = require('./command-display.cjs');
 
-// --repair-host-config 修复命令的唯一实现(lane finding DR-015:此前 setup.cjs 的
-// plan 预览路与 runtime-executor.cjs 的 mutation 结果路各持一份逐字副本,独立演化
-// 会漂移)。两侧 context 形状相同:{ actionPlan: { args, selected_ids, mode } }。
+// --repair-host-config the only implementation of the repair command (lane finding DR-015: previously in setup.cjs the
+// plan previews the route and the runtime-executor.cjs mutation results each maintain an independent, character-by-character copy, evolving separately.
+// will drift). Both side context shapes are identical: { actionPlan: { args, selected_ids, mode } }.
 function hostConfigRepairArgs(context) {
   const args = ['spec-runtime-setup'];
   if (context.actionPlan.args.installationOnly) args.push('--installation-only');

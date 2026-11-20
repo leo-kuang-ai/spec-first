@@ -172,7 +172,7 @@ describe('six-host init lifecycle', () => {
         'SKILL.md',
       ), 'utf8');
       expect(runtimeSetupSkill).toContain('### Readiness Handoff');
-      expect(runtimeSetupSkill).toContain('请基于当前项目处理这个任务：<描述你的需求或问题>。');
+      expect(runtimeSetupSkill).toContain("Use at most three nonblank lines in the user's language");
       expect(runtimeSetupSkill).toContain('Please handle this task based on the current project: <describe your requirement or problem>.');
       const { resolveAgentBrowserProbePath } = require(runtimeSetupExecutor);
       expect(resolveAgentBrowserProbePath()).toBe(fs.realpathSync.native(path.join(

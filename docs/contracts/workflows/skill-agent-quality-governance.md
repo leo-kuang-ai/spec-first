@@ -17,6 +17,8 @@
 
 ## 1. Skill Minimum Contract v1
 
+项目技能的名称说明、正文、引用指令、模板和编写示例统一用英文，不在同一份技能中重复中英文说明。技能源码使用英文，不改变面向用户的交付语言；生成文档时沿用用户或项目指定的语言。机器字段、命令、真实路径和专门验证本地化的输入样本保留原值。
+
 Public workflow skills should make their execution posture understandable without turning the prompt into a state machine.
 
 | Field | Meaning | Required for |

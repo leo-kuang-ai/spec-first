@@ -16,7 +16,7 @@ import sys
 import json
 import os
 
-MAX_LINES = 200  # 恢复的会话可能先写入大量非消息记录，元数据探测仍保持有界。
+MAX_LINES = 200  # Bound the scan even when a resumed session starts with many non-message records.
 
 
 def json_object(line):

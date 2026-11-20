@@ -491,7 +491,7 @@ function writeHostReadinessLedger({ homeDir, host, hostLedger, writer } = {}) {
           reasonCode: 'host-readiness-ledger-symlink-escape',
         });
       } catch (_restoreError) {
-        // 恢复仅提供 best-effort 证据；失败结果仍是权威结果。
+        // Recovery provides best-effort evidence; failure results remain authoritative.
       }
     }
     return {
@@ -511,7 +511,7 @@ function writeSetupFacts({ repoRoot, toolFacts, runtimeCapabilities, writer } = 
   const runtimePath = path.join(configDir, 'runtime-capabilities.json');
   const write = writer || ((filePath, payload) => atomicWriteContained(root, filePath, payload));
 
-  // 使用 lstat 捕获备份，区分不存在、悬空链接、普通文件（SUP-22 修复）
+  // Use lstat to capture backups, distinguish between non-existent, dangling links, and regular files (SUP-22 fix)
   function captureBackup(filePath) {
     try {
       const stat = fs.lstatSync(filePath);
@@ -566,7 +566,7 @@ function atomicWriteContained(root, filePath, contents, options = {}) {
     fs.renameSync(tempPath, target);
     fs.chmodSync(target, mode);
   } catch (error) {
-    try { fs.rmSync(tempPath, { force: true }); } catch (_cleanupError) { /* 保留主错误 */ }
+    try { fs.rmSync(tempPath, { force: true }); } catch (_cleanupError) { /* Preserve the original error. */ }
     throw error;
   }
 }
@@ -575,17 +575,17 @@ function restoreFiles(root, backups) {
   for (const [filePath, backup] of backups.entries()) {
     try {
       if (!backup.existed) {
-        // 原本不存在，删除本次可能创建的文件
+        // Originally did not exist; deleting files that might have been created this time
         fs.rmSync(filePath, { force: true });
       } else if (backup.type === 'symlink') {
-        // 原本是符号链接，保留它（不删除，因为我们没有捕获链接目标）
-        // 这避免了 SUP-22：悬空链接不会被误删
+        // Originally a symbolic link, preserve it (do not delete, as we have not captured the link target)
+        // This prevents SUP-22: hanging links from being accidentally deleted
       } else if (backup.type === 'file') {
-        // 原本是普通文件，恢复内容
+        // Originally a regular file, restore content
         atomicWriteContained(root, filePath, backup.content);
       }
     } catch (_error) {
-      // 恢复仅提供 best-effort 证据；调用方仍会收到失败结果。
+      // Recovery provides only best-effort evidence; the caller will still receive failure results.
     }
   }
 }
@@ -739,7 +739,7 @@ function inspectParentArtifact({ root, relativePath, defaultReason, homeDir }) {
   try {
     artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
   } catch (_error) {
-    // 只要存在即可进入 quarantine；无法读取的 metadata 保持 unknown。
+    // Quarantine entry is allowed as long as it exists; metadata that cannot be read remains unknown.
   }
   const repoRoot = typeof artifact.repo_root === 'string' ? artifact.repo_root : '';
   const generatedAt = typeof artifact.generated_at === 'string' ? artifact.generated_at : null;

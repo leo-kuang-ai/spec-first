@@ -1,11 +1,6 @@
 id: always-plan-unclear-input
-title: 模糊输入也应留在规划流程内澄清而非退出
-description: |
-  验证 "When directly invoked, always plan" 合同:直接调用即使输入不清楚,
-  也必须留在规划评估内(澄清问题、bootstrap 或直接给出 scoping 建议),
-  不得判定"这不是规划任务"而放弃 workflow,更不得滑入实现。
-  确定性地板:实现源码与测试零改动(仅 docs/ 新增允许——规划文档本身合法);
-  澄清/scoping 的语义充分性地板之上由 transcript 人工核验。
+title: "Vague inputs should be clarified within the planning process rather than excluded."
+description: "Verification: When directly invoked, always plan — upon direct invocation, even with unclear inputs, the workflow must remain within planning and evaluation (clarifying questions, bootstrap, or directly providing scoping suggestions); it is prohibited to deem \"this is not a planning task\" and abandon the workflow, nor to slip into implementation. Deterministic floor: zero changes to implementation source code or tests (only documentation additions are permitted — new documentation itself is valid); above the semantic adequacy floor of clarification or scoping, human review of the transcript is required."
 
 input:
   prompt: |

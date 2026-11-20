@@ -43,7 +43,7 @@ Before the pass, identify the tests used as proof from explicit `proof-test:` pa
 
 ## Step 2: Run 3 review lenses
 
-在派发 reviewer 前记录：
+Log entry before assigning reviewer:
 
 ```yaml
 worker_dispatch_authorization: authorized | missing
@@ -54,7 +54,7 @@ worker_model_override: supported | unsupported | unknown
 worker_bounded_parallelism: supported | unsupported | unknown
 ```
 
-`workflow invocation does not authorize dispatch`。只有当前用户或可见 upstream handoff 明确请求 subagent、delegated work、persona 或 parallel work 时，才可把三个 review lens 派发给 generic workers。缺授权时不得探测 tool schema，固定为 `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`，inline 或 serial 执行全部三个 lens 并记录 `dispatch_authorization_missing`。只有授权后才把 current-session registry/schema 作为 `provider_untrusted` evidence 检查：确认缺失时记录 `subagent_capability_missing`；surface 不可用、schema 不完整或候选不唯一时记录 `worker_capability_unproven`，均 inline 或 serial。隔离、模型覆盖和有界并发只取 live facts；required isolation 未满足时保持依赖 gate 打开，model unknown 时继承，parallelism unknown 时串行。记录 `worker_dispatch_outcome`。Inline fallback 保留三个 rubric 的完整覆盖，但不得声称三个 independent reviewers 或 multi-agent coverage。
+`workflow invocation does not authorize dispatch`. The three review lenses may only be assigned to generic workers when the current user or a visible upstream handoff explicitly requests subagent, delegated work, persona, or parallel work. When authorization is missing, do not perform tool schema probing; fix the value to `capability_probe: not_applicable` + `worker_dispatch_capability: unknown`. For inline or serial execution, apply all three lenses and record `dispatch_authorization_missing`. Only after authorization does it treat the current-session registry/schema as `provider_untrusted` evidence for inspection: record `subagent_capability_missing` when missing, and record `worker_capability_unproven` when the capability is unavailable, the schema is incomplete, or the candidate is non-unique, either inline or in sequence. Isolation, model coverage, and bounded concurrency only retain live facts; when required isolation is not satisfied, maintain dependency gate open; inherit when model is unknown, and operate sequentially when parallelism is unknown. Record `worker_dispatch_outcome`. Inline fallback retains full coverage of three rubrics, but does not claim three independent reviewers or multi-agent coverage.
 
 When authorization is present and the current-session semantic probe yields one eligible generic worker candidate, dispatch three bounded workers — code-reuse, code-quality, and efficiency reviewers. Otherwise run the reviews inline or serially. For each reviewer or inline lens, read its prompt asset from this skill's directory and use the **full file content** together with the resolved scope (the full diff or file set) so the review has complete context:
 

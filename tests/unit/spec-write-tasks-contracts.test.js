@@ -70,8 +70,8 @@ describe('spec-write-tasks current contracts', () => {
     expect(qualityGuide).toContain('`done_signal`');
     expect(qualityGuide).toContain('`risk_note`');
     expect(qualityGuide).toContain('`review_gate`');
-    expect(qualityGuide).toMatch(/required proof intent.*不得丢失/is);
-    expect(qualityGuide).toMatch(/unbound.*limitation.*不得.*synthetic check/is);
+    expect(qualityGuide).toMatch(/required proof intent must not be lost/is);
+    expect(qualityGuide).toMatch(/Unbound intent.*limitation and must not use placeholder commands or synthetic checks/is);
   });
 
   test('output-quality cases are parseable and reference current source', () => {
