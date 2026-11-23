@@ -5,6 +5,10 @@
 <!-- Use repo-relative paths throughout this doc, never absolute paths, so it stays portable. -->
 <!-- This template is the source of truth for the report's sections; build the report to this shape rather than from memory. -->
 
+## Readiness
+
+<Lead with the change, the tested checkout or build, and what this run supports. Count distinct scenarios with current browser observations versus in scope; say how many were only partially exercised. Name the required suite result separately and give the first action that would change the decision. Before execution, report zero exercised and readiness not assessed. A green browser matrix cannot cancel a failing or unavailable required suite.>
+
 ## Diff Summary
 
 <Record PR number when applicable, verified base/head and relevant dirty-file identities, served checkout/build identity or limitation, and what changed: new features, modified behavior, new/changed routes, views, components, data flows. 2-6 bullets.>
@@ -15,7 +19,7 @@
 
 - **<Persona name>** — <job-to-be-done / what they care about>
 
-## Flows Tested
+## Flows in Scope
 
 <One Mermaid flowchart per distinct user journey the diff touches. Include happy path and branch points (validation error, empty, permission-denied), side effects (emails, jobs, notifications), and the true end state — including click-through destinations.>
 
@@ -30,11 +34,13 @@ flowchart TD
 
 ## Test Matrix & Results
 
-| # | Flow | Journey / Scenario | Status | Issue | Fix | Commit |
-|---|------|--------------------|--------|-------|-----|--------|
-| 1 |      |                    | Pass   | -     | -   | -      |
-| 2 |      |                    | Fixed  |       |     | <commit-or-uncommitted> |
-| 3 |      |                    | Blocked (needs human verify) | | | |
+| # | Flow | Journey / Scenario | Browser observation | Status | Issue / evidence | Fix | Commit |
+|---|------|--------------------|---------------------|--------|------------------|-----|--------|
+| 1 |      |                    | Not run | Pending | - | - | - |
+
+Record what the browser observed separately from what needs to happen next. Use `Not run` if no scenario step was observed, `Partial` if only a prefix was observed, `Fail` for an observed mismatch, and `Pass` for a verified end state. A failed prerequisite or cleanup is not itself a product mismatch. Give the failed or last verified step and the evidence reference; count a rerun of the same scenario only once. Keep the original failure evidence when a verified replay changes the observation to `Pass` and the status to `Fixed`.
+
+On resume, use `Unknown` for a prior observation whose evidence cannot be recovered for this build. It is neither evidence of zero execution nor current coverage.
 
 Status values: `Pending`, `Pass`, `Fixed`, `Skipped`, `Blocked (fix authorization)`, `Blocked (needs human verify)`, `Blocked (human decision)`. Start every scenario at `Pending` so this table doubles as the resume checkpoint. Use `uncommitted` when a verified fix exists but commit authorization is missing.
 
@@ -60,7 +66,7 @@ For each issue found and fixed:
 
 ## Console Errors
 
-<Any console or network errors observed, and whether they were resolved. "None" if clean.>
+<Report console or network errors and their disposition. Say "None observed" only for an inspected scope; otherwise say "Not checked".>
 
 ## Human Verifications
 
@@ -79,7 +85,3 @@ For each issue found and fixed:
 ## Learnings
 
 <Reusable lessons worth carrying forward — patterns, gotchas, product/UX insights. Feed substantial ones to `spec-compound`.>
-
-## Final Status
-
-<Overall readiness verdict for the branch. Ready to ship? Caveats? Outstanding blocked items? Record the result of the Phase 5 automated test suite run — a green matrix with a red suite is not "ready.">

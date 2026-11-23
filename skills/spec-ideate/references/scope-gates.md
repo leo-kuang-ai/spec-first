@@ -4,6 +4,8 @@
 
 **Refine-vs-generate check (run before anything else in this phase).** If the user already holds one idea and asks to refine, converge, scope, or turn it into requirements, that is `spec-brainstorm`'s work, not ideation: stop and point the user to `spec-brainstorm`; do not run brainstorm-flavored questioning or requirement convergence inside this workflow. This workflow starts only when the user wants candidate directions generated and evaluated.
 
+If the caller brings settled product scope and acceptance criteria and asks how to implement them, point to `spec-plan`. This is an incoming planning request, not permission to send a newly generated or merely selected idea straight to planning.
+
 When the subject, mode, and format are already clear from the prompt, resolve this phase in one pass and move on — the gates below exist for ambiguity, not ceremony.
 
 Output resolution and resume are owned by `references/output-mode.md`; read it before this phase.

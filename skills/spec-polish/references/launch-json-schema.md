@@ -24,7 +24,7 @@ Polish reads `.claude/launch.json` at the repo root to resolve the dev-server st
 
 | Field | Required | Purpose |
 |-------|----------|---------|
-| `name` | yes (when multiple configurations) | Used to disambiguate when the array has more than one entry. Polish asks the user to pick by `name`. |
+| `name` | yes, including a single configuration | Give each entry a unique, non-empty name. When there is more than one, select by name. |
 | `runtimeExecutable` | yes | The binary polish spawns (e.g., `bin/dev`, `npm`, `overmind`, `bun`). |
 | `runtimeArgs` | no | Array of arguments passed to `runtimeExecutable`. Default: empty array. |
 | `port` | yes for a complete tuple | Integer from 1 to 65535. Seeds an HTTP URL candidate; server output or user correction can replace the actual URL, including its scheme. Verify attributed reachability before handoff. |

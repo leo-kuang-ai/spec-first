@@ -53,7 +53,7 @@ score = (owasp_categories_tested / 10) * 50
       + min(unique_findings, 20)
 ```
 
-Higher is better. Perfect score = 100 (all OWASP tested + all STRIDE tested + 20 findings).
+This measures review activity, not how secure the system is. Report coverage and findings by severity separately. Discovering another issue can raise the score without making the system safer.
 
 ## Coverage Tracking
 
@@ -61,7 +61,7 @@ Print coverage summary every 5 iterations:
 ```
 OWASP: [A01✓ A02✓ A03✗ A04✗ A05✓ A06✗ A07✓ A08✗ A09✗ A10✗] 4/10
 STRIDE: [S✓ T✓ R✗ I✓ D✗ E✗] 3/6
-Score: 48.3 | Findings: 7
+Score: 42 (20 + 15 + 7) | Findings: 7
 ```
 
 ## Finding Format

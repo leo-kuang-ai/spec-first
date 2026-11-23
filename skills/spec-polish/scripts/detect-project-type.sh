@@ -64,6 +64,10 @@ cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to project root" >&2; exit 1; }
 
 MATCHES=()
 
+has_astro_config() {
+  [ -f "$1/astro.config.js" ] || [ -f "$1/astro.config.mjs" ] || [ -f "$1/astro.config.ts" ]
+}
+
 # Rails: bin/dev AND Gemfile together. A Gemfile alone (or bin/dev alone) is
 # insufficient -- plenty of gems have Gemfiles without bin/dev, and bin/dev
 # may exist in non-Rails projects.
@@ -77,7 +81,7 @@ if [ -f "next.config.js" ] || [ -f "next.config.mjs" ] || [ -f "next.config.ts" 
 fi
 
 # Vite
-if [ -f "vite.config.js" ] || [ -f "vite.config.ts" ] || [ -f "vite.config.mjs" ] || [ -f "vite.config.cjs" ]; then
+if ! has_astro_config . && { [ -f "vite.config.js" ] || [ -f "vite.config.ts" ] || [ -f "vite.config.mjs" ] || [ -f "vite.config.cjs" ]; }; then
   MATCHES+=("vite")
 fi
 
@@ -87,7 +91,7 @@ if [ -f "nuxt.config.js" ] || [ -f "nuxt.config.mjs" ] || [ -f "nuxt.config.ts" 
 fi
 
 # Astro
-if [ -f "astro.config.js" ] || [ -f "astro.config.mjs" ] || [ -f "astro.config.ts" ]; then
+if has_astro_config .; then
   MATCHES+=("astro")
 fi
 
@@ -118,14 +122,6 @@ case ${#MATCHES[@]} in
     exit 0
     ;;
   *)
-    # astro.config.* is the more specific signature: Astro ships Vite under the
-    # hood, so a leftover vite.config.* in an Astro project is not ambiguity.
-    for m in "${MATCHES[@]}"; do
-      if [ "$m" = "astro" ]; then
-        echo "astro"
-        exit 0
-      fi
-    done
     echo "multiple"
     exit 0
     ;;
@@ -215,7 +211,7 @@ if [ -n "$FOUND_FILES" ]; then
 
     case "$fname" in
       next.config.*) ftype="next" ;;
-      vite.config.*) ftype="vite" ;;
+      vite.config.*) has_astro_config "$fdir" && continue; ftype="vite" ;;
       nuxt.config.*) ftype="nuxt" ;;
       astro.config.*) ftype="astro" ;;
       remix.config.*) ftype="remix" ;;

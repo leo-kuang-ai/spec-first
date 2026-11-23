@@ -455,8 +455,11 @@ function decideSelection(input) {
   const aggregation = spec.aggregation
 
   for (const objective of required) {
-    const base = metricBundle(baseline, objective.name, aggregation, objective.type)
+    let base = metricBundle(baseline, objective.name, aggregation, objective.type)
     const cand = metricBundle(candidate, objective.name, aggregation, objective.type)
+    if (comparison.method === "paired" && cand?.samples.length && base?.samples.length > cand.samples.length) {
+      base = valueBundle({ samples: base.samples.slice(0, cand.samples.length) }, aggregation)
+    }
     baselineBundles[objective.name] = base
     candidateBundles[objective.name] = cand
     if (!base || base.aggregate == null || !cand || cand.aggregate == null) {

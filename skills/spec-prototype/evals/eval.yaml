@@ -13,8 +13,7 @@ engine:
 cases:
   files:
     - evals/cases/headless-blocked.yaml
-    - evals/cases/go-ahead-before-build.yaml
-    - evals/cases/undefined-question-gate.yaml
+    # Natural-language scoping cases use the opt-in evals/semantic.yaml.
     - evals/cases/discovery-routes-out.yaml
   defaults:
     timeout_seconds: 480

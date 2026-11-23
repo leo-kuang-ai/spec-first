@@ -101,12 +101,19 @@ describe('spec-lfg PR watch state helper', () => {
     { observed_at: '2026-07-29T23:59:59.000Z' },
     { review_items: null },
     { checks: null },
+    { pr_state: 'UNKNOWN' },
+    { pr_state: null },
+    { pr_state: ['closed'] },
   ])('rejects incomplete or backward observations without publishing state: %j', (overrides) => {
     const current = append(snapshot(), run(['read', '--state-dir', stateDir]));
     const result = spawnSync(process.execPath, [helper, 'snapshot', '--input', writeInput(root, 'invalid.json', snapshot(overrides)), '--state-dir', stateDir, '--expected-generation', String(current.generation), '--expected-sha256', current.snapshot_sha256], { encoding: 'utf8' });
     expect(result.status).toBe(1);
     expect(JSON.parse(result.stdout).reason_code).toBe('snapshot-invalid');
     expect(run(['read', '--state-dir', stateDir]).generation).toBe(current.generation);
+  });
+
+  test.each([['open', 'watching', 'no-terminal'], ['CLOSED', 'terminal', 'pr-closed'], ['merged', 'terminal', 'pr-merged']])('accepts observed state %s', (pr_state, terminal, reason_code) => {
+    expect(append(snapshot({ pr_state }), run(['read', '--state-dir', stateDir]))).toMatchObject({ terminal, reason_code });
   });
 
   function decisionFile(value, name = 'decision.json') {

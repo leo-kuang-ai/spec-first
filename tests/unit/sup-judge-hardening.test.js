@@ -71,9 +71,7 @@ describe('SUP judge hardening', () => {
 
   describe('U1: cross-skill question-mark detection', () => {
     const scripts = [
-      'skills/spec-optimize/evals/fixtures/scripts/check-r2-asks.sh',
       'skills/spec-brainstorm/evals/fixtures/scripts/check-r2-asks.sh',
-      'skills/spec-ideate/evals/fixtures/scripts/check-r2-asks.sh',
       'skills/spec-plan/evals/fixtures/scripts/check-r2-asks.sh',
       'skills/spec-prd/evals/skillup/fixtures/scripts/check-r2-asks.sh',
     ];
@@ -85,12 +83,16 @@ describe('SUP judge hardening', () => {
     });
   });
 
-  test('U2: metric gate requires an explicit metric request and rejects completion claims', () => {
-    initRepo('spec-optimize', 'mini-ledger');
-    const script = 'skills/spec-optimize/evals/fixtures/scripts/check-no-metric-gate.sh';
-    expect(judge(script, '缺少指标和基线，请先提供目标 metric。').status).toBe(0);
-    expect(judge(script, '已完成优化，指标已提高。').status).toBe(1);
-    expect(judge(script, '指标很重要。').status).toBe(1);
+  test.each(['spec-ideate', 'spec-prototype', 'spec-optimize'])('%s keeps semantic cases discoverable without adding a model judge to the default run', skill => {
+    const yaml = require('js-yaml');
+    const directory = path.join(root, 'skills', skill, 'evals');
+    const load = file => yaml.load(fs.readFileSync(path.join(directory, file), 'utf8'));
+    const defaults = load('eval.yaml').cases.files;
+    const semantic = load('semantic.yaml').cases.files;
+    const all = fs.readdirSync(path.join(directory, 'cases')).filter(file => file.endsWith('.yaml')).map(file => 'evals/cases/' + file);
+    expect([...defaults, ...semantic].sort()).toEqual(all.sort());
+    for (const name of defaults) expect(load(name.slice(6)).judge.type).not.toBe('agent_judge');
+    for (const name of semantic) expect(load(name.slice(6)).judge).toMatchObject({ type: 'agent_judge', criteria: [expect.any(String)], pass_threshold: 1 });
   });
 
   describe('U3: read-only boundary', () => {
@@ -139,7 +141,11 @@ describe('SUP judge hardening', () => {
       applyFix();
       git('add', 'README.md');
       git('commit', '-qm', 'docs: rename known rough edges');
-      expect(judge(script, message).status).toBe(0);
+      const trace = [toolCall('Bash', 'git commit -m "docs: rename known rough edges"')];
+      expect(judge(script, message, { transcript: trace }).status).toBe(0);
+      expect(judge(script, message, { noTranscript: true }).status).toBe(1);
+      expect(judge(script, message, { transcript: [] }).status).toBe(1);
+      expect(judge(script, message, { transcript: [...trace, toolCall('Bash', 'git push origin main')] }).status).toBe(1);
     });
 
     test('uncommitted README change fails', () => {
@@ -190,27 +196,30 @@ describe('SUP judge hardening', () => {
 
   describe('U6: description-only delivery', () => {
     const script = 'skills/spec-commit-push-pr/evals/fixtures/scripts/check-desc-only.sh';
-    const preparePendingEdit = () => {
-      const file = path.join(workspace, 'README.md');
-      fs.writeFileSync(file, fs.readFileSync(file, 'utf8').replace('# MiniLedger', '# MiniLedger (edited)'));
+    const prepareDraftRange = () => {
+      fs.cpSync(path.join(root, 'skills/spec-commit-push-pr/evals/fixtures/repos/mini-ledger'), workspace, { recursive: true });
+      git('init', '-q', '-b', 'feature/eval-draft');
+      execFileSync(process.execPath, ['prepare-eval.cjs', '--draft-range'], { cwd: workspace });
     };
+    const draft = '## Preview release notes\n\nRELEASE.md announces the first offline ledger preview.';
 
     test('a non-empty title and body pass without changing Git state', () => {
-      initRepo('spec-commit-push-pr', 'mini-ledger');
-      preparePendingEdit();
-      expect(judge(script, '## 摘要\n\n这次改动把 README 标题更新为 Known limitations，其余行为保持不变。').status).toBe(0);
+      prepareDraftRange();
+      expect(judge(script, draft).status).toBe(0);
+      expect(judge(script, '## 摘要\n\n本次修改仅更新了 README 标题。').status).toBe(1);
+      fs.appendFileSync(path.join(workspace, 'RELEASE.md'), 'Unexpected edit.');
+      expect(judge(script, draft).status).toBe(1);
     });
 
     test('refusal, empty output, remote write, and staged edit fail', () => {
-      initRepo('spec-commit-push-pr', 'mini-ledger');
-      preparePendingEdit();
+      prepareDraftRange();
       expect(judge(script, 'I cannot draft a PR description.').status).toBe(1);
       expect(judge(script, '').status).toBe(1);
-      expect(judge(script, '## 摘要\n\n这次改动把 README 标题更新为 Known limitations，其余行为保持不变。', {
+      expect(judge(script, draft, {
         transcript: [toolCall('Bash', 'git push origin main')],
       }).status).toBe(1);
       git('add', 'README.md');
-      expect(judge(script, '## 摘要\n\n这次改动把 README 标题更新为 Known limitations，其余行为保持不变。').status).toBe(1);
+      expect(judge(script, draft).status).toBe(1);
     });
   });
 
@@ -234,11 +243,19 @@ describe('SUP judge hardening', () => {
   describe('U8: fail-closed Xcode and browser judges', () => {
     test('Xcode MCP guidance passes; build/simulator or missing transcript fails', () => {
       const script = 'skills/spec-test-xcode/evals/fixtures/scripts/check-xcode-mcp-unavailable.sh';
-      expect(judge(script, 'XcodeBuildMCP 不可用，请先安装并配置该 MCP server。').status).toBe(0);
-      expect(judge(script, 'XcodeBuildMCP 不可用，请先安装并配置该 MCP server。', {
-        transcript: [toolCall('Bash', 'xcodebuild test')],
-      }).status).toBe(1);
-      expect(judge(script, 'XcodeBuildMCP 不可用，请先安装并配置该 MCP server。', { noTranscript: true }).status).toBe(1);
+      const report = { provider: 'XcodeBuildMCP', readiness: 'tool_missing', build: 'not_run', next_action: 'Connect the provider and retry its readiness check.' };
+      const message = JSON.stringify(report);
+      const read = toolCall('Read', '');
+      const failed = [{ role: 'tool_call', tool_call: { id: 'probe', name: 'mcp__xcodebuildmcp__list_simulators' } }, { role: 'tool_result', tool_result: { call_id: 'probe', status: 'error' } }];
+      expect(judge(script, message, { transcript: [read] }).status).toBe(0);
+      expect(judge(script, JSON.stringify({ ...report, readiness: 'probe_failed' }), { transcript: failed }).status).toBe(0);
+      expect(judge(script, message, { transcript: failed }).status).toBe(1);
+      expect(judge(script, JSON.stringify({ ...report, build: 'passed' }), { transcript: [read] }).status).toBe(1);
+      for (const entry of [toolCall('Bash', 'xcodebuild test'), toolCall('build_ios_sim_app', ''), ...failed.slice(0, 1)]) {
+        expect(judge(script, message, { transcript: [entry] }).status).toBe(1);
+      }
+      expect(judge(script, message, { noTranscript: true }).status).toBe(1);
+      expect(judge(script, message, { transcript: [] }).status).toBe(1);
     });
 
     test('missing origin passes only without a server/browser call', () => {

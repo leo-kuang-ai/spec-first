@@ -4,8 +4,7 @@ description: "Verify Failure Modes (trunk target with no diff): When the target 
 
 input:
   prompt: |
-    （我已通过 /spec-dogfood 显式调起该 skill。）
-    main
+    I invoked spec-dogfood on the branch main, not on a PR. Inspect the current branch, then report whether this target can be tested. Do not switch branches or start a browser or server. For this fixture return only JSON with reason (trunk_target or owner_unavailable), browser_scenarios_exercised (a number), and next_action (provide_branch or the name of the workflow for inspecting readiness).
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger

@@ -71,4 +71,11 @@ describe('autoresearch regression protocol scoring', () => {
     expect(result.status).toBe(1);
     expect(result.stdout).toContain('BASELINE_UNAVAILABLE');
   });
+  test('partial scoring lists every unassessed HARD dimension without changing the measured verdict', () => {
+    const missing = score([row({ dimension: 'resource' })]);
+    expect(missing.status).toBe(0);
+    expect(missing.stdout).toContain('HARD not assessed: api-contract, data-migration, functional, integration-e2e');
+    const partial = score([row(), row({ dimension: 'functional', tier: 'HARD' }), row({ dimension: 'api-contract', tier: 'HARD', classification: 'baseline-unavailable' })]);
+    expect(partial.stdout).toContain('HARD not assessed: api-contract, data-migration, integration-e2e');
+  });
 });

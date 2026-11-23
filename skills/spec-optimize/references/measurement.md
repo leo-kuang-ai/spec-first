@@ -154,7 +154,7 @@ bash "$SKILL_DIR/scripts/parallel-probe.sh" "<project_directory>" "<measurement.
 
 Read the JSON output. Present any blockers to the user with suggested mitigations. Treat the probe as intentionally narrow: it should inspect the measurement command, the measurement working directory, and explicitly declared shared files, not the entire repository.
 
-An empty blocker list is heuristic readiness only. It does not prove worker dispatch capability, isolation or execution authority; serial mode needs no parallel worker claim.
+An unavailable measurement directory or declared shared path returns `serial` with `scope_unavailable` before scanning. Correct the paths before retrying; do not substitute the project root. An empty blocker list is heuristic readiness only. It does not prove worker dispatch capability, isolation or execution authority; serial mode needs no parallel worker claim.
 
 ### 1.5 Worktree Budget Check
 

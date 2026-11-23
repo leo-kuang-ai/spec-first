@@ -4,8 +4,7 @@ description: "Second-round variant: revise phrasing for metric gate repair (cont
 
 input:
   prompt: |
-    （spec-optimize skill 已安装，请按它工作。）
-    帮我把这个服务优化到最快。
+    Use spec-optimize. Make this service as fast as possible.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -14,6 +13,8 @@ context:
     checkout: main
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/check-r2-asks.sh
-  timeout_seconds: 900
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - "Pass only if the assistant stops before experimentation and asks for a measurable objective or repeatable benchmark, or explains concretely why one must be supplied. A denial that measurement is needed, an unrelated question or an unsupported improvement claim fails."
+  pass_threshold: 1

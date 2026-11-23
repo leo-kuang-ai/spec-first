@@ -3,10 +3,6 @@
 // 回归测试：SUP-12 - 原型默认 URL 丢失 question 子目录，导致相对资源 404
 // 证据：docs/validation/2026-11-09-harness-full-code-deep-review.md:165-171
 //
-// 核心修复验证：
-// 1. 子目录原型在默认 URL 注入 <base> 标签
-// 2. 浏览器可以正确解析相对资源（CSS、JS）
-// 3. 单文件根目录原型不注入 <base>
 
 const fs = require('node:fs');
 const http = require('node:http');
@@ -35,7 +31,7 @@ function get(url) {
 }
 
 describe('Prototype relative resource handling — SUP-12', () => {
-  test('子目录原型注入 <base> 标签，相对 CSS 可访问', async () => {
+  test('默认入口抵达正确页面，相对 CSS 可访问', async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sup12-css-'));
 
     try {
@@ -52,14 +48,13 @@ describe('Prototype relative resource handling — SUP-12', () => {
       const info = JSON.parse(run(['start', '--root', root], root));
       expect(info.status).toBe('started');
 
-      // SUP-12 修复：/ 返回 HTML 并注入 <base href="/question/">
       const rootResponse = await get(info.url);
-      expect(rootResponse.status).toBe(200);
-      expect(rootResponse.body).toContain('Question');
-      expect(rootResponse.body).toMatch(/<base href="\/question\/"/i);
-
-      // 核心验证：相对 CSS 可以访问（浏览器基于 <base> 解析为 /question/style.css）
-      const cssResponse = await get(`${info.url}/question/style.css`);
+      expect(rootResponse.status).toBe(302);
+      expect(rootResponse.headers.location).toBe('/question/index.html');
+      const pageUrl = new URL(rootResponse.headers.location, info.url);
+      const page = await get(pageUrl);
+      expect(page.headers['content-security-policy']).toContain("base-uri 'none'");
+      const cssResponse = await get(new URL(/href="([^"]+)"/.exec(page.body)[1], pageUrl));
       expect(cssResponse.status).toBe(200);
       expect(cssResponse.body).toContain('background: blue');
 
@@ -97,17 +92,17 @@ describe('Prototype relative resource handling — SUP-12', () => {
     }
   }, 15000);
 
-  test('子目录原型注入 <base> 后相对 JS 可访问', async () => {
+  test('路径中的空格和 # 不破坏相对 JS 加载', async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sup12-js-'));
 
     try {
-      fs.mkdirSync(path.join(root, 'screens', 'density-question'), { recursive: true });
+      fs.mkdirSync(path.join(root, 'screens', 'density #1'), { recursive: true });
       fs.writeFileSync(
-        path.join(root, 'screens', 'density-question', 'index.html'),
+        path.join(root, 'screens', 'density #1', 'index.html'),
         '<!doctype html><html><head><script src="app.js"></script></head><body><h1>Density</h1></body></html>'
       );
       fs.writeFileSync(
-        path.join(root, 'screens', 'density-question', 'app.js'),
+        path.join(root, 'screens', 'density #1', 'app.js'),
         'console.log("app");'
       );
 
@@ -115,11 +110,11 @@ describe('Prototype relative resource handling — SUP-12', () => {
       expect(info.status).toBe('started');
 
       const rootResponse = await get(info.url);
-      expect(rootResponse.status).toBe(200);
-      expect(rootResponse.body).toContain('Density');
-      expect(rootResponse.body).toMatch(/<base href="\/density-question\/"/i);
-
-      const jsResponse = await get(`${info.url}/density-question/app.js`);
+      expect(rootResponse.status).toBe(302);
+      expect(rootResponse.headers.location).toBe('/density%20%231/index.html');
+      const pageUrl = new URL(rootResponse.headers.location, info.url);
+      const page = await get(pageUrl);
+      const jsResponse = await get(new URL(/src="([^"]+)"/.exec(page.body)[1], pageUrl));
       expect(jsResponse.status).toBe(200);
       expect(jsResponse.body).toContain('app');
 

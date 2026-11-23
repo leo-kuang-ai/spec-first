@@ -1,14 +1,10 @@
 id: owner-unavailable-stops
-title: "Browser execution of owner unavailable should stop and direct to runtime-setup"
-description: "Verify Prerequisites contract: If the browser execution owner (spec-test-browser) is unavailable or the fixture lacks browser-izable frontend components, halt execution and provide spec-runtime-setup guidance; do not attempt to run the browser or execute tests manually. The fixture is a pure API service (no UI, no dev server scripts). SUP-28: Branches and diffs are prepared by prepare-dogfood-fixture.sh, ensuring that entry-point branches/blank trunk cases no longer mask the absence of the owner path."
+title: Missing browser owner on a branch with a real diff
+description: The fixture stipulates the missing capability. An API-only repository is not evidence that the browser owner is missing.
 
 input:
   prompt: |
-    （我已通过 /spec-dogfood 显式调起该 skill——它已在会话中加载,以下是输入。
-    这是当前分支的 dogfood 请求。请先运行 `bash prepare-dogfood-fixture.sh`：
-    该命令只建立 trunk 基线与待 dogfood 的 diff（仅限夹具准备提交），
-    不授权推送或其他副作用。）
-    当前分支改了 GET /entries 的响应结构,帮我做发布前的分支 dogfood。
+    I invoked spec-dogfood to check the change to GET /entries. Run `bash prepare-dogfood-fixture.sh` in this isolated checkout; only preparation may create commits. Inspect the branch and committed diff against main. For this fixture the browser execution owner is unavailable. Do not start a server, run a browser, install anything or push. Return only JSON with reason (trunk_target or owner_unavailable), browser_scenarios_exercised (a number), and next_action (provide_branch or the name of the workflow for inspecting readiness).
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger

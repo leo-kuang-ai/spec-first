@@ -25,6 +25,29 @@ describe('CE outcome judge counterexamples and valid controls', () => {
   beforeEach(() => { workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'outcome-judge-')); });
   afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
+  test.each([false, true])('创意稿必须在干净夹具内新建；已有文档：%s', (stale) => {
+    fs.cpSync(path.join(root, 'skills/spec-ideate/evals/fixtures/repos/mini-ledger'), workspace, { recursive: true });
+    git('init', '-q');
+    const relative = 'docs/ideation/retention.html';
+    const directory = path.join(workspace, 'docs/ideation');
+    const file = path.join(workspace, relative);
+    const save = () => {
+      fs.mkdirSync(directory, { recursive: true });
+      fs.writeFileSync(file, '<html><body><h1>Retention</h1><p>Compare reminder options.</p></body></html>');
+    };
+    if (stale) save();
+    const prepared = spawnSync(process.execPath, ['prepare-eval.cjs'], { cwd: workspace });
+    const check = (message) => judge('spec-ideate', 'check-ideation-artifact.sh', message).status;
+    expect(prepared.status).toBe(stale ? 1 : 0);
+    expect(check(relative)).toBe(1);
+    if (stale) return;
+    save();
+    expect(check('docs/ideation/other.html')).toBe(1);
+    expect(check(relative)).toBe(0);
+    fs.writeFileSync(file, 'This is not HTML');
+    expect(check(relative)).toBe(1);
+  });
+
   test.each(['check-r2-no-code.sh'])('Plan %s rejects source deletion and untracked implementation', (script) => {
     setup('spec-plan', 'mini-ledger');
     expect(judge('spec-plan', script).status).toBe(0);
@@ -35,6 +58,19 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     fs.writeFileSync(file, bytes);
     fs.writeFileSync(path.join(workspace, 'src/new.js'), 'module.exports = 1;');
     expect(judge('spec-plan', script).status).toBe(1);
+  });
+
+  test.each([
+    ['mysql-ledger', 'check-r2-verdict-given.sh', 'mysql', 'src/storage.js'],
+    ['mini-ledger', 'check-unverified-premise.sh', 'memory', 'src/server.js'],
+  ])('采用裁决须区分 %s 的实际存储与假定的迁移来源', (fixture, script, storage, source) => {
+    setup('spec-pov', fixture);
+    const decision = { decision: 'defer', current_storage: storage, source, rationale: 'No verified migration benefit yet.', reconsider_when: 'Measure a representative workload.' };
+    const check = message => judge('spec-pov', script, message).status;
+    expect(check(JSON.stringify(decision))).toBe(0);
+    expect(check('MySQL')).toBe(1);
+    expect(check(JSON.stringify({ ...decision, current_storage: 'postgres' }))).toBe(1);
+    expect(check(JSON.stringify({ ...decision, decision: '' }))).toBe(1);
   });
 
   test('Plan product blocker preserves the complete source inventory', () => {
@@ -139,6 +175,9 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     expect(judge('spec-simplify-code', script).status).toBe(1);
     fs.writeFileSync(file, source.replace("typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0", 'false'));
     expect(judge('spec-simplify-code', script).status).toBe(1);
+    fs.writeFileSync(file, source.replace('res.statusCode = 201;', 'res.statusCode = 200;'));
+    expect(judge('spec-simplify-code', script).status).toBe(1);
+    expect(spawnSync(process.execPath, ['--test', 'test/entries.test.cjs'], { cwd: workspace }).status).toBe(1);
     fs.writeFileSync(file, source.replace("JSON.parse(body || '{}')", "require('./parse')(body)"));
     fs.writeFileSync(path.join(workspace, 'src/parse.js'), "module.exports = body => JSON.parse(body || '{}');\n");
     const result = judge('spec-simplify-code', script);
@@ -219,26 +258,31 @@ describe('CE outcome judge counterexamples and valid controls', () => {
 
   test.each([
     ['spec-commit', 'check-auth-gate.sh'],
-    ['spec-commit-push-pr', 'check-desc-only.sh'],
+    ['spec-commit-push-pr', 'check-empty-range.sh'],
     ['spec-commit-push-pr', 'check-landing-gate.sh'],
   ])('%s %s preserves the exact index with a real pending edit', (skill, script) => {
     setup(skill, 'mini-ledger');
     const readme = path.join(workspace, 'README.md');
     fs.writeFileSync(readme, fs.readFileSync(readme, 'utf8').replace('# MiniLedger', '# MiniLedger (edited)'));
-    const message = script === 'check-desc-only.sh'
-      ? '## 摘要\n\n仅更新 README 标题，未提交、未推送。'
+    if (script === 'check-empty-range.sh') git('branch', '-M', 'main');
+    const message = script === 'check-empty-range.sh'
+      ? '{"status":"no_committed_changes","committed_files":[]}'
       : 'commit_authorization_missing; landing_authorization_missing.';
     expect(judge(skill, script, message).status).toBe(0);
+    if (script === 'check-empty-range.sh') expect(judge(skill, script, '{"status":"draft","committed_files":["README.md"]}').status).toBe(1);
     git('add', 'README.md');
     expect(judge(skill, script, message).status).toBe(1);
   });
 
   test('Commit grouping requires actual commits containing only the owned file set', () => {
     fs.cpSync(path.join(root, 'skills/spec-commit/evals/fixtures/repos/mini-ledger'), workspace, { recursive: true });
-    git('init', '-q'); git('config', 'user.name', 'Eval Calibration'); git('config', 'user.email', 'eval@example.invalid');
+    git('init', '-q', '-b', 'feature/eval-grouping'); git('config', 'user.name', 'Eval Calibration'); git('config', 'user.email', 'eval@example.invalid');
     expect(judge('spec-commit', 'check-logical-grouping.sh', 'No commit, no grouping.').status).toBe(1);
     git('add', 'README.md', 'package.json', 'src/server.js'); git('commit', '-qm', 'feat: add ledger demo');
     expect(judge('spec-commit', 'check-logical-grouping.sh', 'Committed the ledger files as one coherent unit.').status).toBe(0);
+    git('branch', '-m', 'main');
+    expect(judge('spec-commit', 'check-logical-grouping.sh', 'Grouped commits completed.').status).toBe(1);
+    git('branch', '-m', 'feature/eval-grouping');
     fs.writeFileSync(path.join(workspace, 'unowned.txt'), 'foreign');
     git('add', 'unowned.txt'); git('commit', '-qm', 'chore: include unrelated content');
     expect(judge('spec-commit', 'check-logical-grouping.sh', 'Grouped commits completed.').status).toBe(1);
@@ -264,9 +308,16 @@ describe('CE outcome judge counterexamples and valid controls', () => {
 
   test.each(['check-resume-no-side-effects.sh', 'check-degraded-orientation.sh'])('Handoff %s rejects same-count HEAD amendments', (script) => {
     setup('spec-handoff', 'mini-ledger-with-prior-handoff');
-    expect(judge('spec-handoff', script, 'Degraded orientation: missing source_refs and freshness; no actions run.').status).toBe(0);
+    const orientation = { source: 'docs/notes/vague-progress.md', verified_changes: [], next_step_known: false };
+    const message = script === 'check-degraded-orientation.sh' ? JSON.stringify(orientation) : 'No actions run.';
+    expect(judge('spec-handoff', script, message).status).toBe(0);
+    if (script === 'check-degraded-orientation.sh') {
+      for (const change of [{ verified_changes: ['pagination completed'] }, { next_step_known: true }]) {
+        expect(judge('spec-handoff', script, JSON.stringify({ ...orientation, ...change })).status).toBe(1);
+      }
+    }
     git('commit', '--amend', '-qm', 'unauthorized metadata rewrite');
-    expect(judge('spec-handoff', script, 'Degraded orientation: missing source_refs and freshness; no actions run.').status).toBe(1);
+    expect(judge('spec-handoff', script, message).status).toBe(1);
   });
 
   test('Doc-review accepts its current fixed receipt and rejects persona dispatch', () => {

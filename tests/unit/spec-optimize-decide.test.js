@@ -12,6 +12,15 @@ const DECIDE = path.join(SKILL_DIR, 'scripts/decide.cjs');
 const MEASURE = path.join(SKILL_DIR, 'scripts/measure.sh');
 
 describe('local evidence boundaries', () => {
+  test.each([['maximize', 16], ['minimize', 4]])('unpaired baseline tails cannot change %s selection or ranking', (direction, value) => {
+    const spec = hardSpec({ primary: { name: 'wall_seconds', direction, type: 'hard' }, comparison: { method: 'paired', relative_threshold: 0.05 } });
+    const observed = samples => snapshot(samples[0], { metrics: { wall_seconds: { samples } } });
+    const select = baseline => decide({ spec, baseline: observed(baseline), candidate: observed([value, value]) });
+    const control = select([10, 10]);
+    expect(control).toMatchObject({ decision: 'keep', primary_delta: 6, rank_score: 0.6 });
+    for (const tail of [0, 90]) expect(select([10, 10, tail, tail, tail])).toEqual(control);
+  });
+
   test('does not reuse the last baseline observation to fabricate a pair', () => {
     const result = decide({
       spec: hardSpec({ comparison: { method: 'paired', relative_threshold: 0.05 } }),

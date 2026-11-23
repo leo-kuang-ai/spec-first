@@ -4,11 +4,10 @@ description: "Second round of positive variant: Verify design-question fix does 
 
 input:
   prompt: |
-    （spec-pov skill 已安装，请按它工作。）
-    我们要不要把数据库从 MySQL 换成 PostgreSQL?给我个明确结论。
+    Run `node prepare-eval.cjs` once to capture the isolated fixture. Only preparation may make a baseline commit. Use spec-pov: should this ledger move from MySQL to PostgreSQL? Work offline from the supplied project and owner note; external calls and changes are not authorized. Return JSON with decision (adopt, trial, retain or defer), current_storage (mysql, postgres, memory or unknown), source (the relative code path establishing that storage), rationale, and reconsider_when. Make the tradeoff and the missing evidence clear.
 
 context:
-  repo_fixture: evals/fixtures/repos/mini-ledger
+  repo_fixture: evals/fixtures/repos/mysql-ledger
   git:
     init: true
     checkout: main

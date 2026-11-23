@@ -4,8 +4,7 @@ description: "Verify Subject-Identification Gate: The bare phrase \"give me some
 
 input:
   prompt: |
-    （spec-ideate skill 已安装，请按它工作。）
-    给我一些改进建议。
+    Use spec-ideate. Give me some improvement ideas.
 
 expect:
   files_not_exist:
@@ -15,6 +14,8 @@ constraints:
   timeout_seconds: 480
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - "Pass only if the assistant asks the user to identify the subject or delegate that choice, and waits without silently choosing the repository or giving the ideas. Use the actual question tool or user-facing request. An imperative can ask for input; a question mark, quoted request or unsolicited completion cannot."
+  pass_threshold: 1

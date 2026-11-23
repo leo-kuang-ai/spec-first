@@ -36,6 +36,24 @@ test('monorepo results are relative to the selected classification root', () => 
   expect(classify('apps').stdout.trim()).toBe('multiple:next@admin,vite@web');
 });
 
+test('Astro absorbs only its co-located Vite signature', () => {
+  signature('astro.config.mjs');
+  signature('vite.config.ts');
+  expect(classify().stdout.trim()).toBe('astro');
+  signature('next.config.ts');
+  expect(classify().stdout.trim()).toBe('multiple');
+  fs.unlinkSync(path.join(root, 'vite.config.ts'));
+  expect(classify().stdout.trim()).toBe('multiple');
+});
+
+test('Astro in a workspace does not hide an independent Vite app', () => {
+  signature('apps/blog/astro.config.ts');
+  signature('apps/blog/vite.config.ts');
+  expect(classify().stdout.trim()).toBe('astro@apps/blog');
+  signature('apps/shop/vite.config.ts');
+  expect(classify().stdout.trim()).toBe('multiple:astro@apps/blog,vite@apps/shop');
+});
+
 test('physical containment rejects an external root and a symlink escape', () => {
   const external = fs.mkdtempSync(path.join(os.tmpdir(), 'polish-external-'));
   try {

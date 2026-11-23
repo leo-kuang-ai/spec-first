@@ -18,12 +18,16 @@ Parse the invocation arguments supplied by the current host: a PR number, a bran
 
 ### Resumability (stop and return at any point)
 
+If scope resolution stops before a report exists, say first that this run does not establish release readiness, what actually ran, and which action would unblock testing. Zero browser scenarios is not a failed browser test. Put other prerequisites after the first blocker; do not lead with unrelated permissions or create a report just to record this stop.
+
 This workflow is designed to be interrupted and resumed. Two pieces of state make that safe:
 
 - **The scenario ledger** maintained by the active workflow host is the live progress record — one entry per matrix scenario. Mark each `in_progress` when you start it and `completed` only when it genuinely passes.
 - **The report doc** at `docs/dogfood-reports/<YYYY-MM-DD>-<branch-slug>-dogfood.md` is the durable checkpoint that survives across sessions. `<branch-slug>` is the branch name lowercased with every run of non-alphanumeric characters (slashes included) collapsed to a single `-` (e.g. `feature/Foo_Bar` -> `feature-foo-bar`). **Create it as soon as the matrix exists (end of Phase 2) by instantiating `references/dogfood-report-template.md`** (read that template now if you haven't) so the checkpoint carries the template-owned section shape from the start — then fill in every scenario at `Pending`, and **update it incrementally** after each scenario judgment and each verified fix/commit-status change, not only at the end. An interrupted run must leave a template-shaped checkpoint, not a bare matrix.
 
 Because tasks are session-scoped but the report doc is on disk, the report is the source of truth for resuming. Always keep the two in sync so a later run (or a teammate) can pick up exactly where this one stopped.
+
+On resume, recover browser observations from evidence for the recorded build, not from a `Blocked` or `Skipped` status. For older reports without an observation column, use the issue notes or receipt. If those do not establish what ran, say the prior observation is unknown; do not count it toward current coverage. Recheck only affected scenarios when their prerequisites are met.
 
 ### Phase 1: Analyze Changes
 
@@ -108,11 +112,11 @@ Determine the port (priority: explicit `--port` > a port explicitly stated in yo
 Work the task list **one item at a time**. For each scenario, mark the task `in_progress`, then:
 
 1. **Document** what you're testing (the journey, expected outcome, exact target origin, and expected-effect classification).
-2. **Execute through the owner** by invoking `spec-test-browser` with `mode:pipeline`, the current branch/PR selector, and `target-origin:<exact-loopback-origin>`. Supply only routes and expected-safe synthetic interactions derived from the flow. If the owner returns `target-origin-*`, exact-origin/conformance failure, `browser-mutation-authorization-required`, cleanup failure, or another `not_run` / `not_supported` result, preserve that reason and do not fall back to a direct browser command. Keep transient screenshots in owner-private temp evidence; copy one into the report only when intentionally embedding it.
+2. **Execute through the owner** by invoking `spec-test-browser` with `mode:pipeline`, the current branch/PR selector, and `target-origin:<exact-loopback-origin>`. Supply only routes and expected-safe synthetic interactions derived from the flow. If the owner returns `target-origin-*`, exact-origin/conformance failure, `browser-mutation-authorization-required`, cleanup failure, or another `not_run` / `not_supported` result, preserve that reason and do not fall back to a direct browser command. Keep transient screenshots private; use a bounded observation and the owner's private evidence reference in the report.
 
 3. **Judge** both correctness and experience: right data, right destination, sensible content, no console errors, and does it feel aligned with the product?
 4. **Walk it as each persona.** Re-run the journey in your head from each primary persona's perspective (from Phase 1) and ask where they'd feel a **paper cut** — a small friction that wouldn't fail a functional test but degrades the experience: a confusing label, an extra click, an unexpected jump, a slow-feeling step, missing feedback, copy that doesn't match how that persona thinks. A scenario can be functionally `Pass` yet still carry paper cuts. Note each paper cut, which persona feels it, and its severity.
-5. **Record** pass/fail plus any paper cuts, with specifics. Mark the task `completed` only when it genuinely passes. Paper cuts do not block a `Pass`, but a **sharp** paper cut (one severe enough to fix now) is routed into the Phase 5 fix loop just like a failure — apply the same auto-fix-vs-escalate judgment to it. Log the rest in the report.
+5. **Record** the browser observation before assigning the workflow status. A wrong destination remains a `Fail` even if the fix needs approval. If a journey stops at a human-only leg, record the last observed step as `Partial`, or `Not run` if none ran. Preserve owner/cleanup errors separately; do not convert them into product failures or a ready verdict. Mark the task `completed` only when it genuinely passes. Paper cuts do not block a `Pass`, but a **sharp** paper cut (one severe enough to fix now) is routed into the Phase 5 fix loop just like a failure. Log the rest in the report.
 
 **External-interaction flows** (OAuth, real email delivery, payments, SMS) require their actual effect authority and observable confirmation. If that leg needs a person, mark it `Blocked (needs human verify)` and request the exact observation while continuing independent scenarios. A pipeline return preserves the blocker; it never converts absent verification to Pass or silently Skips it.
 

@@ -20,6 +20,13 @@ Report every required objective with units and absolute change. Use percentages 
 
 ```
 Optimization: <spec-name>
+Outcome: <what was kept or reverted and why; identify the integrated version>
+Stop reason: <target, budget, plateau, manual stop or blocker>
+Confirmation: <independent holdout result, not configured or not run; remaining limits>
+Original baseline -> final integrated version:
+  <required metric and unit>: <baseline> -> <final> (<absolute change or unconfirmed>)
+  <gate results and relevant diagnostics>
+
 Duration: <wall-clock time>
 Total experiments: <count>
   Kept: <count> (including <runner_up_kept_count> runner-up merges)
@@ -30,11 +37,6 @@ Total experiments: <count>
   Degenerate: <count>
   Errors: <count>
   Deferred: <count>
-
-Baseline -> Final:
-  <primary_metric>: <baseline_value> -> <final_value> (<delta>)
-  <gate_metrics>: ...
-  <diagnostics>: ...
 
 Judge cost: $<total_judge_cost_usd> (if applicable)
 

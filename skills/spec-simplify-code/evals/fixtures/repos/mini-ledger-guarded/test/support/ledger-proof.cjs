@@ -56,6 +56,10 @@ function request(port, method, body) {
     }
     const second = await request(port, 'POST', JSON.stringify({ amount: 7, note: 'after' }));
     assert.ok(second.status >= 200 && second.status < 300);
+    for (const created of [first, second]) {
+      assert.equal(created.status, 201, 'Successful creation must preserve HTTP 201');
+      assert.equal(created.body, 'ok', 'Successful creation must preserve the response body');
+    }
     const final = await request(port, 'GET');
     assert.equal(final.status, 200);
     const entries = JSON.parse(final.body);

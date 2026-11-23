@@ -1,11 +1,10 @@
 id: polish-request-routes-out
 title: "Collaborative UI polishing requests should be routed to spec-polish"
-description: "Verification: Not to use: collaborative UI polish — assign to spec-polish — \"Help me refine UI details\" should explicitly reference spec-polish."
+description: Recommend the owner of collaborative visual work without starting it.
 
 input:
   prompt: |
-    （我已通过 /spec-dogfood 显式调起该 skill。）
-    陪我一起把这个页面的 UI 细节调好看一点,我看着你改。
+    I invoked spec-dogfood, but I want to tune the appearance of this page with you while I watch. Return just the next workflow name; do not start it.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -13,12 +12,8 @@ context:
     init: true
     checkout: main
 
-expect:
-  must_contain:
-    - "spec-polish"
-
 judge:
   type: rule_based
   success:
-    - output_contains:
-        all: ["spec-polish"]
+    - output_matches:
+        all: ['^\s*spec-polish\s*$']

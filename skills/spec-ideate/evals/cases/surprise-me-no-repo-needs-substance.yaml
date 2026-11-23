@@ -4,8 +4,7 @@ description: "Verify the determinism of the surprise-me routing: when CWD is not
 
 input:
   prompt: |
-    （spec-ideate skill 已安装，请按它工作。）
-    随便给我一些惊喜的方向吧，你看着办。
+    Use spec-ideate. Surprise me with some directions; the choice of focus is yours. There is no project checkout or other material for this request.
 
 expect:
   files_not_exist:
@@ -15,6 +14,8 @@ constraints:
   timeout_seconds: 480
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - "Pass only if a user-facing request or question tool asks for at least one usable source (for example a link, pasted draft or short description) and leaves ideation pending. Accept an imperative without a question mark. Declaring input unnecessary, quoting a request, or delivering ideas as if a source existed fails."
+  pass_threshold: 1

@@ -82,4 +82,14 @@ prepareFixture("mini-ledger", {
   "package.json": "03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b",
   "src/server.js": "ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34"
 });
+if (process.argv.includes('--draft-range')) {
+  assert.equal(git('branch', '--show-current').trim(), 'feature/eval-draft');
+  git('branch', 'eval-base', 'HEAD');
+  fs.writeFileSync('RELEASE.md', 'First offline ledger preview.\n', { flag: 'wx' });
+  git('add', '--', 'RELEASE.md');
+  git('-c', 'user.name=Eval Fixture', '-c', 'user.email=eval@example.invalid', 'commit', '-qm', 'Document the first offline ledger preview');
+  const file = baselinePath();
+  const baseline = JSON.parse(regular(file));
+  fs.writeFileSync(file, JSON.stringify({ ...baseline, head: git('rev-parse', 'HEAD').trim(), index: git('ls-files', '--stage', '-z') }));
+}
 fs.writeFileSync('README.md', regular('README.md').toString().replace('# MiniLedger', '# MiniLedger (edited)'));

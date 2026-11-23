@@ -4,8 +4,7 @@ description: "End-to-end validation of repo-grounded mode: Requests should cente
 
 input:
   prompt: |
-    （spec-ideate skill 已安装，请按它工作。）
-    这个记账 demo 留存很差，帮我围绕提升用户留存想一批改进方向。
+    First run `node prepare-eval.cjs` once in the isolated fixture. Only preparation may make a baseline commit. Use spec-ideate to propose and rank ways to improve retention in this ledger demo. Save one HTML document and give me its repository-relative path. Do not stage or commit it.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -23,7 +22,6 @@ expect:
     - ".html"
 
 judge:
-  type: rule_based
-  success:
-    - output_contains:
-        all: ["docs/ideation", ".html"]
+  type: script
+  script_path: evals/fixtures/scripts/check-ideation-artifact.sh
+  timeout_seconds: 30

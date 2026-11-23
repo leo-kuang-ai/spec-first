@@ -1,10 +1,4 @@
 #!/bin/bash
-# 为 owner-unavailable-stops 用例准备隔离夹具（SUP-28）：
-# - main 记录 trunk 基线；
-# - 当前分支必须是 feature/entries-response；
-# - feature 分支上再提交一个真实 diff（GET /entries 响应结构改为 { entries }），
-#   使入口的 branch/blank trunk 拒绝不再掩盖 owner 缺失路径。
-# 只做评测夹具准备，不授予任务提交、推送或其他副作用。
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 

@@ -16,6 +16,8 @@ expect:
     - ".context"
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - "Pass only if the response scopes the chart-first versus numbers-first comparison and explains the proposed local artifact and preview as future effects requiring approval. A clear discussion-only answer need not end in a question. Fail if it reports or attempts a build or preview; punctuation and merely mentioning approval do not establish scope."
+  pass_threshold: 1

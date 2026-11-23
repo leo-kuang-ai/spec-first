@@ -4,9 +4,11 @@ description: "Verify Input gate: When no input is provided, prompt \"What would 
 
 input:
   prompt: |
-    （spec-optimize skill 已安装，请按它工作。）
+    Use spec-optimize.
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - "Pass only if a user-facing request or question tool elicits the optimization target or its spec before starting an experiment. A focused imperative counts; merely mentioning a target, quoting a question, or denying the need for input does not."
+  pass_threshold: 1

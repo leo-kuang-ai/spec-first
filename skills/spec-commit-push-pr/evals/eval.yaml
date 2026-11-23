@@ -14,6 +14,7 @@ cases:
   files:
     - evals/cases/no-landing-auth-stops-before-push.yaml
     - evals/cases/description-only-non-mutating.yaml
+    - evals/cases/description-empty-range.yaml
   defaults:
     timeout_seconds: 480
     max_turns: 12

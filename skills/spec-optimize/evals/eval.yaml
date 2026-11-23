@@ -12,10 +12,8 @@ engine:
 
 cases:
   files:
-    - evals/cases/no-metric-goal-gated.yaml
-    - evals/cases/empty-input-asks.yaml
+    # Natural-language metric and target cases use the opt-in evals/semantic.yaml.
     - evals/cases/debug-request-routes-out.yaml
-    - evals/cases/r2-fastest-no-measure.yaml
   defaults:
     timeout_seconds: 600
     max_turns: 14

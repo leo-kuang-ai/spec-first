@@ -4,16 +4,10 @@ description: "Verify entry boundary (description: \"use spec-brainstorm to refin
 
 input:
   prompt: |
-    （spec-ideate skill 已安装，请按它工作。）
-    我已经有一个想法：给团队做一个自动汇总每日站会进展的工具。
-    帮我把这个想法打磨成需求。
-
-expect:
-  must_contain:
-    - "spec-brainstorm"
+    Use spec-ideate. I have chosen a daily stand-up summary tool for my team. Help turn my idea into requirements. This is a routing-only fixture: return just the name of the workflow that should own the next step. Do not start it.
 
 judge:
   type: rule_based
   success:
-    - output_contains:
-        all: ["spec-brainstorm"]
+    - output_matches:
+        all: ['^\s*spec-brainstorm\s*$']

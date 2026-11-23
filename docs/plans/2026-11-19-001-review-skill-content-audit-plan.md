@@ -11,7 +11,15 @@ status: active
 
 # 研发流程 Skill 全量内容审查方案 - Plan
 
+**第二批当前版复核：** [17 包整改后的逐文件差异与剩余限制](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-20-phase-two/current-review.md)。冻结表用于追溯旧问题，当前版用于核销整改后的差异；均不替代读者和宿主验收。
+
 ## Goal Capsule
+
+**2026-11-23 更新：** 第二批[分支验收包逐文件深化](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-20-phase-two/dogfood-deep-review.md)已区分实际观察、处置和放行；修复停止与转交误判。零执行、已测失败、浏览器全绿但套件失败三份材料已备，尚无真实读者签收。
+
+**2026-11-22 更新：** 第二批[第二轮整改与试读](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-20-phase-two/repair-round-two.md)已区分确定性转交与自然语言澄清，并按独立模型对交付稿的复述修正歧义；真实读者验收仍开放。
+
+**执行进度（2026-11-21）：** [第一批九包内容审查及六项优先整改](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-19-phase-one/phase-one-conclusion.md)已归档。[第二批审查结论及 17 包职责表](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-20-phase-two/report.md)已完成：411 个版本化文件及 1 个本地缓存逐件对账，无缺项、无重复；另 1 个原列对象已退役。第二批已进入整改，[首轮改动、复验与下一批待办](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-20-phase-two/repair-round-one.md)单独记录，不作整包通过或真实收益结论。第三批尚未启动。
 
 **首批把需求文档和技术方案放在一起审。** 先看业务读者能否说清“谁在什么情况下会看到什么变化”；再看研发能否指出“本期功能如何实现、质量要求如何保证、以后变化会牵动哪里”。用户转述两类文档均有读不懂的反馈；目前没有对应版本、原始反馈或样本分母，不能据此认定某个 Skill 有缺陷。
 

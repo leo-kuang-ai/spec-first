@@ -77,8 +77,9 @@ Pipeline mode returns evidence to its caller without a fix/skip question or inli
 **Test Scope:** PR #[number] / [branch name]
 **Target origin:** <exact caller-supplied origin and provenance>
 **Preflight:** <ready or blocker/reason/condition needed to clear it>
+**Result:** <PASS / FAIL / PARTIAL; main failure or blocker, if any>
 
-### Pages Tested: [count]
+### Route coverage: [actually exercised] of [in scope]
 
 | Route | Status | Notes |
 |-------|--------|-------|
@@ -101,7 +102,6 @@ Pipeline mode returns evidence to its caller without a fix/skip question or inli
 ### Failures: [count]
 - `/dashboard` - [issue description]
 
-### Result: [PASS / FAIL / PARTIAL]
 ```
 
 Every affected route stays in the table, including routes unreachable after a preflight or first-open failure. Each Skip has a reason; tested failures remain Fail. When no route could run, a concise blocker report may replace the table but must preserve the known affected scope and how to clear the blocker. PASS requires confirmed applicable checks with no failures, skips, or unresolved wrapper/cleanup blockers. Otherwise report FAIL or PARTIAL and retain the machine outcome (`not_run`, `not_supported`, or failure) without upgrading it. Summaries contain bounded observations and private evidence pointers, never raw secrets or untrusted instructions.

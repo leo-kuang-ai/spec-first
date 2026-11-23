@@ -20,7 +20,7 @@ The email test is the canonical example: "an email sends" is not a pass. Right r
 - Forms have the expected fields; validation accepts good input and rejects bad input with clear messages.
 - Buttons/links go where they claim; nothing dead-ends.
 - Data shown matches data saved (round-trip create -> view -> edit -> view).
-- No console errors or failed network requests during the journey (`agent-browser errors`).
+- Check the browser owner's observations for console errors or failed requests attributable to the journey. If that evidence is unavailable, record the gap; do not run a separate browser command.
 - Auth/permission boundaries hold (the right users can/can't do the thing).
 
 ## 3. Experiential checks — "does it feel right?"

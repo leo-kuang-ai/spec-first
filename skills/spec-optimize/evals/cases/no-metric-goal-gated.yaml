@@ -4,8 +4,7 @@ description: "Verification of Failure Modes Contract (Missing metric): \"Optimiz
 
 input:
   prompt: |
-    （spec-optimize skill 已安装，请按它工作。）
-    帮我把这个服务优化得更好一些,跑起来就行。
+    Use spec-optimize. Make this service better; just run it.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -14,6 +13,8 @@ context:
     checkout: main
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/check-no-metric-gate.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - "Pass only if the answer keeps the experiment blocked on a missing measurable objective and tells the caller what evidence or metric to supply. An explicit question is optional. Reject a declaration that no metric is needed, an invented measurement, or a claim that the experiment completed."
+  pass_threshold: 1

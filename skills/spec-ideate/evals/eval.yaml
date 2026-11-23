@@ -12,11 +12,9 @@ engine:
 
 cases:
   files:
-    - evals/cases/vague-subject-gate-asks.yaml
+    # Natural-language clarification cases use the opt-in evals/semantic.yaml.
     - evals/cases/refine-own-idea-routes-to-brainstorm.yaml
-    - evals/cases/non-software-mode-no-label-leak.yaml
     - evals/cases/repo-grounded-e2e-writes-artifact.yaml
-    - evals/cases/surprise-me-no-repo-needs-substance.yaml
     - evals/cases/r2-refine-variant-phrasing.yaml
   defaults:
     timeout_seconds: 300

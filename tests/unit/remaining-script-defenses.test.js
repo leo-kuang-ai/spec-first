@@ -71,6 +71,26 @@ describe('remaining script failure-path defenses', () => {
     expect(report.blockers).not.toEqual(expect.arrayContaining([expect.objectContaining({ type: 'port' })]));
   });
 
+  test('parallel probe respects its declared scope even when part of it is missing', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-probe-scope-'));
+    try {
+      fs.mkdirSync(path.join(root, 'bench'));
+      fs.writeFileSync(path.join(root, 'other.db'), '');
+      const probe = (...paths) => {
+        const result = spawnSync('bash', [parallelProbe, root, '', ...paths], { encoding: 'utf8' });
+        expect(result.status).toBe(0);
+        return JSON.parse(result.stdout);
+      };
+      for (const paths of [['missing'], ['other.db'], ['bench', 'missing.lock']]) {
+        expect(probe(...paths)).toMatchObject({ mode: 'serial', blockers: [{ type: 'scope_unavailable' }], blocker_count: 1 });
+      }
+      expect(probe('bench')).toMatchObject({ mode: 'parallel', blockers: [] });
+      expect(probe('bench', 'other.db')).toMatchObject({ mode: 'user-decision', blockers: [{ type: 'shared_file' }] });
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   test('Riffrec mirrors stay identical and degrade array payloads, unknown duration, and ffprobe timeout', () => {
     expect(fs.readFileSync(riffrec).equals(fs.readFileSync(sweepRiffrec))).toBe(true);
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-riffrec-'));

@@ -22,8 +22,8 @@
 #      astro.config.*) -- conservative lexical matching of numeric literal
 #      port values. Variable references like process.env.PORT or getPort()
 #      are deliberately not matched; the probe falls through.
-#   3. Rails: config/puma.rb for `port <n>`
-#   4. Procfile.dev (otherwise Procfile): web line scanned for -p/-p=<n>/--port/--port=<n>
+#   3. Procfile.dev (otherwise Procfile): web line scanned for -p/-p=<n>/--port/--port=<n>
+#   4. Rails: config/puma.rb for `port <n>`
 #   5. docker-compose.yml: line-anchored grep for "- "<n>:<n>"" port mapping
 #   6. package.json: dev/start script for --port/-p flags
 #   7. .env files in override order: .env.local -> .env.development -> .env

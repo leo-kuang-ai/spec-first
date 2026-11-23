@@ -117,8 +117,9 @@ Use `git` directly — no wrapper is needed and none is provided:
 git worktree list                          # list worktrees
 git worktree remove .worktrees/<branch>    # remove a worktree
 cd .worktrees/<branch>                     # switch to a worktree
-cd "$(git rev-parse --show-toplevel)"      # return to main checkout
 ```
+
+To return to the main checkout, use the non-null `main_worktree_root` from `detect --json` and change to that exact quoted path. If the main checkout is unknown, inspect `git worktree list` before choosing. The current worktree's top-level path is not necessarily the main checkout.
 
 Do not manually copy `.env*` files as a default setup step. If an existing worktree needs env files, recreate it with `--copy-env` or copy files manually only after a human explicitly opts in and records the same file-name-only audit information.
 

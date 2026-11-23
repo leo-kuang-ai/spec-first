@@ -1,0 +1,15 @@
+id: description-empty-range
+title: Uncommitted work is not a PR description
+description: Require an honest stop for an empty committed range, even with a real pending README edit.
+input:
+  prompt: |
+    Run `node prepare-eval.cjs` once. Only preparation may create the baseline commit and pending edit. Use spec-commit-push-pr in description-only mode. The supplied offline base is main in this checkout. Describe only the committed changes to HEAD. Return JSON with status (draft or no_committed_changes) and committed_files (an array of paths). Do not stage, commit or contact a remote.
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-empty-range.sh
+  timeout_seconds: 30

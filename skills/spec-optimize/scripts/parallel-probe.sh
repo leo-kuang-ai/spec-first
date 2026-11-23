@@ -55,7 +55,7 @@ if ! resolve_python; then
 fi
 
 BLOCKERS="[]"
-SCAN_PATHS=()
+SCAN_PATHS=("$MEASUREMENT_WORKDIR")
 
 add_blocker() {
   local type="$1"
@@ -69,28 +69,18 @@ print(json.dumps(b))
 " 2>/dev/null || echo "$BLOCKERS")
 }
 
-add_scan_path() {
-  local candidate="$1"
-
-  if [[ -z "$candidate" ]]; then
-    return
-  fi
-
-  if [[ -e "$candidate" ]]; then
-    SCAN_PATHS+=("$candidate")
-  fi
+unavailable_scope() {
+  echo '{"mode":"serial","blockers":[{"type":"scope_unavailable","description":"The measurement directory or a declared shared path is unavailable","suggestion":"Verify the declared paths and rerun the probe"}],"blocker_count":1}'
+  exit 0
 }
 
-add_scan_path "$MEASUREMENT_WORKDIR"
+[[ -d "$MEASUREMENT_WORKDIR" && -r "$MEASUREMENT_WORKDIR" && -x "$MEASUREMENT_WORKDIR" ]] || unavailable_scope
 
 if [[ ${#SHARED_FILES[@]} -gt 0 ]]; then
   for shared_file in "${SHARED_FILES[@]}"; do
-    add_scan_path "$shared_file"
+    [[ -r "$shared_file" && ( ! -d "$shared_file" || -x "$shared_file" ) ]] || unavailable_scope
+    SCAN_PATHS+=("$shared_file")
   done
-fi
-
-if [[ ${#SCAN_PATHS[@]} -eq 0 ]]; then
-  SCAN_PATHS=(".")
 fi
 
 # Check 1: Hardcoded ports in measurement command

@@ -11,7 +11,7 @@ Act as a QA engineer who dogfoods the **active branch** end-to-end: understand e
 
 This is **diff-scoped**, not whole-app exploration. You test what *this branch* introduced or modified versus the trunk.
 
-**Outcome:** every changed user journey is exercised through the delegated browser owner, judged for correctness and experience, and any authorized small breakage is regression-tested. **Done:** every matrix row is `Pass`, `Fixed`, `Skipped`, or terminal `Blocked`; the automated suite has been run once and recorded; and the report is finalized against `references/dogfood-report-template.md`. A green matrix with a red suite is a not-ready verdict, not a ready claim. Finalize that evidence; chasing unrelated suite failures is outside this diff-scoped run.
+**Outcome:** account for every changed user journey. Exercise it through the delegated browser owner where possible; otherwise say which steps remain unverified and why. **Done reporting** is not the same as **ready to ship**: every matrix row is `Pass`, `Fixed`, `Skipped`, or terminal `Blocked`; the required suite result (or why it could not run) is recorded; and the report is finalized against `references/dogfood-report-template.md`. A green matrix with a red or unavailable required suite is not ready. Finalize that evidence; chasing unrelated suite failures is outside this diff-scoped run.
 
 Parse the invocation arguments supplied by the current host per `references/phases.md`: strip only the recognized `--port PORT` pair and mode flags while preserving the remainder, quoted paths/tokens, and token order as the target hint.
 

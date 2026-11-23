@@ -126,6 +126,8 @@ function normalize(input) {
     if (!(field in input)) fail('snapshot-invalid', ['missing field: ' + field]);
   }
   if (!Number.isInteger(input.pr_number) || input.pr_number < 1) fail('snapshot-invalid', ['invalid pr_number']);
+  const prState = typeof input.pr_state === 'string' ? input.pr_state.toUpperCase() : null;
+  if (!['OPEN', 'CLOSED', 'MERGED'].includes(prState)) fail('snapshot-invalid', ['pr_state must be OPEN, CLOSED or MERGED']);
   if (!Array.isArray(input.checks) || !Array.isArray(input.review_items)) {
     fail('snapshot-invalid', ['checks and review_items must be complete arrays; missing evidence is not an empty set']);
   }
@@ -180,7 +182,7 @@ function normalize(input) {
     head_sha: input.head_sha,
     base_ref: String(input.base_ref).slice(0, 200),
     base_oid: input.base_oid,
-    pr_state: String(input.pr_state).toUpperCase(),
+    pr_state: prState,
     mergeable: String(input.mergeable).toUpperCase(),
     merge_state_status: String(input.merge_state_status).toUpperCase(),
     review_decision: String(input.review_decision || 'UNKNOWN').toUpperCase(),

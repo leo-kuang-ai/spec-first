@@ -82,6 +82,6 @@ prepareFixture("mini-ledger-guarded", {
   "package.json": "966fdf6bda7b2bf2bd70b9c42ddcbd4f2411804e4a22de7ff0ef161db16ddcad",
   "src/server.js": "60fcede431e7da0426edd494e69a0680e4f6b3dd786e373d942872ce7a4c0716",
   "test/entries.test.cjs": "04bc52452e6a611d0609d28002ea50937126dcf5466e5a40c22727c6726623cf",
-  "test/support/ledger-proof.cjs": "621f7beb407ab683a34577ab28393256b3736ef4f9c4cc2601ed1785a2169c05"
+  "test/support/ledger-proof.cjs": "1edee384d24a39842f6474ccd9e0eb4aefc756dec3addfa8f9669bce083f35ad"
 });
 

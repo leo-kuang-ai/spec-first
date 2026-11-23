@@ -1,16 +1,10 @@
 id: r2-refine-variant-phrasing
-title: "R2 variant: Retain the refined request and still route it to spec-brainstorm"
-description: "Second-round variant: refine-vs-generate repair phase — \"All details are finalized, turning into a plan\" represents convergence over divergence; the spec-brainstorm must be explicitly named."
+title: Route a settled product decision to implementation planning
+description: Contrast a selected idea that still needs requirements with settled requirements that need a technical plan.
 
 input:
   prompt: |
-    （spec-ideate skill 已安装，请按它工作。这是隔离评测沙箱,只做路由判定。）
-    我想做的已经定了:给团队做站会汇总工具,给谁用、成功标准都想清楚了。
-    帮我把它变成可执行的计划。
-
-expect:
-  must_contain:
-    - "spec-brainstorm"
+    Use spec-ideate. Our approved requirement is to send team leads one daily digest of submitted stand-up updates; people without updates must not be listed. Product scope and acceptance criteria are settled. We need an implementation plan, not more ideas. Return only the name of the next workflow; do not start it.
 
 constraints:
   timeout_seconds: 900
@@ -18,5 +12,5 @@ constraints:
 judge:
   type: rule_based
   success:
-    - output_contains:
-        all: ["spec-brainstorm"]
+    - output_matches:
+        all: ['^\s*spec-plan\s*$']

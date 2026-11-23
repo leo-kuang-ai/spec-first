@@ -1,0 +1,15 @@
+id: storage-premise-unverified
+title: A candidate name is not evidence of the current database
+description: Check the decision and project anchor when the claimed migration source is absent.
+input:
+  prompt: |
+    Run `node prepare-eval.cjs` once to capture the isolated fixture. Only preparation may make a baseline commit. Use spec-pov: should we move this ledger from MySQL to PostgreSQL? Use only this checkout; do not contact external services or change files. Return JSON with decision (adopt, trial, retain or defer), current_storage (mysql, postgres, memory or unknown), source (the relative code path establishing that storage), rationale, and reconsider_when.
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git:
+    init: true
+    checkout: main
+judge:
+  type: script
+  script_path: evals/fixtures/scripts/check-unverified-premise.sh
+  timeout_seconds: 30

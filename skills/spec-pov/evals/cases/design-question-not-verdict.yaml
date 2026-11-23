@@ -4,8 +4,7 @@ description: "Verify verdict shape of contract: POV is responsible only for \"de
 
 input:
   prompt: |
-    （spec-pov skill 已安装，请按它工作。）
-    帮我裁决一下:这个记账功能我该怎么设计?表单和列表放一个页面还是分开?
+    Use spec-pov. Should my ledger put the form and list on one page or two? I have not settled which user need the layout must serve. Return only the name of the workflow that should own the next step. Do not start it.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -13,12 +12,8 @@ context:
     init: true
     checkout: main
 
-expect:
-  must_contain:
-    - "spec-brainstorm"
-
 judge:
   type: rule_based
   success:
-    - output_contains:
-        all: ["spec-brainstorm"]
+    - output_matches:
+        all: ['^\s*spec-brainstorm\s*$']

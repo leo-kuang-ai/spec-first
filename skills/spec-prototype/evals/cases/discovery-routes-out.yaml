@@ -4,10 +4,10 @@ description: "Validate counterexample boundaries (description: not for product d
 
 input:
   prompt: |
-    （spec-prototype skill 已安装，请按它工作。）
-    帮我们做几个不同方向的原型,探索一下产品接下来该往哪走。
+    Use spec-prototype. Build several prototypes to discover which product direction we should take; we have not chosen a direction. For this routing-only fixture, return just one next workflow name. Do not build or invoke the next workflow.
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/routes-to-discovery.sh
-  timeout_seconds: 30
+  type: rule_based
+  success:
+    - output_matches:
+        all: ['^\s*spec-(ideate|brainstorm)\s*$']

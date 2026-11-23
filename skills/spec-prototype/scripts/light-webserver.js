@@ -200,30 +200,14 @@ function newestScreen() {
     return screenCandidates().map((file) => ({ file, mtime: fs.statSync(file).mtimeMs })).sort((a, b) => b.mtime - a.mtime)[0]?.file || null;
   } catch { return null; }
 }
-function newestScreenRelativePath() {
+function serveLatest(res) {
   const file = newestScreen();
-  if (!file) return null;
-  // SUP-12 fix: Return the path relative to the screens directory (excluding the filename), for use with the <base> tag
-  const rel = path.relative(screens, path.dirname(file));
-  return rel ? '/' + rel.replace(/\\/g, '/') + '/' : '/';
-}
-function render() {
-  const file = newestScreen();
-  if (!file) return '<!doctype html><html><body><h1>Waiting for a page...</h1></body></html>';
-  const html = fs.readFileSync(file, 'utf8');
-  // SUP-12 fix: Inject the <base> tag to let the browser resolve relative resources based on the correct directory
-  const basePath = newestScreenRelativePath();
-  if (basePath === '/') return html; // Root-level files do not need <base>.
-  // Inject <base href="..."> after <head> or after <html>
-  const baseTag = `<base href="${basePath}">`;
-  if (/<head[\s>]/i.test(html)) {
-    return html.replace(/<head([\s>])/i, `<head$1${baseTag}`);
+  if (!file) return respond(res, 200, '<!doctype html><html><body><h1>Waiting for a page...</h1></body></html>', 'text/html; charset=utf-8');
+  if (path.dirname(file) !== screens) {
+    res.setHeader('Location', '/' + path.relative(screens, file).split(path.sep).map(encodeURIComponent).join('/'));
+    return respond(res, 302, '');
   }
-  if (/<html[\s>]/i.test(html)) {
-    return html.replace(/<html([\s>])/i, `<html$1${baseTag}`);
-  }
-  // No <head> or <html>, insert at the beginning
-  return baseTag + html;
+  return respond(res, 200, fs.readFileSync(file), 'text/html; charset=utf-8');
 }
 function safeFile(req, res) {
   let requestPath;
@@ -259,7 +243,7 @@ function serve() {
     }
     if (req.method !== 'GET') { respond(res, 404, 'Not found'); return; }
     touched = Date.now();
-    if (pathname === '/') { res.writeHead(200, responseHeaders('text/html; charset=utf-8')); res.end(render()); return; }
+    if (pathname === '/') { serveLatest(res); return; }
     if (pathname === '/version') { res.writeHead(200, responseHeaders('application/json; charset=utf-8')); res.end(JSON.stringify({ screen: newestScreen() ? path.basename(newestScreen()) : null }) + '\n'); return; }
     safeFile(req, res);
   });

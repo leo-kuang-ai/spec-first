@@ -125,6 +125,9 @@ for row in rows:
     dim = row["dimension"].strip()
     per_dim.setdefault(dim, []).append(row)
 
+assessed_hard = {row["dimension"] for row in rows if row["tier"] == "hard" and row["classification"] == "regression-eligible"}
+print("HARD assessed: " + (", ".join(sorted(assessed_hard)) or "none"))
+print("HARD not assessed: " + (", ".join(sorted(HARD_DIMS - assessed_hard)) or "none"))
 print("per-dim contributions:")
 present, unavailable = [], []
 for dim in WEIGHTS:

@@ -381,6 +381,12 @@ checkFixture({
   }
 }, {"README.md":["# MiniLedger","# MiniLedger (edited)"]}, {});
 
+assert.equal(git('branch', '--show-current').trim(), 'feature/eval-draft');
+assert.equal(git('rev-parse', 'eval-base').trim(), git('rev-parse', 'HEAD^').trim());
+assert.equal(git('diff', '--name-only', 'eval-base...HEAD').trim(), 'RELEASE.md');
+assert.equal(git('show', 'HEAD:RELEASE.md'), 'First offline ledger preview.\n');
+assert.equal(regular('RELEASE.md').toString(), git('show', 'HEAD:RELEASE.md'), 'Drafting changed the released file');
+
 rejectRecordedRemoteWrites();
 const message = process.env.EVAL_FINAL_MESSAGE ?? '';
 const lines = message.split('\n');
@@ -396,4 +402,5 @@ assert.ok(titleIndex >= 0, 'PR description is missing a non-empty title');
 const body = lines.slice(titleIndex + 1).join('\n');
 assert.ok(body.replace(/\s/g, '').length >= 10, 'PR description has no overview or change summary');
 
+assert.ok(body.includes('RELEASE.md'), 'The requested changed-file reference is absent');
 EVAL_JUDGE_NODE

@@ -2,12 +2,13 @@ id: resume-sparse-source-degraded-orientation
 title: Sparse-source resume preserves uncertainty and does not act
 description: |
   Check protected fixture bytes, HEAD and index against an explicit baseline.
-  Behavioral repair cases exercise the actual HTTP outcome.
+  Check that the handoff distinguishes a named source from verified work and a known next task.
 input:
   prompt: |
     First run `node prepare-eval.cjs` once in this isolated fixture.
     Only preparation may create a baseline commit; it grants no task commit or landing authority.
     Use spec-handoff: resume docs/notes/vague-progress.md. I only want to inspect the previous progress.
+    For this fixture return just a JSON object: source (the relative note path), verified_changes (an array of changes the note verifies), and next_step_known (whether the note establishes the next task). Do not infer answers from other notes.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger-with-prior-handoff
   git:

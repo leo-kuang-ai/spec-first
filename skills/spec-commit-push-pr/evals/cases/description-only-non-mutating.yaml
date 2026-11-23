@@ -5,12 +5,12 @@ description: |
   runner tool calls; text containing an authorization word does not prove a boundary.
 input:
   prompt: |
-    First run `node prepare-eval.cjs` once. Only this preparation may create the baseline commit and pending README edit. Then use spec-commit-push-pr in description-only mode to draft a PR description for the current diff. Do not stage, commit, push, create a PR or edit an existing PR.
+    Run `node prepare-eval.cjs --draft-range` once. Only this fixture preparation may create the local base and feature commits and a pending edit. Use spec-commit-push-pr in description-only mode. The supplied offline base is eval-base in this checkout; describe its committed difference to HEAD, citing the exact changed file in the body. Ignore pending changes. Do not stage, commit, contact a remote, push, create or update a PR.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
   git:
     init: true
-    checkout: main
+    checkout: feature/eval-draft
 constraints:
   timeout_seconds: 600
   max_turns: 25
