@@ -133,6 +133,8 @@ function resolveWorkspaceTargets({
     reasonCode = manifestError;
   } else if (ambiguous.length > 0) {
     reasonCode = 'workspace-targets-ambiguous';
+  } else if (rejected.some(isDeclaredRejection)) {
+    reasonCode = 'workspace-declared-targets-rejected';
   } else if (!hasTargets) {
     reasonCode = allowDiscovery ? 'workspace-no-review-targets' : 'workspace-no-declared-repos';
   }
@@ -148,10 +150,23 @@ function resolveWorkspaceTargets({
     rejected,
     excluded: Array.from(exclusions).sort(),
     reason_code: reasonCode,
-    next_action: ambiguous.length > 0
+    next_action: reasonCode === 'workspace-declared-targets-rejected'
+      ? '核对 rejected 中每个声明路径及原因，修正 --repos 或工作区清单后重试。'
+      : ambiguous.length > 0
       ? '消除重复 alias 或嵌套仓歧义后重试；不要静默选择其中一个仓。'
       : (hasTargets ? '' : '提供 --repos <child> 或在 .spec-first/workspace.yaml 声明仓,或从含子 Git 仓的父目录运行。'),
   };
+}
+
+function isDeclaredRejection(entry) {
+  return entry.source === 'cli' || entry.source === 'manifest';
+}
+
+function workspaceTargetError(targets) {
+  const rejected = (targets.rejected || []).filter(isDeclaredRejection);
+  const reasonCode = targets.manifest_error || (targets.ambiguous.length ? 'workspace-targets-ambiguous' : '')
+    || (rejected.length ? 'workspace-declared-targets-rejected' : '');
+  return reasonCode ? { reason_code: reasonCode, rejected, next_action: targets.next_action } : null;
 }
 
 function resolveDeclaredRepo(workspaceRoot, relPath) {
@@ -271,6 +286,7 @@ function baseResult(workspaceRoot, overrides) {
 
 module.exports = {
   resolveWorkspaceTargets,
+  workspaceTargetError,
   MANIFEST_RELATIVE_PATH,
   MANIFEST_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION,

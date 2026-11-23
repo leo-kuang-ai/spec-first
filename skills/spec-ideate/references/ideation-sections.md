@@ -17,6 +17,12 @@ the candidates were qualified against, and a record of what was cut. It
 is a human-facing discovery document, not a requirements doc or plan —
 keep it about the ideas and their basis, not implementation.
 
+In either format, put a short lead immediately below the title, before the
+grounding context: name the leading candidate, the evidence or reasoning
+that puts it first, and its largest tradeoff in the reader's terms. Ranking
+is not approval. If no candidate survives, say why instead of naming a winner.
+Leave the full comparison in Ranked Ideas; no new heading or metadata field.
+
 ### Metadata
 
 - **date** — composition date (YYYY-MM-DD).
@@ -154,6 +160,8 @@ mode: <repo-grounded | elsewhere-software | elsewhere-non-software>
 ---
 
 # Ideation: <Title>
+
+[Leading candidate, why it ranks first, and its main tradeoff; if none survived, say why.]
 
 ## Grounding Context
 [Grounding summary from Phase 1 — "Codebase Context" in repo mode, "Topic Context" in elsewhere mode]

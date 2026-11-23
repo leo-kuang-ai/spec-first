@@ -4,8 +4,7 @@ description: "Verify that when the gate:pulse_product_name configuration is not 
 
 input:
   prompt: |
-    （spec-product-pulse skill 已安装，请按它工作。）
-    给我出一份产品脉搏报告。
+    Use spec-product-pulse. Give me a product pulse report.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -13,7 +12,12 @@ context:
     init: true
     checkout: main
 
+expect:
+  files_not_exist: [docs/pulse-reports]
+
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - Begin setting up the unconfigured product by confirming its name or the first signal to track. Do not fabricate observations, deliver an empty report or treat a question about an unrelated topic as setup.
+  pass_threshold: 1

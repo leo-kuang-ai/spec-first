@@ -6,6 +6,8 @@ This directory contains maintainer evidence and is not projected to runtime. `tr
 - `node skills/spec-write-skill/evals/export-trigger-evals.cjs --format skill-creator` can output the shape of `evals.json` for `skill-creator`.
 - `node skills/spec-write-skill/evals/export-trigger-evals.cjs --format yao` can output the three-bucket shape of the Yao trigger evaluator.
 - Export addresses only schema portability and does not generate semantic, baseline, or field evidence.
+
+`mirror-patch-refused.yaml` tests the decision after explicit invocation, not whether the Skill triggers naturally. The source and mirror fixtures start as separate files with identical bytes. When changing that baseline, update both files and verify the digest pinned in the judge. The judge checks the refusal decision, source path, refresh command, final file digests, and runner trace separately. Recognized read-only calls can be graded automatically; unknown calls need manual review. A correct reply without a trace returns a nonzero exit code. Even a pass does not establish the absence of all side effects.
 - When adding a new case, concurrently verify `expected_trigger`, `expected_effect`, `expected_layer_result`, `reason_code`, `forbidden_signals`, and `source_refs`, and run `npm run test:eval-fixtures`.
 
 ## Promotion Protocol

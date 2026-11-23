@@ -266,9 +266,18 @@ function validateAuthoringPreview({ manifest, authorizedRoot, scope, writeSet })
     const dirtyProtectedPaths = new Set([...manifestPaths, ...normalizedPathSet(manifest.generated || [])]);
     const dirtyOverlaps = [...dirtyProtectedPaths].filter((filePath) => dirtyPaths.has(filePath));
     for (const filePath of dirtyOverlaps) {
-      const record = Array.isArray(manifest.dirty_overlap) && manifest.dirty_overlap.find((entry) => entry && entry.path === filePath);
+      const records = Array.isArray(manifest.dirty_overlap) ? manifest.dirty_overlap.filter((entry) => entry && entry.path === filePath) : [];
+      if (records.length > 1) {
+        add('dirty_overlap_duplicate', 'dirty-overlap', 'error', filePath, 'Each overlapping dirty path must have exactly one disposition.');
+        continue;
+      }
+      const [record] = records;
       if (!record || !SHA256.test(record.current_sha256 || '') || !['replace', 'preserve'].includes(record.disposition) || record.authorization !== true) {
         add('dirty_overlap_disposition_missing', 'dirty-overlap', 'error', filePath, 'Dirty overlap requires current hash, disposition, and explicit authorization.');
+        continue;
+      }
+      if (manifestPaths.has(filePath) && record.disposition !== 'replace') {
+        add('dirty_overlap_write_conflict', 'dirty-overlap', 'error', filePath, 'A dirty file marked for preservation cannot appear in the write set.');
         continue;
       }
       const absolute = resolveWithin(root, filePath);

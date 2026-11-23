@@ -399,7 +399,29 @@ assert.ok(!report.artifact_path.includes('..'), 'artifact_path must not traverse
 const artifactPath = path.relative(fs.realpathSync(process.cwd()), fs.realpathSync(path.resolve(report.artifact_path)));
 assert.ok(artifactPath.startsWith('docs/pulse-reports/'));
 const saved = regular(artifactPath).toString();
-assert.ok(saved.includes('1200') && saved.includes('permission-denied'));
+let fence = '';
+const lines = saved.replace(/<!--[\s\S]*?(?:-->|$)/g, '').split(/\r?\n/).map(line => {
+  const marker = /^ {0,3}(\x60{3,}|~{3,})(.*)$/.exec(line);
+  if (fence) {
+    if (marker && marker[1].startsWith(fence) && !marker[2].trim()) fence = '';
+    return '';
+  }
+  if (marker) { fence = marker[1]; return ''; }
+  return /^(?: {4}|\t)/.test(line) ? '' : line.trim();
+});
+const cells = line => line.replace(/^\||\|$/g, '').split('|').map(cell => cell.trim());
+const headers = lines.flatMap((line, index) => cells(line).map(cell => cell.toLowerCase()).join('|') === 'metric|source|state|value' ? [index] : []);
+assert.equal(headers.length, 1, 'Expected one metric table');
+const start = headers[0];
+const divider = cells(lines[start + 1] || '');
+assert.ok(divider.length === 4 && divider.every(cell => /^:?-{3,}:?$/.test(cell)), 'Missing table divider');
+const rows = [];
+for (let index = start + 2; index < lines.length && lines[index].includes('|'); index++) rows.push(cells(lines[index]));
+assert.equal(rows.length, report.metrics.length, 'Expected one table row per metric');
+for (const metric of report.metrics) {
+  const matches = rows.filter(row => row[0] === metric.name);
+  assert.deepEqual(matches, [[metric.name, metric.source, metric.state, metric.value === null ? 'n/a' : String(metric.value)]], 'Saved observation differs from the returned metric: ' + metric.name);
+}
 rejectRecordedRemoteWrites();
 
 EVAL_JUDGE_NODE

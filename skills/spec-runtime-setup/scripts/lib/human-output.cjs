@@ -50,6 +50,10 @@ function diagnosticNextActions(payload = {}, { liveBaselineFailures, requiredPro
   const actions = [];
   let blocking = false;
   const project = payload.project || {};
+  if (project.local_config_status === 'invalid') {
+    actions.push(project.local_config_next_action || '检查 .spec-first/config.local.yaml 的内容，修正后重新检查。');
+    blocking = true;
+  }
   if (project.inside_git_repo && (
     project.example_config_status !== 'ok'
     || project.local_config_gitignore_status === 'missing'

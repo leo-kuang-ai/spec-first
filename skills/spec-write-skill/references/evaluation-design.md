@@ -1,6 +1,10 @@
 # Shape-Aware Evaluation Design
 
-**trigger_condition:** full apply has confirmed a single source owner and needs a baseline, protected behavior, and a pre-patch eval plan before writing the core. **must_read:** read fully for full apply; Tier A behavior-preserving revise does not trigger this reference. **fallback_if_unread:** do not begin a full apply source patch; report structural-only evidence without claiming a baseline, semantic adequacy, or behavioral improvement. **eval_case:** `prepatch-entry-governor`.
+**trigger_condition:** full apply has confirmed a single source owner and needs a baseline, protected behavior, and a pre-patch eval plan before writing the core.
+
+**must_read:** For full apply, read the entire reference. Skip it for Tier A copy edits. For a behavior-preserving move, read only [Restructure Coverage](#restructure-coverage); no full Design Record is required.
+
+**fallback_if_unread:** do not begin a full apply source patch; report structural-only evidence without claiming a baseline, semantic adequacy, or behavioral improvement. **eval_case:** `prepatch-entry-governor`.
 
 Prefer the target project's existing native eval owner. If none exists, create target-local maintainer cases; do not turn the `spec-write-skill` promotion validator into a general platform. A behavioral subject receives raw source, the real request, and artifacts without the intended fix.
 

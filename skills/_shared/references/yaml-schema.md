@@ -1,6 +1,6 @@
 # YAML Frontmatter Schema
 
-`schema.yaml` in this directory is the canonical contract for `docs/solutions/` frontmatter written by `spec-compound`.
+Use `references/schema.yaml` in the active `spec-compound` or `spec-compound-refresh` package for the canonical `docs/solutions/` frontmatter contract. In the source repository this shared directory owns the guide, not the schema. The package's `assets/resolution-template.md` owns the body: in its opening problem or context paragraph tell the reader what they will observe and which fix or practice applies, including a material limit. Do not add summary metadata.
 
 Use this file as the quick reference for:
 - required fields
@@ -60,7 +60,7 @@ Every **new or materially rewritten learning**, in either track, must include:
 
 If the condition depends on external issues, versions, or behavioral dependencies, specify which external change would render the recommendation invalid, and describe how to perform a read-only verification of refresh. Remove workaround, upgrade dependencies, and rerun CI verification steps in the main body; do not pretend external conditions have been met. Retain `invalidation_condition`; do not add a synonymous retirement field in parallel; no batch migration of legacy documents that have not been modified.
 
-Run `scripts/validate-frontmatter.py --promotion <doc-path>` after writing a new learning, materially rewriting an existing learning, or writing a replacement successor. Default validator mode remains parser-safety-only so untouched legacy docs are not forced through a bulk migration.
+Use the package's `scripts/validate-frontmatter.py --promotion <doc-path>` on the candidate before publication. This adds checks for the two promotion fields to the default parser-safety checks; it does not validate all enums, prove the references support the claim or establish that the advice is still current. Check the remaining schema rules and evidence separately. Untouched legacy docs do not require bulk migration.
 
 ## Bug Track Fields
 

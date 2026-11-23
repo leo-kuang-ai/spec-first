@@ -74,7 +74,7 @@ echo "$RUN_DIR"
 
 ### Phase 3: Compose the explainer
 
-Read the rendering reference for the resolved format **now**, not earlier: `references/explainer-html.md` (default) or `references/explainer-markdown.md` (when intake resolved `output:md`). Compose per its contract — visible metadata header, show-n-tell form matched to the material, ~70ch measure, single self-contained file — and read `references/check-in.md` with it: it owns whether the artifact ends with a `Check yourself` section and that section's shape. The run never blocks on the check-in — no offer, no prediction turn, no exercise posed in chat; the section is static text the reader works through alone, so a user who switches away never comes back to a waiting question. Write the artifact to `$RUN_DIR/explainer.html` (or `$RUN_DIR/explainer.md` when intake resolved `output:md`) before anything else happens with it. Display it to the user (inline summary plus the file path; open locally per Phase 4 when chosen). The artifact exists at that stable path from this moment — a declined destination ask never loses it.
+Read the rendering reference for the resolved format **now**, not earlier: `references/explainer-html.md` (default) or `references/explainer-markdown.md` (when intake resolved `output:md`). Compose per its contract and read `references/check-in.md` with it. The self-check is static text; never wait for a reader's answer. Write the artifact to `$RUN_DIR/explainer.html` (or `$RUN_DIR/explainer.md`), then present a short summary. That first copy is a preview in private scratch. Complete Phase 4 before reporting the durable delivery path, including when a destination is declined.
 
 ### Phase 4: Destination ask and close
 

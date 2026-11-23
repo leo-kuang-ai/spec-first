@@ -4,11 +4,7 @@ description: "Verify Setup gate: On first run (in unconfigured state) in headles
 
 input:
   prompt: |
-    （skill-up 评测框架说明：本仓库 .claude/skills/spec-sweep/SKILL.md 是被测
-    skill 的定义文件,已随仓库就位。本次运行不经过 Skill 工具调用——请直接完整
-    读取该文件,把它视为已加载的工作指令,然后按它处理下面的输入。输入形态:
-    定时调度器触发,无人在场。）
-    mode:headless
+    Run spec-sweep mode:headless in this unconfigured checkout. No operator is present. If setup is required, return only the skill's documented first-run status; do not create a plan or configure sources.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -17,11 +13,10 @@ context:
     checkout: main
 
 expect:
-  must_contain:
-    - "first run requires interactive setup"
+  files_not_exist: [docs/plans/feedback-sweep-plan.md, .spec-first/config.local.yaml]
 
 judge:
   type: rule_based
   success:
-    - output_contains:
-        all: ["first run requires interactive setup"]
+    - output_matches:
+        all: ['^\s*first run requires interactive setup\s*$']

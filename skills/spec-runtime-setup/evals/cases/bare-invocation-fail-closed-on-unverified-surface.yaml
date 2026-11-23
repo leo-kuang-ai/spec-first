@@ -1,16 +1,12 @@
 id: bare-invocation-fail-closed-on-unverified-surface
-title: "Surface-level naked calls on non-true hosts must be fail-closed and have zero side effects."
+title: "Bare setup on an unverified host surface is blocked without changing the watched files"
 description: "Verify host authority fail-closed gate: in the skill-up sandbox, the skill loading surface is not the actual host surface; bare mutation calls must be blocked + reason_code = host-invocation-surface-unverified + structured reporting, and no .spec-first/home writes shall occur. Note: the successful mutation path, after passing this gate, is deemed \"sandbox structurally untestable\" — the security gate effectively prevents mutations from non-authentic surfaces; the successful path requires a genuine host harness (recorded in Appendix A of the evaluation plan)."
 
 input:
   prompt: |
-    这是一个隔离评测工作区（spec-runtime-setup skill 已安装，请按它工作）。
-    环境准备说明（仅用于评测隔离，不属于被测行为）：本次运行请以
-    `HOME="$PWD/.eval-home"` 环境变量调用共置 setup 脚本，使所有
-    home 级写入落在工作区内。
-    请按 skill 对当前宿主执行 bare 调用（registry baseline，不带
-    --check/--plan），完成后汇报 readiness 结果。bare 调用本身不要
-    重定向输出：阻断证据需要直接出现在该调用的结果中。
+    Use the installed spec-runtime-setup skill in this isolated workspace. Use read tools to locate its companion script.
+    From the fixture root, run MCP_SETUP_HOST=claude HOME="$PWD/.eval-home" node "<loaded skill directory>/scripts/setup.cjs" directly in Bash.
+    Use the actual path. The only optional argument is --json. Do not redirect the output; report the result of this invocation.
 
 context:
   repo_fixture: evals/fixtures/repos/setup-target

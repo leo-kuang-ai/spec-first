@@ -14,7 +14,7 @@
 const path = require('node:path');
 const { performance } = require('node:perf_hooks');
 const { isAbsolutePath } = require('./path-safety.cjs');
-const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
+const { resolveWorkspaceTargets, workspaceTargetError } = require('./workspace-target.cjs');
 const { buildWorkspaceGraphs } = require('./workspace-graph-build.cjs');
 const { makeWorkspaceRunners } = require('./workspace-provider-runners.cjs');
 const { injectRoutingInstruction } = require('./workspace-routing-inject.cjs');
@@ -72,24 +72,13 @@ function runWorkspaceGraphBuild({
       build: null,
     };
   }
-  if (targets.manifest_error) {
+  const selectionError = workspaceTargetError(targets);
+  if (selectionError) {
     return {
       schema_version: 'workspace-graph-executor.v1',
       status: 'failed',
       topology: targets.topology,
-      reason_code: targets.manifest_error,
-      workspace_root: targets.workspace_root,
-      targets,
-      pending_confirm: [],
-      build: null,
-    };
-  }
-  if (targets.ambiguous.length > 0) {
-    return {
-      schema_version: 'workspace-graph-executor.v1',
-      status: 'failed',
-      topology: targets.topology,
-      reason_code: 'workspace-targets-ambiguous',
+      ...selectionError,
       workspace_root: targets.workspace_root,
       targets,
       pending_confirm: [],

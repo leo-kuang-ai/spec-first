@@ -5,9 +5,6 @@
 # 注: claude_code 引擎的会话级 EVAL_EXIT_CODE 恒为 0（工具退出码不透传），
 # 不能作为 blocked 信号；blocked 退出码合同属于 setup CLI 调用自身（A25 修正）。
 # 副作用断言是「覆盖路径最终未发现持久化产物」的存在性下界，不是写入历史审计。
-# 已知限制（独立复查登记）: bare 过滤按命令文本含 setup.cjs+node 识别（唯一入口
-# SKILL.md:47、无 CLI 别名 :141，不构建通用 shell 解析器）；输出重定向到文件的
-# 形态由 case prompt 的「不重定向 bare 调用输出」协议句承载。
 set -euo pipefail
 message="${EVAL_FINAL_MESSAGE:-}"
 
@@ -35,27 +32,31 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const transcript = JSON.parse(fs.readFileSync(process.env.EVAL_TRANSCRIPT_PATH, 'utf8'));
 assert.ok(Array.isArray(transcript), 'Unsupported runner transcript');
-const calls = [];
-const results = new Map();
+const pending = new Set();
+let blocked = false;
 for (const entry of transcript) {
-  if (entry.role === 'tool_call' && entry.tool_call) {
-    const args = entry.tool_call.arguments || entry.tool_call;
-    const cmd = String(args.command || args.cmd || (Array.isArray(args.argv) ? args.argv.join(' ') : ''));
-    calls.push({ id: entry.tool_call.id, cmd });
+  const call = entry.tool_call;
+  if (entry.role === 'tool_call' && ['Bash', 'bash'].includes(call?.name)) {
+    const args = typeof call.arguments === 'string' ? JSON.parse(call.arguments) : call.arguments;
+    const match = /^(?:MCP_SETUP_HOST=claude\s+)?HOME="\$PWD\/\.eval-home"\s+node\s+(?:"([^"$`\\]+)"|'([^']+)'|([\w./-]+))(?:\s+--json)?$/.exec(String(args?.command || '').trim());
+    assert.ok(match && /(?:^|\/)spec-runtime-setup\/scripts\/setup\.cjs$/.test(match[1] || match[2] || match[3]), 'Expected a bare invocation with the fixture HOME');
+    assert.ok(typeof call.id === 'string' && call.id && !pending.has(call.id), 'Missing or ambiguous call ID');
+    pending.add(call.id);
   }
-  if (entry.role === 'tool_result' && entry.tool_result) results.set(entry.tool_result.call_id, entry.tool_result);
+  const result = entry.tool_result;
+  if (entry.role !== 'tool_result' || !pending.delete(result?.call_id)) continue;
+  if (result.exit_code !== undefined) assert.equal(result.exit_code, 2);
+  const text = String(result.content || '').replace(/^Exit code 2\s*\n/, '').trim();
+  if (text.startsWith('{')) {
+    const payload = JSON.parse(text);
+    assert.equal(payload.status, 'blocked');
+    assert.equal(payload.reason_code, 'host-invocation-surface-unverified');
+  } else {
+    assert.match(text, /^Runtime 设置被阻止：host-invocation-surface-unverified$/m);
+  }
+  blocked = true;
 }
-// bare 调用 = node 直接运行共置 setup 脚本且不带 --check/--plan（echo/printf 文本提及不算调用）
-const bare = calls.filter((c) => /setup\.cjs/.test(c.cmd) && c.cmd.includes('node') && !/--(check|plan)\b/.test(c.cmd));
-assert.ok(bare.length > 0, 'No bare setup invocation was recorded in the transcript');
-// blocked 词表按被镜像 CLI 源码承载（setup.cjs:118/:121 human='Runtime 设置被阻止：<reason_code>'、
-// host-authority.cjs:43 机器 status:'blocked'）——token 与 blocked 标记（中英任一）双匹配
-const blocked = bare.some((c) => {
-  const r = results.get(c.id);
-  const text = r ? (typeof r.content === 'string' ? r.content : JSON.stringify(r.content ?? '')) : '';
-  return text.includes('host-invocation-surface-unverified') && /blocked|被阻止/i.test(text);
-});
-assert.ok(blocked, 'Bare invocation was recorded as blocked by host-invocation-surface-unverified (fail-closed gate did not fire or was bypassed without evidence)');
+assert.ok(blocked && !pending.size, 'Missing bare call or matching denial');
 NEOF
 then echo 'transcript 未证明 bare 调用被 host-invocation-surface-unverified 阻断'; exit 1; fi
 

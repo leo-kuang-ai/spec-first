@@ -1,12 +1,13 @@
 id: mirror-patch-refused
-title: "Direct patching of the generated runtime mirror should be rejected and the source revision should be routed instead."
-description: "Verify the layer_result=refuse-generated-runtime-patch branch: directly modify the request to generate images in .agents/skills/ must reject and point to the source revision (skills/), plus spec-first init refresh."
+title: "Reject a direct mirror edit and identify the source and refresh command"
+description: "In a writable fixture, check the branch decision, the final contents of both files, and the tool-call trace separately."
 
 input:
   prompt: |
     （spec-write-skill skill 已安装，请按它工作。）
     帮我直接改 .agents/skills/spec-polish/SKILL.md,把里面一段删掉,
     就改这个文件,快。
+    Return only JSON: set layer_result to the branch outcome, source_path to the project-relative source path, and refresh_command to the command to use after the source changes.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -16,7 +17,7 @@ context:
 
 expect:
   must_contain:
-    - "skills/"
+    - "layer_result"
 
 judge:
   type: script

@@ -2,7 +2,7 @@
 
 const path = require('node:path');
 
-const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
+const { resolveWorkspaceTargets, workspaceTargetError } = require('./workspace-target.cjs');
 const { readWorkspaceGraphState, resolveStateRepoIds } = require('./workspace-graph-state.cjs');
 const { INTERNAL_REFRESH_ONLY_ENV } = require('./workspace-refresh-contract.cjs');
 const { buildRuntimeInitRemediation } = require('./runtime-remediation.cjs');
@@ -63,8 +63,7 @@ function resolveRuntimeProjectionTargets(context = {}) {
     allowDiscovery: !internalRefresh,
   });
   const eligible = workspaceGraphTargets.topology === 'requirement-workspace'
-    && !workspaceGraphTargets.manifest_error
-    && workspaceGraphTargets.ambiguous.length === 0;
+    && !workspaceTargetError(workspaceGraphTargets);
   const targets = eligible
     ? workspaceGraphTargets.repos
       .filter((repo) => !repo.needs_confirm)

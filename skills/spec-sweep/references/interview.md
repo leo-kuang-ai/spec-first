@@ -13,7 +13,7 @@ Ask **one question at a time** using the platform's blocking question tool: the 
 1. **One source at a time, fully.** Sections 1-3 form a per-source loop: for each source, capture its identity, its acknowledgment actions plus standing approval, and its sensitivity flag before moving to the next source. Do not batch these across sources — a user answering "approve writes" needs to know *which* source they are approving.
 2. **Standing approval is consent, captured verbatim.** Section 2's approval question authorizes source-side writes (Slack reactions, GitHub labels) on every future run with no per-run confirmation. Record the literal yes/no. A "no" is not a failure — it leaves that source read-only.
 3. **Defaults are shown, not silently applied.** Every question with a default states the default in the question. The user accepts or overrides; you never pick for them.
-4. **Capture in the user's own terms.** Config ids, emoji names, and label names are read by the whole team and used verbatim by the connectors — record exactly what the user gives.
+4. **Capture in the user's own terms.** Configuration is machine-local. The connectors use its ids, emoji names and label names verbatim; confirm the exact values.
 
 ---
 

@@ -108,6 +108,8 @@ function runWorkspaceBatch(context, dependencies = {}) {
       const childStatus = summarizeChildExecution(child, {
         mode: batchContext.actionPlan.mode,
         selectedIds: batchContext.actionPlan.selected_ids,
+        installationOnly: batchContext.actionPlan.args.installationOnly === true,
+        providerIds: batchContext.effectiveRegistry && (batchContext.effectiveRegistry.providers || []).map((entry) => entry.id),
       }, firstSelectedProviderFailure);
       return {
         repo_label: candidate.repo_label,
@@ -372,7 +374,7 @@ function sharedHostPhaseFailureResult(context, candidates, sharedHostPhase) {
   };
 }
 
-function summarizeChildExecution(child, { mode, selectedIds = [] } = {}, firstSelectedProviderFailure) {
+function summarizeChildExecution(child, { mode, selectedIds = [], installationOnly, providerIds } = {}, firstSelectedProviderFailure) {
   if (!child || child.exit_code !== 0) {
     return {
       overall_status: 'action-required',
@@ -380,7 +382,13 @@ function summarizeChildExecution(child, { mode, selectedIds = [] } = {}, firstSe
     };
   }
   const executionSummary = child.payload && child.payload.execution_summary;
-  if (executionSummary && executionSummary.overall_status !== 'ready') {
+  const scopedSuccess = mode === 'verify' && executionSummary
+    && executionSummary.overall_status === 'partial' && executionSummary.reason_code === 'subset-setup-complete'
+    && executionSummary.scope === (installationOnly ? 'installation' : 'subset')
+    && Array.isArray(executionSummary.selected_ids)
+    && executionSummary.selected_ids.length === selectedIds.length
+    && selectedIds.every((id) => executionSummary.selected_ids.includes(id));
+  if (executionSummary && executionSummary.overall_status !== 'ready' && !scopedSuccess) {
     return {
       overall_status: executionSummary.overall_status,
       reason_code: executionSummary.reason_code || 'child-setup-partial',
@@ -390,7 +398,8 @@ function summarizeChildExecution(child, { mode, selectedIds = [] } = {}, firstSe
     child.payload && child.payload.tool_facts
       ? child.payload.tool_facts.provider_readiness
       : [],
-    selectedIds,
+    providerIds ? selectedIds.filter((id) => providerIds.includes(id)) : selectedIds,
+    { installationOnly },
   );
   if (providerFailure) {
     return {
@@ -439,6 +448,9 @@ function summarizeChildExecution(child, { mode, selectedIds = [] } = {}, firstSe
       reason_code: 'generated-runtime-manifest-refresh-required',
     };
   }
+  if (scopedSuccess && manifest.status !== 'current') {
+    return { overall_status: 'action-required', reason_code: manifest.reason_code || 'child-manifest-unverified' };
+  }
   return { overall_status: 'ready', reason_code: null };
 }
 
@@ -466,6 +478,7 @@ function buildVerifyChildResult(child, candidate, context) {
   if (childRemediation) nextActions.push(childRemediation.next_action);
   return {
     schema_version: 'mcp-verify-child-result.v1',
+    execution_summary: payload.execution_summary || null,
     baseline_ready: setupSummary.baseline_ready === true,
     generated_runtime_manifest: manifest,
     tool_facts_status: payload.write_result && payload.write_result.status
@@ -607,7 +620,7 @@ function buildWorkspaceVerifySummary(context, results, computeGeneratedRuntimeMa
     next_action: manifestRefreshRequired
       ? '按 runtime_init_actions 中与目标 topology 对应的 cwd + argv 刷新 runtime，然后重新 verify。'
       : (overallStatus === 'ready'
-        ? '所有 child repo 均已验证必需 MCP/helper dependency readiness。父目录双层图请用 --workspace-graph --repos <清单> 构建/复核（勿用 --workspace-graph --all-repos）。'
+        ? '所有 child repo 均已通过请求范围的验证；逐仓范围见 result.execution_summary，安装接线成功不证明已构图或查询。'
         : '检查每个 child 的 reason_code，并为 action-required repo 重新运行 setup/verify。'),
     dual_path_hint: {
       child_batch_verify: 'spec-runtime-setup --verify-only --all-repos',

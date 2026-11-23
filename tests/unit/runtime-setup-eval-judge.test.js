@@ -13,7 +13,7 @@ describe('runtime setup 只读 Judge 校准', () => {
   let workspace;
   const run = (overrides = {}) => spawnSync('bash', [script], {
     cwd: workspace,
-    env: { ...process.env, EVAL_FINAL_MESSAGE: '已检查 readiness。', EVAL_EXIT_CODE: '0', ...overrides },
+    env: { ...process.env, EVAL_FINAL_MESSAGE: '已检查 readiness。', EVAL_EXIT_CODE: '0', EVAL_TRANSCRIPT_PATH: path.join(workspace, 'trace.json'), ...overrides },
     encoding: 'utf8',
   });
 
@@ -23,6 +23,10 @@ describe('runtime setup 只读 Judge 校准', () => {
     fs.mkdirSync(path.join(workspace, '.claude'));
     fs.writeFileSync(path.join(workspace, '.claude/settings.json'), '{}\n');
     fs.writeFileSync(path.join(workspace, '.mcp.json'), '{}\n');
+    fs.writeFileSync(path.join(workspace, 'trace.json'), JSON.stringify([
+      { role: 'tool_call', tool_call: { id: 'check', name: 'Bash', arguments: { command: 'node ".claude/skills/spec-runtime-setup/scripts/setup.cjs" --check --json' } } },
+      { role: 'tool_result', tool_result: { call_id: 'check', content: JSON.stringify({ schema_version: 'spec-runtime-setup-preflight.v2', target: { target_kind: 'git-repo', target_root: workspace }, provider_readiness: [], mcp_servers: [] }) } },
+    ]));
   });
 
   afterEach(() => fs.rmSync(workspace, { recursive: true, force: true }));
@@ -31,6 +35,30 @@ describe('runtime setup 只读 Judge 校准', () => {
     expect(run().status).toBe(0);
     expect(run({ EVAL_EXIT_CODE: '1' }).status).not.toBe(0);
     expect(run({ EVAL_FINAL_MESSAGE: '' }).status).not.toBe(0);
+  });
+
+  test('实际 setup 诊断结果能被当前工作区的 judge 消费', () => {
+    const { runSetup } = require('../../skills/spec-runtime-setup/scripts/setup.cjs');
+    expect(spawnSync('git', ['init', '--template=', '-q', workspace]).status).toBe(0);
+    const diagnostic = runSetup({ cwd: workspace, argv: ['--check', '--json'], homeDir: workspace, env: {}, runner: () => ({ exit_code: 1 }) });
+    const tracePath = path.join(workspace, 'trace.json');
+    const trace = JSON.parse(fs.readFileSync(tracePath, 'utf8'));
+    trace[1].tool_result.content = JSON.stringify(diagnostic.payload);
+    trace[1].tool_result.exit_code = diagnostic.exit_code;
+    fs.writeFileSync(tracePath, JSON.stringify(trace));
+    expect(run().status).toBe(0);
+  });
+
+  test('缺调用、缺结果、结果不配对、目标错误均不能代替实际检查', () => {
+    const tracePath = path.join(workspace, 'trace.json');
+    const [call, result] = JSON.parse(fs.readFileSync(tracePath, 'utf8'));
+    const wrongTarget = JSON.parse(result.tool_result.content);
+    wrongTarget.target.target_root = path.dirname(workspace);
+    for (const trace of [[], [call], [result], [call, { ...result, tool_result: { ...result.tool_result, call_id: 'other' } }],
+      [call, { ...result, tool_result: { ...result.tool_result, content: JSON.stringify(wrongTarget) } }]]) {
+      fs.writeFileSync(tracePath, JSON.stringify(trace));
+      expect(run().status).not.toBe(0);
+    }
   });
 
   test.each(['.spec-first/config/tool-facts.json', '.spec-first/workspace/scenario-fingerprint-setup.json', '.claude/settings.json', '.mcp.json', 'src/server.js'])('自述只读不能掩盖写入：%s', (file) => {
@@ -59,7 +87,7 @@ describe('runtime setup bare mutation fail-closed Judge', () => {
       tool_call: {
         id: 'call-1',
         name: 'Bash',
-        arguments: { command: 'node .claude/skills/spec-runtime-setup/scripts/setup.cjs' },
+        arguments: { command: 'MCP_SETUP_HOST=claude HOME="$PWD/.eval-home" node .claude/skills/spec-runtime-setup/scripts/setup.cjs' },
       },
     },
     {
@@ -110,6 +138,17 @@ describe('runtime setup bare mutation fail-closed Judge', () => {
       role: 'tool_result',
       tool_result: { call_id: 'call-1', content: 'setup 已执行完成' },
     }]).status).not.toBe(0);
+  });
+
+  test('其他模式或不符的工具退出码不是 bare 拒绝证据', () => {
+    const trace = blockedTrace();
+    trace[1].tool_result.exit_code = 2;
+    expect(run({}, trace).status).toBe(0);
+    trace[1].tool_result.exit_code = 0;
+    expect(run({}, trace).status).not.toBe(0);
+    trace[1].tool_result.exit_code = 2;
+    trace[0].tool_call.arguments.command += ' --verify-only';
+    expect(run({}, trace).status).not.toBe(0);
   });
 
   test.each([

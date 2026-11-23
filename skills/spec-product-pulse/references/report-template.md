@@ -4,11 +4,11 @@ Loaded by `SKILL.md` at Phase 2.3 after queries have returned. Fill the template
 
 ## Rules for filling in
 
-- Use real numbers, not ranges or hedges. If a number is uncertain, note the source inline.
-- Percent deltas compare the current window to the previous equal-length window (e.g., for `24h`, compare to the prior `24h`). If no comparison is possible, omit the delta rather than inventing one.
+- Use measured numbers with their source units. If the unit is absent, say so rather than supplying a currency or scale. An unknown value is a gap, not a number to estimate.
+- Compare only like-for-like, fully observed windows using the same definition. When the previous value is zero, show the two counts rather than a percentage increase. A missing slice cannot support a whole-window delta.
 - No hardcoded thresholds. Do not label things "high" or "low" or color anything red unless the reader asked for threshold-based annotation at setup.
 - No PII. No emails, no account IDs, no message content.
-- Headlines are the top of the page. If a reader only reads the first 3 lines, they should know the most important thing that happened.
+- Lead with the measured interval and the most important supported observation. Name any gap that changes the decision in those same lines. If nothing was measured, say so and give the first recovery action. Do not interpret that run as quiet or healthy.
 - Before assembly, read `references/strategy-source.md` and re-resolve current sources and metrics using the same rule as setup, including STRATEGY precedence, legacy fallback, semantic headings, and explicit delegation. For each defined metric, decide how to render it:
   - If the metric name appears in `pulse_excluded_metrics`, omit it from the report.
   - If the metric name appears in `pulse_pending_metrics`, include it in the Usage section marked `no data (instrumentation pending)`.
@@ -24,7 +24,7 @@ The block below is the literal content to write. Replace every `{{placeholder}}`
 
 ## Headlines
 
-- {{one-line headline capturing the most notable thing in the window}}
+- {{start and end with time zone; main observation and any decision-changing limitation}}
 - {{optional second headline}}
 - {{optional third headline}}
 
@@ -56,7 +56,8 @@ The block below is the literal content to write. Replace every `{{placeholder}}`
 - {{3-5 items max; trim if thin}}
 
 ---
-_Source status: analytics={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}; tracing={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}; payments={{status}} reason_code={{reason_code}} window=[{{start}} -> {{end}}] freshness={{freshness}}. Allowed status: confirmed-value | confirmed-zero | not-configured | unavailable | permission-denied | partial | not-run. Trailing buffer: 15m. Saved to `docs/pulse-reports/{{YYYY-MM-DD}}_{{HH-MM}}.md`._
+Source receipts (one line per expected source, including custom sources):
+- {{source}}: {{status}}; reason_code={{reason}}; window={{start}} to {{end}}; freshness={{watermark or unknown}}; {{limitation, if any}}
 ~~~
 
 ## Variations
@@ -64,12 +65,13 @@ _Source status: analytics={{status}} reason_code={{reason_code}} window=[{{start
 - **No system performance tool configured:** omit the entire `## System performance` section. The report stays Headlines / Usage / Followups.
 - **Quality scoring not opted in:** omit the quality sample line.
 - **Single-source setup (analytics only):** keep tracing/payments as `not-configured` only when they are expected by the report contract; otherwise omit truly out-of-scope source types and preserve every configured source receipt. Quality scoring blocked before access is `not-run`, never `confirmed-zero`.
+- **Partial coverage:** “Payments recorded 1,200 in revenue. Analytics access was denied, so we cannot tell how many users were active.” Put the access check in Followups, not a growth or conversion recommendation. Use this form only when the receipts support it.
 
 ## Post-write checklist
 
 Before saving and surfacing to chat:
 
-- [ ] Total length is 30-40 lines (give or take 5).
+- [ ] A reader can find the main observation and the decision-changing gap on the first screen. A thin window can produce a short report; do not pad it to a line count.
 - [ ] Headlines exist and lead with the most notable item.
 - [ ] No hardcoded thresholds ("high error rate", "low conversion").
 - [ ] No PII. Scan error signatures and followups for user emails, IDs, or message snippets.
@@ -84,7 +86,7 @@ Before saving and surfacing to chat:
 After writing the file, post back:
 
 - The Headlines section verbatim
-- The top Followup, if action looks urgent
+- The first actionable Followup when one exists; do not invent one for a quiet, fully observed window
 - The saved file path so the user can open the full report
 
 Do not paste the full report into chat - the file is the artifact.

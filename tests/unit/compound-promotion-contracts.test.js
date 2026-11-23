@@ -313,6 +313,16 @@ describe('compound knowledge-promotion contract', () => {
     expect(result.stdout).toContain('OK:');
   });
 
+  test('neither promotion validator accepts a hyphen-prefixed scalar as a source list', () => {
+    const fields = 'source_refs:\n  -src/auth.js\ninvalidation_condition: recheck\n';
+    expect(yaml.safeLoad(fields).source_refs).toBe('-src/auth.js');
+    for (const packageRoot of PACKAGE_ROOTS) {
+      const result = runValidator(packageRoot, solutionDoc(fields));
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("promotion requires non-empty top-level 'source_refs' array");
+    }
+  });
+
   test.each(PACKAGE_ROOTS)('%s default parser-safety mode remains compatible with legacy docs', (packageRoot) => {
     const result = runValidator(packageRoot, solutionDoc(), false);
 

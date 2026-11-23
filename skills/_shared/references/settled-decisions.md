@@ -10,13 +10,13 @@ Classify each conversation-carried decision by whether it survived examination �
 - **Directive** — the user asserted a choice no one examined (e.g., a cold "build it with X"). Not settled. It receives exactly one in-pipeline challenge, spent during this skill's research/pressure-test phase; the outcome lands in the artifact as a (labeled or unlabeled) decision entry. The artifact is the only challenge ledger — later stages do not get a second challenge, and an unanswered pipeline-surfaced challenge may resurface only through the divergent/residual channel of the calling pipeline.
 - **Unlabeled** — anything only the agent inferred or proposed without user engagement. Ordinary planning input; never annotated.
 
-Contrast pair: the user rejected option A after seeing the tradeoff -> settled (`user-directed`); the user said "sounds good" to a passing mention -> at most `user-approved`; the agent proposed X and the user never engaged -> no label.
+The user rejected A and chose B after seeing the tradeoff -> `user-directed`. The agent explained why B over A and the user agreed -> `user-approved`. A passing mention followed by "sounds good", without an examined tradeoff, is not settled; neither is a proposal the user never addressed.
 
 **No self-settling.** An agent never labels its own unexamined proposal, and never upgrades bare assent to `user-directed`. Only the user's conversation acts mint provenance.
 
 ## Provenance classes
 
-Exactly two classes; both render as visible English in the artifact:
+Exactly two classes; both tokens remain visible in the artifact:
 
 - `user-directed` — the user chose against or between surfaced options ("no, do X").
 - `user-approved` — the agent proposed with the tradeoff surfaced; the user assented.
@@ -25,11 +25,11 @@ The class records decision strength for human readers (plan annotation, PR prove
 
 ## The annotation
 
-A settled decision is recorded on its Key Technical Decision entry (plan) or Key Decision entry (brainstorm Product Contract) as an inline English parenthetical:
+A settled decision is recorded on its Key Technical Decision entry (plan) or Key Decision entry (brainstorm Product Contract) as an inline parenthetical:
 
 `(session-settled: user-directed — chosen over <alternative>: <one-line reason>)`
 
-- The stem `session-settled:` and the class tokens `user-directed` / `user-approved` are stable protocol — greppable and test-pinned. The rest of the sentence is free-form prose.
+- The stem `session-settled:` and the class tokens `user-directed` / `user-approved` are stable protocol — greppable and test-pinned. Write the alternative and reason in the artifact reader's language. A label records a choice, not permission to execute it.
 - Self-contained: decision, rejected alternative, and reason must be readable by a consumer with no access to the conversation.
 - No sidecar files, no frontmatter registry, no numeric weights, no lifecycle field. An unrecognized consumer sees a normal decision entry; the worst-case degradation is today's re-litigation, never corruption.
 

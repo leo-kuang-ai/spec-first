@@ -12,7 +12,7 @@ const crypto = require('node:crypto');
 assert.equal(process.env.EVAL_EXIT_CODE, '0', '缺少成功的引擎退出证据');
 assert.ok(process.env.EVAL_FINAL_MESSAGE?.trim(), '最终输出为空');
 const expected = {
-  'README.md': '4aac9f15131207d5e35f3d146e5e0998a26039d49c6ba87432a40e0697a71855',
+  'README.md': 'a8d4987b27da3f174847904e1c0e361fb9e581d4f47ffdf3c4d2ff1e4f74a3aa',
   'package.json': '03422077e4a5f51c61b08600a3a997da8efeb5928a78950be69d37fa5c5ded2b',
   'src/server.js': 'ff9d96855c23af77404d023eaa9d29fdc2cbea765b31a0ec8d5f9bbaba54cf34',
 };

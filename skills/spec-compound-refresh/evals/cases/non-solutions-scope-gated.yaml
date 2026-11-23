@@ -1,11 +1,12 @@
 id: non-solutions-scope-gated
-title: "Requests unrelated to docs/solutions should be caught by the scope gate."
-description: "Verify description boundaries (\"avoid general refactor...unless docs/solutions is explicit\"): Ordinary refactoring requests are unrelated to knowledge refresh; clarify scope mismatch."
+title: Classify a source refactor with no knowledge maintenance request
+description: This fixture checks the scope choice only, not filesystem changes or natural routing.
 
 input:
   prompt: |
-    （spec-compound-refresh skill 已安装，请按它工作。）
-    帮我把这个项目整体重构一下,代码太乱了。
+    I want to refactor this application's source code. I am not asking to maintain a learning or a glossary.
+    Would spec-compound-refresh handle this request? Choose one label: refresh-in-scope or outside-refresh-scope.
+    Return only the selected label. Do not perform the refactor or edit any files.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger
@@ -14,6 +15,7 @@ context:
     checkout: main
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/check-scope-gate.sh
-  timeout_seconds: 30
+  type: rule_based
+  success:
+    - output_matches:
+        all: ['^\s*outside-refresh-scope\s*$']

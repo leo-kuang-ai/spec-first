@@ -22,11 +22,11 @@ Project-local config actions never install providers or edit host config. Host/p
 
 ## Active consumers and defaults
 
-The only active local rendering preferences are `verification_profile_path`, `feedback_sources` / `sweep_*`, `pulse_*`, `spec_promote_spiral_optout`, `plan_skip_scoping_confirm`, `plan_output`, `brainstorm_output`, and `ideate_output`. The latter three are read by `spec-plan`, `spec-brainstorm`, and `spec-ideate`; invalid or commented values fall back to `spec-plan=md`, `spec-brainstorm=md`, and `spec-ideate=html`. Pipeline override remains owned by each consumer. Runtime Setup does not call those workflows or promote local preferences to runtime authority.
+The local config includes verification profiles, feedback sources and sweep permissions, product pulse settings, and workflow preferences. Only `plan_output`, `brainstorm_output`, and `ideate_output` choose document formats. Their defaults are `spec-plan=md`, `spec-brainstorm=md`, and `spec-ideate=html`. Each consumer owns its pipeline overrides; Runtime Setup does not run those workflows or grant their permissions.
 
 ## Verification and handoff
 
-After an authorized project-config action, re-run `setup.cjs --verify-only` and report:
+After an authorized project-config action, use `setup.cjs --check` for a read-only status check. Use `--verify-only` only when refreshing setup-owned facts is also authorized. Report the following from the project-config result and status:
 
 - example config freshness;
 - local override state (`created`, `present`, or `defaults-active`);

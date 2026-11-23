@@ -2,10 +2,10 @@ id: publication-preserve
 title: "Only offline knowledge and actual citations prevent accidental deletion"
 input:
   prompt: |
-    先运行 node prepare-eval.cjs，为隔离评测创建基线；这不授权任务提交。
-    用 spec-compound-refresh 审查 docs/solutions/old.md 是否可用 new.md 替换并删除。
-    本次仅审查，不修改任何文件；检查源码、独有内容和 catalog 的入站引用。
-    最终仅返回 JSON，字段为 status（recommended-only）、changed、deleted；路径数组记录本轮实际变化。
+    First run node prepare-eval.cjs to establish the isolated fixture baseline. This does not authorize a task commit.
+    Use spec-compound-refresh to decide whether docs/solutions/new.md can replace docs/solutions/old.md and the old file can be deleted.
+    Review only. Do not edit files. Check the source, content unique to the old document, and the inbound catalog reference.
+    Return JSON only: status, changed, deleted, decision (retain or delete), unique_section (path#heading of the old document's unique section), and inbound_from (path of the file that relies on it). Use repository-relative paths. The two change arrays record only this run's actual changes and deletions.
 context:
   repo_fixture: evals/fixtures/repos/publication-safety
   git:

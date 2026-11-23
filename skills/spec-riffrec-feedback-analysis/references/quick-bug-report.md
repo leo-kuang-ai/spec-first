@@ -6,7 +6,7 @@ Use this path when the input is a short recording (under ~60 seconds), the user 
 
 1. Read [Shared analyzer](analyzer.md) and run its quick command with a temporary output directory. Use `--no-transcribe` unless explicit provider egress authority permits `--transcribe`. Capture the printed directory and receipt for subsequent reads.
 
-2. Read only `analysis.md` from the temp output. Skip `problem-analysis.md`, `review-prompt.md`, `requirements-kickoff.md`, and `source-materials.md` — they are designed for the extensive path.
+2. Read `analysis.md` and the transcript/coverage receipt in `analysis.json` from the temp output. Skip `problem-analysis.md`, `review-prompt.md`, `requirements-kickoff.md`, and `source-materials.md`; they are designed for the extensive path.
 
 3. Pick at most one or two screenshots from `frames/` that directly show the reported issue. Prefer frames near a verbal complaint, a failed click, a console error, or a failed network request.
 
@@ -16,10 +16,10 @@ Use this path when the input is a short recording (under ~60 seconds), the user 
 
 Keep it focused and short. Include only what the recording supports:
 
-- **Title** — one short sentence naming the broken behavior.
-- **Steps to reproduce** — bullet list reconstructed from clicks and transcript.
-- **Expected vs. actual** — what the user said should happen vs. what happened.
-- **Evidence** — transcript quote(s) with timestamps, plus 0–2 screenshot references.
+- **Title** — name the observed symptom, not an unverified failure or cause.
+- **Steps to reproduce** — list only supported actions; write "not established" if the capture lacks a sequence.
+- **Expected vs. actual** — separate a stated expectation from the observed result. If no one stated an expectation, say so.
+- **Evidence** — cite the available event, transcript passage, or frame. For an event-only capture, no quote or screenshot is required. Capture duration is not an event timestamp.
 - **Suggested next step** — single sentence: file an issue, open `spec-debug`, or escalate to extensive analysis if more issues surfaced.
 
 ## Source mapping (optional, only if obvious)

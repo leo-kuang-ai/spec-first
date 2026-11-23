@@ -70,6 +70,21 @@ test('exposes payload smoke as a no-execution CLI mode', () => {
   expect(result.stderr).toBe('');
 });
 
+test.each(['empty directory', 'notes only', 'undeclared entry'])('staged payload is not ready: %s', kind => {
+  const root = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'spec-write-skill-entry-'));
+  tempRoots.push(root);
+  const files = [];
+  if (kind === 'notes only') {
+    fs.writeFileSync(path.join(root, 'notes.txt'), 'Notes');
+    files.push({ path: 'notes.txt', consumer: 'notes', expected_sha256: crypto.createHash('sha256').update('Notes').digest('hex') });
+  } else if (kind === 'undeclared entry') {
+    fs.writeFileSync(path.join(root, 'SKILL.md'), '# Demo\n');
+  }
+  const report = smokeTargetPayload({ payloadDir: root, runtimeFileSet: { files, dynamic_dependencies: 'none' } });
+  expect(report).toMatchObject({ result: 'fail', target_readiness: 'not-ready' });
+  expect(report.findings).toContainEqual(expect.objectContaining({ path: 'SKILL.md', reason_code: 'payload_entry_missing' }));
+});
+
 test('fails missing reference or maintainer-only payload inclusion and degrades unknown dynamic dependencies', () => {
   const root = payload();
   fs.mkdirSync(path.join(root, 'evals'));

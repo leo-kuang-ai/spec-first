@@ -1,0 +1,13 @@
+id: direct-answer-accuracy
+title: Explain the difference directly in chat
+input:
+  prompt: With spec-explain available, what's the difference between a Node.js stream and a buffer? Keep it brief.
+context:
+  repo_fixture: evals/fixtures/repos/mini-ledger
+  git: {init: true, checkout: main}
+judge:
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - Give a concise correct contrast between incremental data flow and an in-memory sequence of bytes. They can work together. A refusal, a repeated question, or a claim that streams cannot carry buffers fails.
+  pass_threshold: 1

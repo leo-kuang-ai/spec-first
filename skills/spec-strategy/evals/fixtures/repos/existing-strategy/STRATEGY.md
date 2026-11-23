@@ -6,20 +6,20 @@ last_updated: 2026-08-01
 
 ## Target problem
 
-LedgerFlow 的自由职业者要用三张表格拼凑记账,月底对账要花两小时。
+LedgerFlow freelancers piece together their books from three spreadsheets. Month-end reconciliation takes two hours.
 
 ## Our approach
 
-一个面向自由职业者的极简记账工具,银行流水自动导入 + 一键分类。
+A minimal ledger for freelancers: import bank transactions automatically and categorize them in one click.
 
 ## Who it's for
 
-1-5 人工作室的自由职业设计师与开发者。
+Freelance designers and developers in studios of one to five people.
 
 ## Key metrics
 
-月底对账时长(目标 <10 分钟);周活跃导入用户。
+Month-end reconciliation time (target: under ten minutes); weekly active importers.
 
 ## Tracks
 
-自动导入质量;分类准确率。
+Automatic import quality; categorization accuracy.

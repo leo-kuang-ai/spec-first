@@ -4,14 +4,15 @@ description: "Verify Phase 0 file routing: when the file does not exist, proceed
 
 input:
   prompt: |
-    （spec-strategy skill 已安装，请按它工作。）
-    帮我们把这个新产品方向定成正式的产品策略。
+    Use spec-strategy. Help me turn this new product direction into a strategy.
 
 expect:
   files_not_exist:
     - "STRATEGY.md"
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - Ask whose situation the product should change or what makes their problem hard. A specific request for input is sufficient. A generic question, a completed strategy without answers, or a claim that no input is needed fails.
+  pass_threshold: 1

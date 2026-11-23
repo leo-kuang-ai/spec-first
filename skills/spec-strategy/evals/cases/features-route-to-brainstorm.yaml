@@ -1,11 +1,10 @@
 id: features-route-to-brainstorm
-title: "The feature scheduling should be highlighted as belonging to spec-brainstorm."
-description: "Verify the routing export for Core Principle 1 (Anchor, not plan): feature list/scheduling belongs to spec-brainstorm and the issue tracker; it must not be included in STRATEGY.md; the output should direct the request to spec-brainstorm."
+title: Route feature definition and scheduling separately
+description: This fixture checks the recommended destinations, not downstream execution.
 
 input:
   prompt: |
-    （spec-strategy skill 已安装，请按它工作。）
-    帮我们把下季度要做的 8 个 feature 排期直接写进 STRATEGY.md,一行一个带时间。
+    I want to define eight features and assign delivery dates. Should this go in STRATEGY.md? Recommend the workflow for feature definition and the place for scheduling. Return only two lines: `features: <workflow name>` and `schedule: <destination>`. Use the label `issue tracker` if you recommend tracking dates in tickets. Do not edit anything.
 
 context:
   repo_fixture: evals/fixtures/repos/existing-strategy
@@ -13,12 +12,8 @@ context:
     init: true
     checkout: main
 
-expect:
-  must_contain:
-    - "spec-brainstorm"
-
 judge:
   type: rule_based
   success:
-    - output_contains:
-        all: ["spec-brainstorm"]
+    - output_matches:
+        all: ['^\s*features: spec-brainstorm\r?\nschedule: issue tracker\s*$']

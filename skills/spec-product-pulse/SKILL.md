@@ -18,7 +18,7 @@ allowed-tools:
 
 `disable-model-invocation: true` in the frontmatter only stops the model from triggering this skill on its own initiative; it does not block execution when the user's message explicitly directs this skill — in that case read this skill and follow it, starting from the config routing below.
 
-**Done:** the 30-40 line report exists at `docs/pulse-reports/YYYY-MM-DD_HH-MM.md`, its Headlines and top Followup are surfaced in chat, and Phase 3 has been considered. Missing-source receipts and limitations remain visible; report completion is not proof that every source was available.
+**Done:** the report exists at `docs/pulse-reports/YYYY-MM-DD_HH-MM.md`, its Headlines and first actionable Followup (if any) are surfaced in chat, and Phase 3 has been considered. Missing-source receipts and limitations remain visible; report completion is not proof that every source was available.
 
 The skill does not mutate the product, the database, or any external system. Its only writes are pulse settings appended to `.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) and the report file (`docs/pulse-reports/...`). MCP and other data-source tools are invoked read-only; if a tool offers write modes, do not use them.
 
@@ -70,7 +70,7 @@ Read `references/setup.md`, which requires `references/interview.md` and `refere
 
 ### Phase 2: Run the Pulse
 
-Read `references/run.md` before dispatching queries. Re-read local config after setup edits, preserve per-source receipts (`confirmed-value`, `confirmed-zero`, `not-configured`, `unavailable`, `permission-denied`, `partial`, `not-run`) and `confirmed-zero` semantics, keep analytics/tracing/payments parallel and read-only DB work serial, and write the four-section report to the fixed `docs/pulse-reports/` contract.
+Read `references/run.md` before dispatching queries. Re-read local config after setup edits, preserve per-source receipts (`confirmed-value`, `confirmed-zero`, `not-configured`, `unavailable`, `permission-denied`, `partial`, `not-run`) and `confirmed-zero` semantics, keep analytics/tracing/payments parallel and read-only DB work serial, and save the report to `docs/pulse-reports/`. Omit out-of-scope performance metrics, not configured sources that failed.
 
 ### Phase 3: Routine Hook
 

@@ -6,11 +6,13 @@ argument-hint: "[optional: scope hint — directory, filename, module, or keywor
 
 # Compound Refresh
 
+Check existing `docs/solutions/` guidance against current source, tests, or project decisions. An explicit glossary request can target `CONCEPTS.md` alone. A request to refactor application code is outside refresh scope.
+
+Tell readers which guidance they can still use, what changed and why, and which edits are only proposals. Missing evidence is a verification gap, not a reason to mark a learning stale. When merging or replacing a learning, carry forward the sources and recheck conditions for every retained claim. Verify the published content and its citations before reporting completion.
+
 ## Project Intelligence Evidence Boundary
 
 Graph output is advisory navigation for finding candidate solution records or affected code. Confirm freshness, supersession, and applicability from current source, tests, docs, contracts, or owner evidence before refreshing durable knowledge; empty graph results have no negative authority. Direct reads remain valid when readiness is unknown or unavailable.
-
-Maintain the quality of `docs/solutions/` over time. This workflow reviews existing learnings against the current codebase, then refreshes any derived pattern docs that depend on them.
 
 ## Workflow Contract Summary
 
@@ -142,6 +144,10 @@ After completing the per-document operation, load the general terminology rules 
 
 Follow `references/publication.md` after learning, citation, catalog, and vocabulary candidates are ready. Publish only approved dependency groups. Failed validation leaves final targets unchanged; a partial publication remains incomplete and reports exact changed and pending paths. A candidate is never an Applied result.
 
+## Discoverability Check
+
+Before the final report, read `references/discoverability.md` to check whether readers can find the knowledge store and any existing glossary. Separate proposed instruction changes from verified edits. Existing commit and landing authority still applies.
+
 ## Output Format
 
 Read `references/report.md` after processing the selected scope. The full per-file Applied/Recommended report is the deliverable.
@@ -155,10 +161,6 @@ Read `references/commit.md` after the report and only when verified refresh-owne
 - `spec-compound` captures a newly solved, verified problem
 - `spec-compound-refresh` maintains older learnings as the codebase evolves — both their individual accuracy and their collective design as a document set
 
-Use **Replace** only when the refresh process has enough real evidence to write a trustworthy successor. When evidence is insufficient, mark as stale and recommend `spec-compound` for when the user next encounters that problem area.
+Use **Replace** only when the old guidance no longer applies and the successor has verifiable support. If drift is confirmed but no reliable successor is available, a stale annotation may be appropriate; recommend `spec-compound` when fresh evidence becomes available. Missing corroboration alone does not justify a stale annotation.
 
 Use **Consolidate** when accumulated learnings overlap without independent retrieval value. `spec-compound` may create, update, or skip a learning; refresh maintains the resulting set. Worth audit optionally applies the capture bar to accurate existing content without turning ordinary refresh into a pruning run.
-
-## Discoverability Check
-
-Read `references/discoverability.md` after the report. It owns the semantic `docs/solutions/` and optional `CONCEPTS.md` discoverability check, mode-specific edit boundary, and same-authority commit handling.

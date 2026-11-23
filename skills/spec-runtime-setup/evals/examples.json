@@ -69,7 +69,7 @@
         "project-boundary",
         "git-hooks"
       ],
-      "expected_outcome": "Report optional project-local auto-refresh as blocked/manual-only and external hook execution as unverified; do not inspect or mutate the external hook and do not claim it is absent, uninstalled, or unable to execute.",
+      "expected_outcome": "Only inspect the two named external hook files within the read limit. Report verified-external for a post-commit marker with no detected legacy override and complete inspection; otherwise report manual-only. Neither result proves what Git executes. Never rewrite or run the external hooks.",
       "forbidden_signals": [
         "external-hook-not-installed",
         "external-hook-cannot-run",

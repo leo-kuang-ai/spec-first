@@ -7,12 +7,12 @@ Use this shape when converting Riffrec evidence into a durable brainstorm or pla
 ```markdown
 ### F1. <Short problem title>
 
-- **Severity:** P0/P1/P2/P3
+- **Impact:** <Who was affected and how, or unassessed if the evidence does not show it>
 - **Observed:** <What happened, grounded in transcript/events/screenshots>
-- **Expected:** <What the user appeared to expect or what the product should do>
-- **Evidence:** <Moment IDs and screenshot links>
+- **Expected:** <Cite a stated expectation; label an inference or write unknown>
+- **Evidence:** <Cite an available event, moment ID, quote, or frame; omit unavailable materials>
 - **Confidence:** High/Medium/Low, with reason
-- **Requirement candidates:** R1, R2
+- **Requirement candidates:** <Link supported candidates only; omit when there are none>
 ```
 
 ## Requirements Kickoff
@@ -52,8 +52,8 @@ topic: <topic>
 
 ## Requirements
 
-**Observed product behavior**
-- R1. <Concrete product behavior requirement>
+**Candidate product behavior (not confirmed by this capture)**
+- R1. <Proposed behavior, linked finding, and what the owner still needs to confirm; omit if unsupported>
 
 **Feedback evidence and reviewability**
 - R2. <Requirement about making the issue observable or preventing recurrence>

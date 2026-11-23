@@ -599,6 +599,12 @@
         }
       }
     },
+    "installationCommandChoice": {
+      "oneOf": [
+        { "required": ["command"] },
+        { "required": ["command_display"] }
+      ]
+    },
     "platformOverrides": {
       "type": "object",
       "additionalProperties": false,
@@ -611,18 +617,7 @@
               "type": "object",
               "additionalProperties": true,
               "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
-              "anyOf": [
-                {
-                  "required": [
-                    "command"
-                  ]
-                },
-                {
-                  "required": [
-                    "command_display"
-                  ]
-                }
-              ],
+              "$ref": "#/$defs/installationCommandChoice",
               "properties": {
                 "command": {
                   "type": "string",
@@ -647,18 +642,7 @@
               "type": "object",
               "additionalProperties": true,
               "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
-              "anyOf": [
-                {
-                  "required": [
-                    "command"
-                  ]
-                },
-                {
-                  "required": [
-                    "command_display"
-                  ]
-                }
-              ],
+              "$ref": "#/$defs/installationCommandChoice",
               "properties": {
                 "command": {
                   "type": "string",
@@ -683,18 +667,7 @@
               "type": "object",
               "additionalProperties": true,
               "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
-              "anyOf": [
-                {
-                  "required": [
-                    "command"
-                  ]
-                },
-                {
-                  "required": [
-                    "command_display"
-                  ]
-                }
-              ],
+              "$ref": "#/$defs/installationCommandChoice",
               "properties": {
                 "command": {
                   "type": "string",
@@ -719,18 +692,7 @@
               "type": "object",
               "additionalProperties": true,
               "description": "Platform installation face: registry owns the execution definition using command (+ operation lock); the provider's own code owns the execution face using command_display contract (e.g., graphify). The two must be mutually exclusive.",
-              "anyOf": [
-                {
-                  "required": [
-                    "command"
-                  ]
-                },
-                {
-                  "required": [
-                    "command_display"
-                  ]
-                }
-              ],
+              "$ref": "#/$defs/installationCommandChoice",
               "properties": {
                 "command": {
                   "type": "string",

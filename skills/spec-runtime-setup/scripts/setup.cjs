@@ -143,7 +143,8 @@ function runSetup(input = {}) {
     };
   }
 
-  const mutationNeedsHost = ['bare', 'verify', 'only', 'graphify-refresh', 'host-config-repair', 'workspace-graph-build'].includes(actionPlan.mode);
+  const parentDiagnostic = target.mode === 'workspace-all-repos' && ['bare', 'check'].includes(actionPlan.mode);
+  const mutationNeedsHost = !parentDiagnostic && ['bare', 'verify', 'only', 'graphify-refresh', 'host-config-repair', 'workspace-graph-build'].includes(actionPlan.mode);
   const runner = input.runner || runCommandSync;
   const candidates = advisoryHostCandidates({ env, runner });
   const internalWorkspaceRefresh = isInternalWorkspaceGraphRefreshInvocation({ actionPlan, env });
@@ -205,7 +206,7 @@ function runSetup(input = {}) {
       return runWorkspaceGraphStatusSetup(context);
     }
     // Parent directory bare/check diagnoses only; no read-only path blocking shall occur due to missing projection in the factor repository.
-    if (target.mode === 'workspace-all-repos' && ['bare', 'check'].includes(actionPlan.mode)) {
+    if (parentDiagnostic) {
       return runParentWorkspaceDiagnostic(context);
     }
     const runtimeProjectionSelection = requiresRuntimeProjectionPreflight(actionPlan)

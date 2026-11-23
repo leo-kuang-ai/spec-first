@@ -84,8 +84,7 @@ _Why it serves the approach:_ {{one line}}
 
 Before confirming the write, scan the draft for:
 
-- [ ] Frontmatter present at the top with `name` and `last_updated` keys.
-- [ ] `last_updated` carries today's date in ISO format (YYYY-MM-DD).
+- [ ] For a new document, frontmatter contains `name` and today's ISO `last_updated`. When updating an existing document, follow `update-run.md`: do not add absent frontmatter or rewrite another writer's metadata.
 - [ ] Each section this skill wrote has at most four sentences, except Tracks, where each track has a short block. Do not apply this limit to other writers.
 - [ ] No placeholders remain (`{{...}}`).
 - [ ] Optional sections with no content have been deleted, not left empty.

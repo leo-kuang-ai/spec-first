@@ -1,11 +1,10 @@
 id: simple-qa-not-triggered
 title: "Ordinary Q&A should not trigger deep teaching artifact"
-description: "Counterexample for description: ordinary Q&A does not constitute a durable teaching artifact—questions that can be answered in one sentence should be answered directly, without generating teaching documents."
+description: Check for a nonblank reply and absence of teaching artifacts in the fixture. Answer accuracy is assessed separately.
 
 input:
   prompt: |
-    （spec-explain skill 已安装，请按它工作。）
-    Node 的 stream 和 buffer 有什么区别?简单说说就行。
+    With spec-explain available, what's the difference between a Node.js stream and a buffer? Keep it brief.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger

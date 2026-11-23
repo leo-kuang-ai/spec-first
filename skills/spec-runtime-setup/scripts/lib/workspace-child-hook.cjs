@@ -297,12 +297,8 @@ function removeWorkspaceChildHook(childGitRoot, hooksRoot) {
     changed = true;
     if (createdBySpecFirst && (!stripped || stripped === '#!/bin/sh')) {
       fs.rmSync(target, { force: true });
-    } else if (!stripped || stripped === '#!/bin/sh') {
-      fs.writeFileSync(target, stripped ? stripped + '\n' : '', 'utf8');
-      fs.chmodSync(target, 0o755);
     } else {
-      fs.writeFileSync(target, `${stripped}\n`, 'utf8');
-      fs.chmodSync(target, 0o755);
+      fs.writeFileSync(target, stripped ? `${stripped}\n` : '', 'utf8');
     }
   }
   return { ok: true, changed, reason_code: null };

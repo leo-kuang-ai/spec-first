@@ -69,6 +69,19 @@ function expectRegistryError(mutator, code) {
 }
 
 describe('spec-runtime-setup registry v11', () => {
+  test.each(['macos', 'linux', 'wsl', 'windows'])('platform installation has exactly one command owner: %s', platform => {
+    for (const [installation, valid] of [[{ command: 'local-tool' }, true], [{ command_display: 'provider-managed' }, true], [{ command: 'local-tool', command_display: 'provider-managed' }, false], [{}, false]]) {
+      const fixture = withRegistryMutation(registry => {
+        registry.providers.find(entry => entry.id === 'graphify').platform_overrides[platform].installation = installation;
+      });
+      try {
+        const load = () => loadRegistry({ skillRoot: fixture.tempRoot });
+        if (valid) expect(load).not.toThrow();
+        else expect(load).toThrow(expect.objectContaining({ code: 'registry_schema_invalid' }));
+      } finally { fixture.cleanup(); }
+    }
+  });
+
   test('detects WSL from the real Linux runtime signals', () => {
     expect(detectRuntimePlatform({
       platform: 'linux',

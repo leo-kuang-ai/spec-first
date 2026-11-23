@@ -164,8 +164,9 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
   if (Array.isArray(schema.allOf)) {
     for (const item of schema.allOf) validateSchemaValue(value, item, rootSchema, location);
   }
-  if (Array.isArray(schema.anyOf)) {
-    const matches = schema.anyOf.some((item) => {
+  for (const keyword of ['anyOf', 'oneOf']) {
+    if (!Array.isArray(schema[keyword])) continue;
+    const matches = (item) => {
       try {
         validateSchemaValue(value, item, rootSchema, location);
         return true;
@@ -173,8 +174,9 @@ function validateSchemaValue(value, schema, rootSchema, location = '$') {
         if (error instanceof SchemaValidationError) return false;
         throw error;
       }
-    });
-    if (!matches) throw new SchemaValidationError(location, '不匹配任何允许的 schema');
+    };
+    if (keyword === 'oneOf' && schema.oneOf.filter(matches).length !== 1) throw new SchemaValidationError(location, 'Expected exactly one matching schema');
+    if (keyword === 'anyOf' && !schema.anyOf.some(matches)) throw new SchemaValidationError(location, '不匹配任何允许的 schema');
   }
   // if/then(/else): conditional application — silently skips when prerequisites do not match (implemented on 2026-09-13)
   // Previously silently ignored, making the pypi condition mandatory effectively useless (lane finding DR-017).
@@ -631,7 +633,7 @@ function assertProviderReadinessMirrorsProvider(registry) {
 const SCHEMA_DIALECT_KEYWORDS = new Set([
   '$schema', '$id', '$ref', 'title', 'description',
   'type', 'const', 'enum',
-  'allOf', 'anyOf', 'if', 'then', 'else',
+  'allOf', 'anyOf', 'oneOf', 'if', 'then', 'else',
   'properties', 'required', 'additionalProperties', 'minProperties',
   'items', 'prefixItems', 'minItems', 'maxItems', 'uniqueItems',
   'minLength', 'pattern',
@@ -660,7 +662,7 @@ function assertSchemaDialect(schema) {
         visit(value);
         continue;
       }
-      if (key === 'allOf' || key === 'anyOf') {
+      if (key === 'allOf' || key === 'anyOf' || key === 'oneOf') {
         visit(value);
         continue;
       }

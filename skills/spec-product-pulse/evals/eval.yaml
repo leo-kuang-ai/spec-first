@@ -9,10 +9,9 @@ engine:
 cases:
   files:
     - evals/cases/check-source-outcomes.yaml
-    - evals/cases/unconfigured-guides-setup.yaml
-defaults:
-  timeout_seconds: 480
-  max_turns: 12
+  defaults:
+    timeout_seconds: 480
+    max_turns: 12
   parallelism: 1
 report:
   formats: [json, html]

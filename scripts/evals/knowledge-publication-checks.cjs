@@ -26,6 +26,10 @@ function checkKnowledgePublication(expected, mode) {
   };
   if (mode === 'preserve') {
     assert.equal(report.status, 'recommended-only');
+    assert.deepEqual(Object.keys(report).sort(), ['changed', 'decision', 'deleted', 'inbound_from', 'status', 'unique_section']);
+    assert.equal(report.decision, 'retain', 'The catalog still depends on the offline guidance in the old document');
+    assert.equal(report.unique_section, `${old}#离线恢复`);
+    assert.equal(report.inbound_from, catalog);
     equalPaths(report.changed, []);
     equalPaths(report.deleted, []);
   } else if (mode === 'partial') {
@@ -39,9 +43,12 @@ function checkKnowledgePublication(expected, mode) {
     assert.equal(report.status, 'applied');
     assert.ok(!fs.existsSync(old), '旧文件尚未按请求移除');
     const current = regular(successor).toString();
-    // Fixed tasks allow only appending of the block at the end; it is not permissible to conceal content loss by retaining a few words.
     const originalSuccessor = execFileSync('git', ['show', `HEAD:${successor}`], { env: cleanEnv, encoding: 'utf8' });
-    assert.equal(current, originalSuccessor + '\n## 离线恢复\n\n离线时保留最后可用凭据，不删除备份。\n', 'successor出现额外修改或知识丢失');
+    const expectedSuccessor = originalSuccessor.replace(
+      'invalidation_condition: "src/auth.js认证复验逻辑变化时复查"',
+      'invalidation_condition: "src/auth.js认证复验逻辑变化时复查；src/auth.js不再保留离线凭据时复查"',
+    ) + '\n## 离线恢复\n\n离线时保留最后可用凭据，不删除备份。\n';
+    assert.equal(current, expectedSuccessor, 'The successor must retain the offline guidance and both recheck conditions with no other edits');
     const originalCatalog = execFileSync('git', ['show', `HEAD:${catalog}`], { env: cleanEnv, encoding: 'utf8' });
     assert.equal(regular(catalog).toString(), originalCatalog.replace('(old.md#离线恢复)', '(new.md#离线恢复)'), '引用或人工条目丢失');
     equalPaths(report.changed, [successor, catalog]);

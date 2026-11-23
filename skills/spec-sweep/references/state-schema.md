@@ -159,7 +159,7 @@ Records the outcome of a sweep run under `last_run`.
 | `timestamp` | `--timestamp` (required) | Caller-supplied ISO run time. The engine never invents it. |
 | `outcome` | `--outcome` | One of `completed`, `aborted-locked`, `partial`, `failed`. |
 | `writer` | `--writer` | The writer id that recorded the run. |
-| `counts` | `--counts` (JSON object) | Free-form tallies (per status, per source, etc.). |
+| `counts` | `--counts` (JSON object) | Free-form tallies (per status, per source, etc.). Invalid JSON or a non-object returns `REFUSED` (`invalid-counts`) and preserves the previous receipt. |
 
 `run-record` is intentionally **lease-agnostic**: a run that aborted precisely
 because the lease was `LOCKED` (`outcome: aborted-locked`) must still be able to

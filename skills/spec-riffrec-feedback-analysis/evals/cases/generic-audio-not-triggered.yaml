@@ -4,10 +4,10 @@ description: "Verify counterexample: generic podcasts/meetings/transcriptions do
 
 input:
   prompt: |
-    （spec-riffrec-feedback-analysis skill 已安装，请按它工作。）
-    帮我把这个会议录音 meeting-final.mp3 转写成文字纪要。
+    I have an ordinary meeting recording, meeting-final.mp3. Which workflow fits: general-transcription or riffrec-feedback? Return only the label. Do not analyze the file.
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/check-generic-refused.sh
-  timeout_seconds: 30
+  type: rule_based
+  success:
+    - output_matches:
+        all: ['^\s*general-transcription\s*$']

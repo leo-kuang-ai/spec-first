@@ -26,6 +26,16 @@ function invoke(command, args = [], env = {}) {
 function acquire() { return invoke('lease-acquire', ['--writer', 'owner', '--now', now]); }
 function upsert(data) { return invoke('upsert-item', ['--writer', 'owner', '--source', 'fixture', '--id', '1', '--now', now, '--json', JSON.stringify(data)]); }
 
+test('invalid counts cannot overwrite a previous run receipt', () => {
+  const record = counts => invoke('run-record', ['--writer', 'owner', '--timestamp', now, '--outcome', 'completed', '--counts', counts]);
+  expect(record('{"seen":2}')[0]).toBe('OK');
+  const previous = fs.readFileSync(state);
+  for (const counts of ['unavailable', '[]', 'null']) {
+    expect(record(counts)[0]).toBe('REFUSED');
+    expect(fs.readFileSync(state)).toEqual(previous);
+  }
+});
+
 test('first write in a new parent directory creates a real lock file', () => {
   state = path.join(root, 'fresh', 'state.yml');
   expect(acquire()[0]).toBe('OK');

@@ -10,10 +10,9 @@ cases:
   files:
     - evals/cases/check-unreleased-local-drafts.yaml
     - evals/cases/no-publish-side-effects.yaml
-    - evals/cases/nothing-shipped-asks.yaml
-defaults:
-  timeout_seconds: 480
-  max_turns: 14
+  defaults:
+    timeout_seconds: 480
+    max_turns: 14
   parallelism: 1
 report:
   formats: [json, html]

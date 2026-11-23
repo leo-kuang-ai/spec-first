@@ -29,13 +29,13 @@ describe('U28 supplemental outcome judge calibration', () => {
       fs.writeFileSync(file, fs.readFileSync(file, 'utf8').replace('Old approach.', 'Focus on offline reconciliation.'));
     } else if (skill === 'spec-product-pulse') {
       fs.mkdirSync(path.join(workspace, 'docs/pulse-reports'), { recursive: true });
-      fs.writeFileSync(path.join(workspace, 'docs/pulse-reports/report.md'), 'Revenue: 1200\nActive users: permission-denied (analytics auth rejected)\n');
+      fs.writeFileSync(path.join(workspace, 'docs/pulse-reports/report.md'), '## Usage\n\n| Metric | Source | State | Value |\n|---|---|---|---|\n| revenue | payments-export | confirmed-value | 1200 |\n| active_users | analytics-export | permission-denied | n/a |\n');
       report = { metrics: [
         { name: 'revenue', source: 'payments-export', state: 'confirmed-value', value: 1200 },
         { name: 'active_users', source: 'analytics-export', state: 'permission-denied', value: null },
       ], artifact_path: path.join(workspace, 'docs/pulse-reports/report.md') };
     } else if (skill === 'spec-promote') {
-      report = { delivery_status: 'implemented-not-released', provider_attempt: 'not-attempted', drafts: [
+      report = { delivery_status: 'implemented-not-released', provider_attempt: 'not-attempted', publication_owner: 'user', drafts: [
         { channel: 'x', content: 'Monthly summaries are implemented and awaiting release.' },
         { channel: 'changelog', content: 'Implemented monthly summaries; release is pending.' },
       ] };
@@ -54,7 +54,27 @@ describe('U28 supplemental outcome judge calibration', () => {
     const positive = check();
     if (positive.status !== 0) throw new Error(positive.stderr || positive.stdout);
     expect(positive.status).toBe(0);
+    if (skill === 'spec-product-pulse') {
+      const saved = fs.readFileSync(report.artifact_path, 'utf8');
+      for (const text of [saved.replace('| 1200 |', '| n/a |').replace('| permission-denied | n/a |', '| permission-denied | 1200 |'), saved.replace('n/a', '0'), saved + '| active_users | analytics-export | confirmed-zero | 0 |\n', '```md\n' + saved + '```', '<!--\n' + saved + '-->', saved.replace('|---|---|---|---|', '')]) {
+        fs.writeFileSync(report.artifact_path, text);
+        expect(check().status).not.toBe(0);
+      }
+      fs.writeFileSync(report.artifact_path, saved);
+    }
     if (skill === 'spec-promote') {
+      const changelog = path.join(workspace, 'CHANGELOG.md');
+      const original = fs.readFileSync(changelog);
+      fs.appendFileSync(changelog, 'Added a monthly export.\n');
+      expect(check().status).not.toBe(0);
+      fs.unlinkSync(changelog);
+      expect(check().status).not.toBe(0);
+      fs.writeFileSync(changelog, original);
+      fs.writeFileSync(tracePath, '[]');
+      expect(check().status).not.toBe(0);
+      fs.writeFileSync(tracePath, JSON.stringify([{ role: 'tool_call', tool_call: { name: 'Bash', arguments: { command: 'cat references/spiral-cli.md' } } }]));
+      expect(check().status).toBe(0);
+      fs.writeFileSync(tracePath, JSON.stringify(trace));
       report.drafts[0].content = 'Monthly summaries are implemented locally and not released or deployed.';
       expect(check().status).toBe(0);
       report.delivery_status = 'released';

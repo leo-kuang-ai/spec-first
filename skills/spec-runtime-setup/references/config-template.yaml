@@ -62,9 +62,8 @@
 # spec_promote_spiral_optout: true
 
 # --- Document rendering ---
-# The following three items are respectively read by spec-plan, spec-brainstorm, and spec-ideate; only uncommented entries are accepted
-# md or html. Keep the example in comment state and continue using the default values for each workflow, Runtime Setup
-# These workflows will not be invoked, and they will not modify the consumer's own pipeline override.
+# Uncomment a setting to choose md or html for its workflow. Leave it commented to use the default.
+# Each workflow owns its pipeline overrides. Runtime Setup does not run these workflows.
 
 # plan_output: html       # active: md | html (spec-plan default md)
 # brainstorm_output: html # active: md | html (spec-brainstorm default md)

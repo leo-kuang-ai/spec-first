@@ -1,11 +1,10 @@
 id: update-reads-existing-doc
 title: "Read the existing documentation carefully before updating and provide a summary of the current status."
-description: "Verify Phase 2 file reading discipline: Update run with complete reading of STRATEGY.md, output a 3-5 line summary of current status—assertions must reference unique content from the fixture (LedgerFlow, reconciliation duration) to prove actual reading rather than template replication."
+description: Assess whether the summary accurately represents the existing strategy. The summary alone cannot establish how the agent obtained those facts.
 
 input:
   prompt: |
-    （spec-strategy skill 已安装，请按它工作。）
-    策略文档过时了,过一遍。
+    Use spec-strategy. Our strategy might be out of date. Summarize what it actually says before proposing changes.
 
 context:
   repo_fixture: evals/fixtures/repos/existing-strategy
@@ -13,13 +12,9 @@ context:
     init: true
     checkout: main
 
-expect:
-  must_contain:
-    - "LedgerFlow"
-    - "对账"
-
 judge:
-  type: rule_based
-  success:
-    - output_contains:
-        all: ["LedgerFlow", "对账"]
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - Accurately summarize the freelancer's three-spreadsheet reconciliation problem. Distinguish the current two hours from the under-ten-minute goal. Merely naming LedgerFlow, denying a read, or presenting the target as a measured improvement fails. Assess the summary, not an unsupported claim about tool use.
+  pass_threshold: 1

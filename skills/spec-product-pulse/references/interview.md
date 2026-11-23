@@ -7,7 +7,7 @@ For each section: ask the opening question, evaluate the answer against the qual
 ## Overall Rules
 
 1. **Push back, but don't spiral.** One round of pushback per section max. If the second answer still isn't usable, capture what the user gave, flag it in the config as `needs-review`, and move on.
-2. **Name events in the user's own words.** The config will be readable by the whole team - use the terms they actually use, not a generic template.
+2. **Name events in the user's own words.** The config is machine-local; use the team's terms so reports make sense to their readers.
 3. **Ask about tools, not credentials.** The interview captures *which* tool and *what shape of query*. It does not collect API keys, tokens, or database passwords. Those stay in the user's environment.
 4. **Honor strategy seeds.** Use the product name and metrics from the STRATEGY or legacy source that setup read under `references/strategy-source.md` as defaults for correction. Do not re-ask questions the document already answered unambiguously.
 5. **Evaluate metrics against the SMART bar.** Every event, metric, and signal the user proposes should be:
@@ -57,7 +57,7 @@ This is the heartbeat of the pulse. Pick one event - the one that represents a u
 
 **Opening question:** "What event fires when a user actually gets value - when the product delivered what they came for?"
 
-Different from engagement. Engagement says "they're using it"; value-realization says "they got what they wanted." Some products have a clear distinction (engagement: `typed_in_box`; value: `got_useful_answer`); for others it's the same event (engagement: `ride_requested`; value: `ride_completed`).
+Engagement says "they're using it"; value-realization says "they got what they wanted." A ride request and a completed ride are distinct. For a one-tap timer, `timer_started` can be both the action and the immediate value if starting the timer is the user's goal. Confirm that interpretation before reusing one event.
 
 **Apply the SMART bar.** The bar here is the same - specific, measurable, actionable, relevant, timely - and the proxy test is especially important because value-realization is often felt, not fired.
 
@@ -98,7 +98,7 @@ If the user opts in, ask: "What dimension should sessions be scored on? (e.g., '
 **Pushback:**
 
 - **Vague dimension** ("quality", "goodness", "helpful", "good response") -> "Quality on what axis specifically? The dimension should be something a human could look at a transcript and judge consistently."
-- **Multiple dimensions** ("accurate AND actionable") -> "Start with one. You can add dimensions by editing the config later. Keeping it at one keeps the scores comparable across runs. Which matters more right now?"
+- **Multiple dimensions** ("accurate AND actionable") -> "Which single dimension matters most for this report? Keep it stable for comparisons; changing it starts a new series."
 - **Reviewability test** - after the user names a dimension, apply this check silently: could two separate reviewers look at the same session and agree on the score? If no, push back once: "Let's tighten this - what would make a reviewer score this a 5 vs a 3? If you can name the distinction in one sentence, the dimension is tight enough." If the user can answer, persist the short scoring note within the existing `pulse_quality_dimension` string alongside the dimension name. If they can't, flag the dimension `needs-review` and move on.
 
 **Capture:** opt-in after the context-processing disclosure (yes/no), dimension (if opted in), scoring note (1 sentence distinguishing 5 from 3), scoring anchors within `pulse_quality_dimension` (no forced score distribution).

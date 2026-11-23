@@ -1,59 +1,16 @@
-# Shared References
+# Shared references
 
-Canonical sources for references used by multiple skills. Each skill maintains a self-contained copy in its own `references/` directory for independent distribution (per `skills-lock.json` model), but maintenance happens here.
+Edit shared wording in `skills/_shared/references/`. Each listed package ships and reads its own `references/<file>` so it also works when installed alone. The distribution map is `SYNC_MAP` in [`scripts/sync-shared-references.js`](../../scripts/sync-shared-references.js); a reader of a resulting plan, glossary, ticket or learning is not another copy target.
 
-## Files
+| Shared source | Packages receiving a copy | When the package reads it |
+|---|---|---|
+| `html-rendering.md` | `spec-plan`, `spec-ideate`, `spec-brainstorm` | Present the selected artifact as a single HTML document; its producer's section contract supplies the content. |
+| `markdown-rendering.md` | `spec-plan`, `spec-ideate`, `spec-brainstorm` | Present the selected artifact in Markdown, preserving producer-owned headings, metadata and IDs. |
+| `concepts-vocabulary.md` | `spec-compound`, `spec-compound-refresh` | Capture or maintain project terms in `CONCEPTS.md`; lightweight capture can update but not seed a glossary. |
+| `settled-decisions.md` | `spec-plan`, `spec-brainstorm` | Carry examined user choices into their owning technical or product decision without asking again or inventing assent. |
+| `tracker-defer.md` | `spec-work`, `spec-lfg` | File explicitly deferred findings at an authorized destination. `spec-work` owns the policy; `spec-lfg` uses the non-interactive mode. |
+| `yaml-schema.md` | `spec-compound`, `spec-compound-refresh` | Consult the frontmatter guide alongside the package's `schema.yaml` when classifying or materially rewriting a learning. |
 
-- `html-rendering.md` — HTML plan/doc rendering principles (637 lines)
-  - Used by: `spec-plan`, `spec-ideate`, `spec-brainstorm`
-  - Defines Goal Capsule, section types, responsive design, theme-aware CSS
-- `markdown-rendering.md` — Markdown plan/doc rendering principles (350 lines)
-  - Used by: `spec-plan`, `spec-ideate`, `spec-brainstorm`
-  - Defines section types, code fences, tables, front matter
-- `concepts-vocabulary.md` — Compound workflow terminology (88 lines)
-  - Used by: `spec-compound`, `spec-compound-refresh`
-  - Defines artifact, aspect, horizon, durable knowledge, synthesis
-- `settled-decisions.md` — How to document decisions in plans (124 lines)
-  - Used by: `spec-plan`, `spec-brainstorm`
-  - Decision record format, rationale, alternatives, constraints
-- `tracker-defer.md` — Deferred work tracking contract (156 lines)
-  - Used by: `spec-work`, `spec-lfg`
-  - Format for parking out-of-scope work, follow-up conditions
-- `yaml-schema.md` — Compound YAML schema reference (267 lines)
-  - Used by: `spec-compound`, `spec-compound-refresh`
-  - Full schema, validation rules, examples
+After editing a source, run `npm run sync:shared-references`, then `npm run check:shared-references`. The check is read-only: it reports each registered package path and detects missing or divergent copies. It does not discover new consumers or validate artifact quality. When adding a shared source, add its intended targets to `SYNC_MAP` and update the table before syncing.
 
-**Total**: 6 files, 16 copies synced (was 19 before html-rendering.md drift fix)
-
-**Reviewed 2026-08-20 (see `docs/methodology/spec-first代码审查方案.md` Step 2 P2)**: The 8 file groups previously listed as "known drift requiring manual merge decision" were re-diffed. Seven of the eight consist of independently authored content that coincidentally share the same filename—title divergences are evident from line 1 (e.g., `cross-model-review.md`: "Cross-Model Adversarial Pass" vs. "Cross-Model Whole-Document Pass", supported by distinct scripts and gate structures; `intake.md`, `interview.md`, `pipeline-return.md`, `review-output-template.md`, `subagent-template.md`, `synthesis-summary.md` follow the same pattern). These are correctly independent — not drift, no merge action needed, no consumer/owner ambiguity to resolve.
-
-**One real candidate**: `model-tiers.md` (`skills/spec-sweep/references/`, `skills/spec-brainstorm/references/`) has identical structure — same four sections (extraction/generation/ceiling tier + degradation rule), same sentence patterns, only the worker-role nouns differ (e.g. "media-analyzer workers" vs "claim verifier"). This looks like a shared template with skill-specific nouns substituted in, not independent authorship. Not added to `SYNC_MAP` yet: the skill-specific nouns are load-bearing content, not incidental — syncing the shared scaffolding would require extracting a parameterized template (nouns as variables), which is a bigger change than the sync script currently supports. Left as an open `architecture-mismatch` note rather than force-synced.
-
-## Sync Workflow
-
-**After editing a shared reference:**
-
-```bash
-npm run sync:shared-references
-```
-
-This copies `_shared/references/*.md` to each skill's `references/` directory per the map in `scripts/sync-shared-references.js`.
-
-**CI check (detects drift):**
-
-```bash
-npm run check:shared-references
-```
-
-Exit code 1 if any per-skill copy diverges from its shared source. Run this in CI to catch manual edits to copies.
-
-## Why Not Symlinks or Cross-Skill Paths?
-
-Skills are designed for independent distribution (`skills-lock.json` shows external skills like `autoresearch`, `baoyu-*` pulled from other repos). Cross-skill references (`../spec-plan/references/html-rendering.md`) would break when a skill is distributed alone. Duplication with sync script preserves self-containment.
-
-## Adding a New Shared Reference
-
-1. Move the canonical version to `skills/_shared/references/`
-2. Add the source → targets mapping to `SYNC_MAP` in `scripts/sync-shared-references.js`
-3. Run `npm run sync:shared-references`
-4. Commit all files (shared source + per-skill copies)
+**Matching names are not a distribution rule.** `cross-model-review.md`, `review-output-template.md`, `subagent-template.md`, `intake.md`, `interview.md`, `pipeline-return.md` and `synthesis-summary.md` have package-specific callers and outputs. Even the similar `model-tiers.md` files retain different evidence on fallback: brainstorm needs the grounding dossier and claim checks; sweep needs retrieved media and per-finding evidence. Do not synchronize an entire file by basename.

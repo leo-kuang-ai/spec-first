@@ -56,10 +56,10 @@ function parseEntrypointOptions(argv = []) {
     else if (token === '--delete-legacy-markdown') options.deleteLegacyMarkdown = true;
     else if (token === '--version') {
       const value = argv[index + 1];
-      if (value !== undefined && !String(value).startsWith('--')) {
+      if (value !== undefined && String(value).trim() && !String(value).startsWith('-')) {
         options.pluginVersion = String(value);
         index += 1;
-      }
+      } else modeArgv.push(token);
     } else if (!OUTPUT_FLAGS.has(token)) {
       modeArgv.push(token);
     }
@@ -95,6 +95,10 @@ function parseArgs(argv = []) {
 
   for (let index = 0; index < input.length; index += 1) {
     const token = input[index];
+    if (token === '--version') {
+      result.errors.push({ reason_code: 'missing-option-value', option: token });
+      continue;
+    }
     if (!token.startsWith('--')) {
       result.errors.push({ reason_code: 'unexpected-positional', value: token });
       continue;

@@ -13,7 +13,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { assertContainedPath } = require('./path-safety.cjs');
-const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
+const { resolveWorkspaceTargets, workspaceTargetError } = require('./workspace-target.cjs');
 const {
   resolveContainedProjectPath,
   classifyGraphFreshness,
@@ -73,25 +73,13 @@ function runWorkspaceGraphStatus({
       default_project_path: null,
     };
   }
-  if (targets.manifest_error) {
+  const selectionError = workspaceTargetError(targets);
+  if (selectionError) {
     return {
       schema_version: 'workspace-graph-status.v1',
       status: 'invalid',
       topology: targets.topology,
-      reason_code: targets.manifest_error,
-      workspace_root: targets.workspace_root,
-      repos: [],
-      workspace: null,
-      routing: null,
-      default_project_path: null,
-    };
-  }
-  if (targets.ambiguous.length > 0) {
-    return {
-      schema_version: 'workspace-graph-status.v1',
-      status: 'invalid',
-      topology: targets.topology,
-      reason_code: 'workspace-targets-ambiguous',
+      ...selectionError,
       workspace_root: targets.workspace_root,
       repos: [],
       workspace: null,
@@ -138,11 +126,9 @@ function runWorkspaceGraphStatus({
       scope_id: repo.repo_id,
       scope_kind: 'child',
       provider: 'codegraph',
-      freshness: codegraphPresent ? 'complete' : 'unknown',
-      hasResults: codegraphPresent ? true : null,
       limitations: codegraphPresent
-        ? []
-        : ['no-.codegraph-directory — run --workspace-graph to build'],
+        ? ['codegraph-index-freshness-unverified', 'codegraph-query-not-run']
+        : ['codegraph-db-missing-or-empty'],
     });
     return {
       repo_id: repo.repo_id,
@@ -245,7 +231,6 @@ function runWorkspaceGraphStatus({
     scope_kind: 'workspace',
     provider: 'graphify',
     freshness: effectiveFreshness,
-    hasResults: mergedPresent ? true : null,
     limitations,
   });
 

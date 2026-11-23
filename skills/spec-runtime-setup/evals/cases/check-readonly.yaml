@@ -4,9 +4,10 @@ description: "--check is a read-only diagnosis; --verify-only allows writing of 
 
 input:
   prompt: |
-    （spec-runtime-setup skill 已安装，请按它工作。）
-    用 --check 检查当前夹具项目的 runtime readiness，只看状态。
-    不安装、不修改 host 配置、不写 setup facts；不要改用 --verify-only。
+    Use the installed spec-runtime-setup skill to check this project's runtime readiness.
+    Do not install tools, change host configuration, write facts, or substitute --verify-only.
+    From the fixture directory, run node "<loaded skill directory>/scripts/setup.cjs" --check --json
+    directly in Bash, using the actual path without pipes or redirection. Use read tools for path discovery.
 
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger

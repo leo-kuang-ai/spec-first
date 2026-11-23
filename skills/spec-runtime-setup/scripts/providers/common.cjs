@@ -33,7 +33,7 @@ function text(result) {
 function versionOutputMatches(output, versionPin) {
   if (!versionPin) return true;
   const escaped = String(versionPin).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(^|[^0-9A-Za-z.])${escaped}([^0-9A-Za-z.]|$)`).test(String(output || ''));
+  return new RegExp(`^(?:(?:codegraph|graphify)\\s+)?v?${escaped}$`, 'i').test(String(output || '').trim());
 }
 
 function providerLimitation(outcome, reasonCode, message) {

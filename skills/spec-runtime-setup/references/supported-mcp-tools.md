@@ -27,6 +27,9 @@ This article summarizes the current `spec-runtime-setup` registry. The machine s
   - Kiro: workspace `.kiro/settings/mcp.json` by default; user `~/.kiro/settings/mcp.json` only with `--user-scope` or `KIRO_USER_SCOPE=1`.
   - Qoder: local `.qoder/settings.local.json` by default; user `~/.qoder/settings.json` only with `--user-scope` or `QODER_USER_SCOPE=1`.
   - Cursor: writes to project `.cursor/mcp.json` by default; writes to user `~/.cursor/mcp.json` only when using `--user-scope`.
+  - OpenCode: use `mcp` in the project's `opencode.json` by default. User scope is explicit. A conflicting higher-priority JSONC file blocks the write.
+  - ZCode: use `mcp.servers` in the workspace's `.zcode/config.json`; there is no user-scope fallback.
+  - Pi: use `mcpServers` in the project's `.pi/mcp.json` by default, or `~/.pi/agent/mcp.json` for user scope. Configuration alone does not prove the extension loaded.
 - Claude, Kiro, Qoder, and Cursor use JSON `mcpServers`; Codex uses bounded TOML section editing. Both retain irrelevant entries, reject ambiguous or invalid inputs, and require secret-like values to remain as environment references.
 
 ## Runtime entry point
@@ -114,7 +117,7 @@ After the final state is written, if budget review/cancellation occurs within th
 
 Index status uses the native `status --json`, requiring the initialized, version, projectPath/indexPath, worktreeMismatch, pendingChanges, and index fields to be valid. Only proceed to query validation when `index.state=complete`, there are no pending reference resolutions or pending files to process, reconstruction is not recommended, and the path matches. Old `state:null` does not directly support ready; explicit apply requires using the native `index -f` to rebuild and verify again. Missing fields, unknown text, invalid JSON, and work tree mismatches are not supported for indexed.
 
-This fix only corrects status misjudgment and does not make the original status/query read-only: When CodeGraph 1.6.0 opens the database, it may perform recovery and migration. The read-only artifact verify path still awaits migration to be tied with source code, installation identity, and DB/WAL evidence readback; this boundary cannot currently be declared complete.
+CodeGraph 1.6.0 may recover or migrate a database when native status or query opens it. Setup uses those commands on the authorized build or repair path. Read-only verification uses the saved evidence described below; it does not run or timestamp a new query.
 
 
 ### CodeGraph artifact evidence (read-only consumption)

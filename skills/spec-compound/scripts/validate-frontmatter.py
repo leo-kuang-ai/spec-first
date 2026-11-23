@@ -244,7 +244,7 @@ def valid_source_refs(fm_lines: list[str], occurrences: list[tuple[int, str]]) -
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
-        match = re.fullmatch(r"[ \t]+-[ \t]*(.*)", line)
+        match = re.fullmatch(r"[ \t]+-[ \t]+(.*)", line)
         if not match or not non_empty_yaml_string(match.group(1)):
             return False
         items.append(match.group(1))

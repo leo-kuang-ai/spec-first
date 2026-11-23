@@ -36,6 +36,7 @@ read and a focused merge does not need another worker. For each topic cluster:
 2. Extract unique content from every subsumed doc, including independently
    valuable incident evidence, rejected alternatives, and unverifiable but
    plausible claims. Do not discard a claim merely because code cannot witness it.
+   Keep each retained claim traceable to its source. Include each independent condition that still calls for rechecking it in the successor's `invalidation_condition`, not just the canonical document's original condition.
 3. Integrate that content into a private canonical candidate. A material rewrite
    re-evaluates all classification fields under v2 and includes grounded
    `source_refs` and a concrete `invalidation_condition`.
@@ -88,6 +89,7 @@ the current evidence, and the final target to a worker or use them inline.
 Do not invent classification or section structure from memory. Re-evaluate all
 classification fields under v2 and include grounded `source_refs` and a concrete
 `invalidation_condition` in the private successor candidate.
+When a successor retains part of the old guidance, retain the evidence and recheck conditions specific to that part. Do not carry over recommendations that are known to be obsolete.
 
 - **Same-path Replace:** publish new contents at the original path after
   validation and freshness checks; never enqueue that path for deletion.

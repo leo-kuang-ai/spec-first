@@ -69,7 +69,7 @@ When two terms were used interchangeably and the team settled on a distinction, 
 ## One illustrative entry — the shape, not a template
 
 ```
-## Booking
+## Dining room
 
 ### Reservation
 A future commitment to seat a Party at a specified date and time.

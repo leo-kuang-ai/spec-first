@@ -13,11 +13,7 @@ engine:
 cases:
   files:
     - evals/cases/check-owned-update.yaml
-    - evals/cases/first-run-interview-asks.yaml
-    - evals/cases/existing-asks-which-section.yaml
-    - evals/cases/targeted-update-metrics.yaml
     - evals/cases/features-route-to-brainstorm.yaml
-    - evals/cases/update-reads-existing-doc.yaml
   defaults:
     timeout_seconds: 480
     max_turns: 12

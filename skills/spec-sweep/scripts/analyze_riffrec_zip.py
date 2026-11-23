@@ -6,9 +6,8 @@ Supported sources: Riffrec zip or unpacked capture, standalone video, audio, and
 meeting notes text/markdown. The script extracts transcript, high-signal
 video frames when available, and spec-first-friendly markdown artifacts.
 
-Canonical owner：spec-riffrec-feedback-analysis。
-Package-local projection：spec-sweep 保留 byte-identical copy，因为 host runtime
-package 不能导入另一个 skill 的 private script path。
+Canonical owner：spec-riffrec-feedback-analysis
+Package-local projection：spec-sweep keeps an identical copy for independent installation.
 """
 
 from __future__ import annotations
@@ -1047,7 +1046,7 @@ def write_requirements_kickoff(
         "",
         "## Actors",
         "",
-        "- A1. User: Operates the product in the recorded session and verbalizes friction.",
+        "- A1. User: The person whose workflow is under review. Events alone do not establish their intent.",
         "- A2. Product surface: The UI and backend behavior visible in the recording.",
         "- A3. Brainstorm agent: Uses the evidence bundle to confirm, correct, and group requirements before planning.",
         "",
@@ -1174,7 +1173,7 @@ def write_source_materials(
         f"- Source kind: `{source_kind}`",
         f"- Original path: `{source_path}`",
         f"- Local raw copy: `{link(copied_source) if copied_source else 'n/a'}`",
-        "- Commit policy: raw media, audio chunks, zip contents, session dumps, and extracted screenshots are local-only by default; commit generated Markdown/JSON/manifests when useful for brainstorm/planning traceability.",
+        "- This manifest, raw media, frames and generated reports are private by default. Share only a separately sanitized subset with explicit approval for its destination.",
         f"- Session URL: `{session.get('url', 'unknown')}`",
         f"- Duration: `{session.get('duration_seconds', 'unknown')}` seconds",
         "",
@@ -1242,7 +1241,8 @@ def write_problem_analysis(
         "## 1. Visual/UI Problems",
         "",
     ]
-    if moments:
+    frames = [moment for moment in moments if moment.get("screenshot")]
+    if frames:
         lines.extend(
             [
                 "1. Review required: inspect the extracted frames and replace this scaffold with precise visual observations. Include location, UI element type, issue description, and frame reference.",
@@ -1274,13 +1274,13 @@ def write_problem_analysis(
         ]
     )
 
-    for index, moment in enumerate(moments, start=1):
+    for index, moment in enumerate(frames, start=1):
         screenshot = markdown_link(moment.get("screenshot"), output_path.parent, repo_root)
         lines.append(
             f"{index}. Moment {moment['id']} at {format_time(moment['t'])}: Review `{screenshot}` for UX friction related to `{moment['reason']}`."
         )
-    if not moments:
-        lines.append("1. Review the transcript or notes for workflow friction, confusion, and unmet expectations.")
+    if not frames:
+        lines.append("1. No visual evidence. Review available events, notes or transcript before inferring user impact.")
 
     lines.append("</analysis>")
     safe_write_text(output_path, "\n".join(lines) + "\n")
@@ -1294,13 +1294,15 @@ def write_review_prompt(
 ) -> None:
     frame_lines: list[str] = []
     for moment in moments:
+        if not moment.get("screenshot"):
+            continue
         screenshot = markdown_link(moment.get("screenshot"), output_path.parent, repo_root)
         event_summary = "; ".join(event_label(event) for event in moment.get("events", [])) or "no event metadata"
         frame_lines.append(
             f"- {moment['id']} ({format_time(moment['t'])}, {moment['reason']}): `{screenshot}`. Events: {event_summary}"
         )
     if not frame_lines:
-        frame_lines.append("- No video frames are available for this source. Analyze transcript or meeting notes only.")
+        frame_lines.append("- No video frames are available. Use only the events, notes or transcript actually present.")
 
     lines = [
         "You will be analyzing a product feedback session by examining video frames and a discussion transcript. Your goal is to identify problems, requirements, and feedback points that need to be addressed - focusing on clear problem statements rather than solutions.",

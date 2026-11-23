@@ -52,6 +52,8 @@ Process each new item in cursor order. This ordering is an invariant; do not reo
 
 1. If the source's config entry has `approved: false` (the user declined standing approval for source-side writes), skip the ack write entirely and upsert the item as `ack_deferred` — never write to a source the user did not approve, even when the write tool is available. Otherwise: if the item's `existing_ack` (own identity) is true, skip the ack write; else perform the source's configured ack action at the source.
 2. Read back and confirm the ack is visible at the source before trusting it.
+
+   If a configured label already exists but its applying identity is unknown or different, do not reapply it to manufacture ownership. Record `ack_deferred`, report the conflict and hold the cursor pending reconciliation.
 3. `upsert-item --state <state> --id <id> --source <source-id> --json <item-json> --writer <writer>`. Include `"sensitive": true` in the item JSON when the source's config entry is marked sensitive — the engine drops `body`/`quote` before writing.
 4. `cursor-advance --state <state> --source <source-id> --to <item's own cursor value> --past-item <id> --writer <writer>` — only after the item is durably in state. Never advance past an item not yet upserted.
 

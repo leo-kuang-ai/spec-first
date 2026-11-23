@@ -123,7 +123,8 @@ function declaredCommands(registry) {
 function readJsonState(filePath) {
   if (!fs.existsSync(filePath)) return { status: 'missing', value: null };
   try {
-    return { status: 'read', value: JSON.parse(fs.readFileSync(filePath, 'utf8')) };
+    const value = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return isObject(value) ? { status: 'read', value } : { status: 'unreadable', value: null };
   } catch (error) {
     return { status: 'unreadable', value: null, error };
   }
@@ -251,7 +252,8 @@ function makeEntry({ kind, sourcePath, command, idSuffix, configuredStatus }, lo
   const name = commandName(command);
   if (!name) return null;
   const declaredToolId = lookup.get(name) || null;
-  const dependency = dependencyStatusFor(name);
+  const denied = configuredStatus === 'denied';
+  const dependency = denied ? 'not-applicable' : dependencyStatusFor(name);
   const undeclared = !declaredToolId;
   return {
     id: `${kind}:${idSuffix || name}`,
@@ -263,8 +265,8 @@ function makeEntry({ kind, sourcePath, command, idSuffix, configuredStatus }, lo
     declared_status: undeclared ? 'undeclared' : 'declared',
     dependency_status: dependency,
     configured_status: configuredStatus || 'configured',
-    result: undeclared || dependency !== 'ready' ? 'action-required' : 'ready',
-    reason_code: undeclared
+    result: denied ? 'not-applicable' : (undeclared || dependency !== 'ready' ? 'action-required' : 'ready'),
+    reason_code: denied ? 'configured-command-denied' : undeclared
       ? 'configured-dependency-undeclared'
       : (dependency === 'ready' ? 'configured-dependency-ready' : 'configured-dependency-missing'),
   };

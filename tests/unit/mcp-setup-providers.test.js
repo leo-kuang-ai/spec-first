@@ -907,6 +907,11 @@ describe('Graphify provider', () => {
       hook_status: 'verified-external',
     });
     expect(verified.next_actions.join('\n')).toContain('commit-time 自动刷新已只读验证');
+    fs.writeFileSync(path.join(outsideHooks, 'post-checkout'), '#'.repeat(1024 * 1024 + 1));
+    expect(provider.verify(context).steady_state).toMatchObject({
+      refresh_mode: 'manual-only', hook_verified: false, hook_skipped_reason: 'graphify-external-hook-inspection-incomplete',
+    });
+    expect(hookCalls).toEqual([]);
   });
 
   test.each([
@@ -2089,7 +2094,18 @@ describe('Graphify provider', () => {
     fs.writeFileSync(packageCli, '#!/usr/bin/env node\n');
     fs.symlinkSync(packageCli, npmLauncher);
     fs.symlinkSync(npmLauncher, staleLauncher);
+    const launcher = path.join(homeDir, 'python-tools', 'graphify');
+    const interpreter = path.join(homeDir, 'python-tools', 'python');
+    fs.mkdirSync(path.join(target, '.qoder', 'rules'), { recursive: true });
+    fs.writeFileSync(path.join(target, '.qoder', 'rules', 'spec-first.md'), 'graphify query: graphify-out/graph.json\n');
     const runner = (command, args) => {
+      if (command === interpreter) return success(JSON.stringify({ version: '0.9.57', packages: [['graphifyy', '0.9.57']] }));
+      if (command === launcher && args[0] === 'extract') {
+        fs.mkdirSync(path.join(target, 'graphify-out'));
+        fs.writeFileSync(path.join(target, 'graphify-out', 'graph.json'), '{"nodes":[{"id":"fixture"}]}');
+        return success();
+      }
+      if (command === launcher && args[0] === 'query') return success('fixture');
       if (command === 'npm' && args[0] === 'list') {
         return success(JSON.stringify({ dependencies: { '@sentropic/graphify': { version: '0.17.1' } } }));
       }
@@ -2102,13 +2118,17 @@ describe('Graphify provider', () => {
       return failure('unexpected');
     };
 
-    expect(provider.cleanupNpmGraphifyIncumbent({
+    expect(provider.apply({
       repoRoot: target,
       homeDir,
-      graphifyOriginalPathCommand: staleLauncher,
+      host: 'qoder', targetKind: 'non-git-folder', dependency: { ecosystem: 'pypi', version: '0.9.57' },
       env: { HOME: homeDir, PATH: path.dirname(staleLauncher) },
       runner,
-    }, target)).toMatchObject({ ok: true, status: 'removed', version: '0.17.1' });
+    }, { mutation: true, artifact_root: path.join(target, 'graphify-out'),
+      resolved_graphify_command: launcher, resolved_graphify_interpreter: interpreter, resolved_graphify_installer: 'uv',
+      original_path_graphify_command: staleLauncher, resolved_graphify_collision_state: 'npm-incumbent',
+      actions: [{ kind: 'first-generation', args: ['extract', '.', '--code-only'] }],
+    })).toMatchObject({ lifecycle: { installed: true, configured: true, query_verified: true }, limitations: expect.arrayContaining([expect.stringContaining('migration cleanup:')]) });
     expect(fs.existsSync(staleLauncher)).toBe(false);
     expect(fs.existsSync(packageRoot)).toBe(false);
   });

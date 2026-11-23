@@ -129,8 +129,9 @@ function compactProjectStatus(projectConfigStatus, insideGitRepo) {
     inside_git_repo: true,
     local_config_status: localStatus === 'present'
       ? 'ok'
-      : (defaultsActive ? 'defaults-active' : 'missing'),
-    local_config_gitignore_status: localStatus === 'present'
+      : (defaultsActive ? 'defaults-active' : (localStatus === 'invalid' ? 'invalid' : 'missing')),
+    ...(localStatus === 'invalid' ? { local_config_next_action: status.local_config.next_action } : {}),
+    local_config_gitignore_status: ['present', 'invalid'].includes(localStatus)
       ? (gitignoreStatus === 'ignored' ? 'ok' : 'missing')
       : (defaultsActive
         ? (gitignoreStatus === 'ready-for-local-config' ? 'ok' : 'missing')

@@ -47,14 +47,14 @@ If the source cannot project or de-identify before returning data, do not fetch 
 
 #### 2.3 Assemble the Report
 
-Read `references/report-template.md`. Fill in the template using the query results and per-source receipts. Four sections, in order:
+Read `references/report-template.md`. Fill in the template using query results and per-source receipts. Use these sections in order; omit System performance only when it is out of scope. If tracing was configured but failed, keep the section and explain what was not measured.
 
 1. **Headlines** - 2-3 lines summarizing the window
 2. **Usage** - primary engagement, value realization, completions, quality sample
 3. **System performance** - latency (p50/p95/p99) and top 5 errors by count with one-line explanation each
 4. **Followups** - 1-5 things worth investigating
 
-Keep the total to 30-40 lines. If a section is thin, leave it thin; do not pad.
+Aim for a single page. If a section is thin, leave it thin; do not pad.
 
 #### 2.4 Write the Report
 

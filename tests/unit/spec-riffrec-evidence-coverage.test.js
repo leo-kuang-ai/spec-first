@@ -117,7 +117,7 @@ with tempfile.TemporaryDirectory() as directory:
     with patch.object(sys, 'argv', [str(sys.argv[1]), str(capture), '--output-dir', str(output), '--no-transcribe']), patch('builtins.print'):
         code = m.main()
     result = json.loads((output / 'analysis.json').read_text())
-    print(json.dumps({'code': code, 'result': result, 'analysis': (output / 'analysis.md').read_text()}))
+    print(json.dumps({'code': code, 'result': result, 'analysis': (output / 'analysis.md').read_text(), 'problem': (output / 'problem-analysis.md').read_text(), 'review': (output / 'review-prompt.md').read_text(), 'manifest': (output / 'source-materials.md').read_text(), 'kickoff': (output / 'requirements-kickoff.md').read_text()}))
 `);
     expect(payload.code).toBe(0);
     expect(payload.result.moments).toHaveLength(12);
@@ -127,6 +127,11 @@ with tempfile.TemporaryDirectory() as directory:
     expect(findings.some((f) => f.title.includes('Console'))).toBe(true);
     expect(payload.analysis).toContain('M15');
     expect(payload.analysis).not.toContain('No obvious failure');
+    expect(payload.problem).toContain('No video frames were available');
+    expect(payload.problem).not.toContain('Review `n/a`');
+    expect(payload.review).not.toContain('`n/a`. Events:');
+    expect(payload.manifest).toContain('private by default');
+    expect(payload.kickoff).not.toContain('verbalizes friction');
   });
 
   test('a quiet capture does not create a product requirement or button acceptance example', () => {

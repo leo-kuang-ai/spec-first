@@ -3100,7 +3100,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(result.payload.results.find((entry) => entry.repo_label === 'a')).toMatchObject({
       exit_code: 1,
       overall_status: 'action-required',
-      reason_code: 'child-setup-execution-failed',
+      reason_code: 'local-config-ignore-unreadable',
     });
     expect(fs.existsSync(path.join(second, '.spec-first', 'config', 'tool-facts.json'))).toBe(true);
     expect(fs.existsSync(path.join(workspace, '.spec-first', 'workspace', 'mcp-verify-summary.json'))).toBe(true);

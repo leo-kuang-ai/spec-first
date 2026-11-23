@@ -291,7 +291,7 @@ function runVerificationOrMutation(context, repoRoot) {
       host_ledger_write_result: hostLedgerWriteResult,
       host_config_receipt: buildHostConfigReceipt(hostConfigResults),
     },
-    human: renderHumanSummary(bundle, { executionSummary }),
+    human: renderHumanSummary(bundle, { executionSummary, args: context.actionPlan.args }),
     target: context.target,
   };
 }
@@ -590,6 +590,7 @@ function configureOrInspectHost(context, repoRoot, {
     }
     if (typeof scopeFilter === 'function' && !scopeFilter(target.scope, target, entry)) continue;
     let inspection = inspectHostConfig({ entry, target, jsonDocumentPolicy });
+    let recoveryFields = {};
     const repairAuthorized = context.actionPlan.args.repairHostConfig === true
       && inspection.reason_code === 'host-config-conflict';
     if (applyMutation
@@ -605,6 +606,10 @@ function configureOrInspectHost(context, repoRoot, {
       });
       if (applied.ok) inspection = inspectHostConfig({ entry, target, jsonDocumentPolicy });
       else inspection = { ...applied, ok: false, configured: false };
+      recoveryFields = hostRecoveryFields(applied);
+      if (inspection.configured && recoveryFields.lock_release_status === 'failed') {
+        inspection = { ...inspection, ok: false, reason_code: recoveryFields.lock_release_reason_code };
+      }
     }
     results.set(entry.id, {
       configured_status: inspection.ok && inspection.configured
@@ -629,9 +634,27 @@ function configureOrInspectHost(context, repoRoot, {
       next_action: inspection.reason_code === 'host-config-conflict'
         ? hostConfigRepairCommand(context)
         : null,
+      ...recoveryFields,
     });
   }
   return results;
+}
+
+function hostRecoveryFields(result) {
+  const fields = {};
+  if (result.recovery && result.recovery.next_action) {
+    fields.recovery = { status: result.recovery.status, next_action: result.recovery.next_action };
+    fields.backup_path = result.backup_path || null;
+    fields.next_action = result.recovery.next_action;
+  }
+  if (result.lock_release_status === 'failed') {
+    fields.lock_release_status = 'failed';
+    fields.lock_release_reason_code = result.lock_release_reason_code || 'host-config-lock-release-failed';
+    fields.lock_path = result.lock_path || null;
+    fields.lock_release_next_action = result.lock_release_next_action;
+    fields.next_action = [fields.next_action, result.lock_release_next_action].filter(Boolean).join('\n');
+  }
+  return fields;
 }
 
 function isSharedHostConfigScope(scope) {
@@ -647,6 +670,7 @@ function buildHostConfigReceipt(hostConfigResults) {
     repo_root: result.repo_root || null,
     outcome: result.configured_status || 'unknown',
     reason_code: result.reason_code || null,
+    ...hostRecoveryFields(result),
   }));
 }
 

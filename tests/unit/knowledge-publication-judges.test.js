@@ -10,6 +10,8 @@ const fixtures = path.join(root, 'skills/spec-compound-refresh/evals/fixtures');
 const old = 'docs/solutions/old.md';
 const successor = 'docs/solutions/new.md';
 const catalog = 'docs/solutions/catalog.md';
+const verificationTrigger = 'src/auth.js认证复验逻辑变化时复查';
+const offlineTrigger = 'src/auth.js不再保留离线凭据时复查';
 
 describe('知识发布固定判据正反例校准', () => {
   let workspace;
@@ -19,7 +21,7 @@ describe('知识发布固定判据正反例校准', () => {
   const read = (file) => fs.readFileSync(path.join(workspace, file), 'utf8');
   const write = (file, text) => fs.writeFileSync(path.join(workspace, file), text);
   const reports = {
-    preserve: { status: 'recommended-only', changed: [], deleted: [] },
+    preserve: { status: 'recommended-only', changed: [], deleted: [], decision: 'retain', unique_section: `${old}#离线恢复`, inbound_from: catalog },
     partial: { status: 'partial', published_before_run: [successor], changed: [], deleted: [], pending: [catalog, old] },
     recover: { status: 'applied', changed: [successor, catalog], deleted: [old], pending: [] },
   };
@@ -27,7 +29,7 @@ describe('知识发布固定判据正反例校准', () => {
     cwd: workspace, env: { ...env, EVAL_EXIT_CODE: '0', EVAL_FINAL_MESSAGE: JSON.stringify(report) }, encoding: 'utf8', timeout: 15000,
   });
   function recover() {
-    write(successor, read(successor) + '\n## 离线恢复\n\n离线时保留最后可用凭据，不删除备份。\n');
+    write(successor, read(successor).replace(verificationTrigger, `${verificationTrigger}；${offlineTrigger}`) + '\n## 离线恢复\n\n离线时保留最后可用凭据，不删除备份。\n');
     write(catalog, read(catalog).replace('(old.md#离线恢复)', '(new.md#离线恢复)'));
     fs.unlinkSync(path.join(workspace, old));
   }
@@ -58,6 +60,14 @@ describe('知识发布固定判据正反例校准', () => {
   test('保留措辞不能掩盖真实删除', () => {
     fs.unlinkSync(path.join(workspace, old));
     expect(judge('preserve').status).not.toBe(0);
+  });
+  test.each([{ decision: 'delete' }, { unique_section: successor }, { inbound_from: old }, { recommendation: 'Delete the old document now' }])('an unchanged worktree cannot justify a wrong deletion decision or citation: %j', (wrong) => {
+    expect(judge('preserve', { ...reports.preserve, ...wrong }).status).not.toBe(0);
+  });
+  test.each([verificationTrigger, offlineTrigger])('rejects a restored body and catalog when only one recheck condition remains: %s', (remaining) => {
+    recover();
+    write(successor, read(successor).replace(`${verificationTrigger}；${offlineTrigger}`, remaining));
+    expect(judge('recover').status).not.toBe(0);
   });
   test('恢复正例保留独有知识、人工条目及可恢复原件', () => {
     recover();

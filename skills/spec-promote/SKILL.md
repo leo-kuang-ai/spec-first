@@ -87,7 +87,7 @@ If the authorized `spiral write` call errors or returns no usable drafts, fall b
 No Spiral needed — draft strong copy directly using a compact layer of editorial and social-media fundamentals. (The Spiral path goes further: brand-voice matching, humanization, saved styles, and cross-channel campaign orchestration.)
 
 **Editorial fundamentals** — every channel:
-- Lead with the user-facing outcome: what someone can now do, not how it was built.
+- Lead with what the change means for the reader. Say what someone can do now only when availability is confirmed. For a local implementation, name what was built and say in the draft itself that it is not released; do not invite readers to try it today.
 - One idea per piece. Cut windup, hedges, and throat-clearing.
 - Be concrete and specific; show the value, don't assert it.
 - Plain, active language. Strip AI tells — "thrilled/excited to announce," "game-changer," "in today's fast-paced world," "unlock/leverage/seamless," em-dash padding.
@@ -111,7 +111,7 @@ No Spiral needed — draft strong copy directly using a compact layer of editori
 
 ## Phase 4 — Present the drafts
 
-Show every draft as a clean, copy-pasteable block, labeled by channel. For each:
+Show every draft as a clean, copy-pasteable block, labeled by channel. Read each block without the surrounding status note: its availability claim must still be true. For local-only work, “Monthly summaries are implemented and awaiting release” is appropriate; “Get your summary today” is not. For each:
 
 ```
 ### X post

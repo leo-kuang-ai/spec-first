@@ -72,7 +72,9 @@ test('conditional sources name their trigger, purpose, and fallback', () => {
 
   expect(skill).toContain('## Conditional Sources');
   expect(skill).toContain('change in target metadata/invocation or local governance/catalog/generator patch');
-  expect(skill).toContain('Unread not allowed to start; full apply source patch; Tier A does not trigger.');
+  const tierA = skill.split('\n').find(line => line.startsWith('| Tier A apply |'));
+  expect(tierA).toContain('(references/evaluation-design.md#restructure-coverage)');
+  expect(skill).toContain('Skip it for Tier A copy edits');
   expect(authoring).toContain('Branch-First Information Hierarchy');
   expect(authoring).toContain('trigger_condition');
   expect(authoring).toContain('purpose');
@@ -189,7 +191,9 @@ test('authoring workbench keeps semantic design, shape-aware evaluation, and mut
   expect(previewValidator).toContain('re-confirm only if scope or side effects expand');
   expect(previewValidator).not.toContain('must re-confirm current user authorization before writing');
   expect(evaluation).toContain('full apply has confirmed a single source owner');
-  expect(evaluation).toContain('read fully for full apply; Tier A behavior-preserving revise does not trigger');
+  expect(evaluation).toMatch(/full apply, read the entire reference.*Skip it for Tier A copy edits.*behavior-preserving move, read only.*#restructure-coverage/);
+  expect(evaluation).toContain('## Restructure Coverage');
+  expect(workbench).toContain('(evaluation-design.md#restructure-coverage)');
   expect(evaluation).toContain('do not begin a full apply source patch');
   expect(evaluation).toContain('fallback_if_unread');
   expect(evaluation).toContain('protected_behavior -> source carrier -> contract assertion -> semantic eval case');

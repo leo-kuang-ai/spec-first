@@ -46,6 +46,7 @@ not a clean result. If the interpreter or validator is unavailable, report
    structured values and nested values are outside this check.
 3. In promotion mode, `source_refs` occurs exactly once as a non-empty top-level
    block or flow array of non-empty strings.
+   A block sequence item requires whitespace between `-` and its non-empty content. `-src/auth.js` is a scalar, not a list item.
 4. In promotion mode, `invalidation_condition` occurs exactly once as a non-empty
    top-level scalar or block string. For both promotion fields, quote tokens
    otherwise typed as null, boolean, number, sexagesimal, date, or timestamp.

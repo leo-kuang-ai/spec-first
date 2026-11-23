@@ -26,7 +26,7 @@ For a restructure, place each moved block in the reference read by the step that
 
 Even a behavior-preserving Tier A restructure must apply the size and pin audit in [Authoring Method](authoring-method.md#size-restructure-checkpoints) and the applicable evaluation guidance in [Evaluation Design](evaluation-design.md#restructure-coverage). This does not require the full Design Record for Tier A.
 
-Before applying the source patch, first form the minimal eval plan according to `evaluation-design.md`. create at least three examples: positive, negative/near-neighbor, and main failure/adversarial; revise the fixed old version protected behavior and before baseline, without reversing the implementation of candidate solutions. Each load behavior provides `protected_behavior → source carrier → contract assertion → semantic eval case`; without new assertions or semantic cases, full green passes of existing tests do not constitute coverage.
+Only full apply needs a pre-patch eval plan. For a new Skill, cover a positive case, a negative or near-neighbor case, and the main failure mode. For a revision, pin the previous version and identify the behavior it must preserve. Map each required behavior as `protected_behavior -> source carrier -> contract assertion -> semantic eval case`. Passing the existing suite does not establish coverage for new behavior.
 
 Expand the package topology preview only when changes occur in file sets, resource placement, or runtime carrier; distinguish between spine, triggered references, scripts, assets, maintainer-only evals, target sidecar, and project governance; a single-file revise reports only changed surfaces. New or modified runtime references must still record consumer, trigger condition, must-read, fallback, and eval case; runtime closure must not be claimed when conditions are not met.
 
@@ -48,3 +48,23 @@ node "$SKILL_DIR/scripts/validate-authoring-preview.cjs" <manifest.json> \
 ```
 
 The script only verifies structure, hash, containment, snapshot, collision, scope, and write-set binding. The `authorization_claim` is merely a structural field; the host must verify that the exact write set remains within the current authorization, and re-verification is required only when the root/scope is expanded, an uncovered dirty overwrite occurs, or new external/network/high-risk side effects are introduced. A canonical source may only be written when both the host can use atomic conditional patch primitives (expected-old-hash / expected-nonexistence) and symlink/ancestor substitution is rejected. Mutation readiness is `not-ready` when the primitive or exact pre-write binding is missing, and application stops; final recheck or loud convention must not mask TOCTOU. The write-after receipt must carry the actual changed/unchanged paths produced by the primitive, and then verify each path individually against the after hash; a missing actual path list shall prevent completion of the declaration. partial failure reports the current diff, failure reason, and rollback preview, but does not automatically rollback.
+
+**Single-file preview.** Suppose `example-skill/SKILL.md` exists and has no pending edits. The host has verified the exact write set and its ability to apply an atomic conditional patch. Supply the canonical absolute repository path as `root`, the existing file bytes as `before`, and the proposed bytes as `after`. This example builds the three JSON inputs for the command above. It does not establish authorization or write a file.
+
+```js
+const path = 'example-skill/SKILL.md';
+const sha = bytes => require('node:crypto').createHash('sha256').update(bytes).digest('hex');
+const change = { path, before_sha256: sha(before), after_sha256: sha(after) };
+const writeSet = [change];
+const scope = { paths: [path], dirty_paths: [], pre_write_binding: true, conditional_patch_primitive: 'atomic-expected-hash' };
+const manifest = {
+  schema_version: 'spec-write-skill.authoring-preview/v1', target_repo_root: root,
+  authorized_root: '.', canonical_source_root: 'example-skill', requested_effect: 'apply', authorization_claim: 'ready',
+  source_snapshot: { files: [{ path, sha256: change.before_sha256 }] },
+  would_change: [{ ...change, collision_disposition: 'replace' }], preserve: [], generated: [], not_touch: [],
+  planned_side_effects: [], residual_risks: [],
+};
+({ manifest, scope, writeSet });
+```
+
+After the write, pass the host's actual receipt to `verifyWriteReceipt({ preview, root, writeSet, patch_receipt })` from the same module. Without a receipt, it returns `actual_change_list_unavailable` and `completion_claim_allowed: false` even if the preview passed. Do not construct a receipt from this example.

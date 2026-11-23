@@ -20,6 +20,9 @@ function smokeTargetPayload({ payloadDir, runtimeFileSet }) {
   }
   const declared = new Set(Array.isArray(files) ? files.map((entry) => entry.path) : []);
   const actual = new Set(facts.regular_file_inventory);
+  if (!declared.has('SKILL.md') || !actual.has('SKILL.md')) {
+    findings.push(payloadFinding('payload_entry_missing', 'error', 'SKILL.md', 'The staged payload and runtime manifest must both include SKILL.md at the root.'));
+  }
   if (facts.findings.some((entry) => entry.reason_code === 'secret_like_file_not_read' || entry.reason_code === 'secret_like_directory_not_read')) {
     findings.push(payloadFinding('payload_secret_like_path_forbidden', 'error', null, 'Payload contains a secret-like path and cannot prove complete runtime closure.'));
   }

@@ -42,7 +42,10 @@ function parseArgs(argv) {
     const arg = argv[index];
     if (arg === '--json') args.json = true;
     else if (arg === '--strict-portable') args.strictPortable = true;
-    else if (arg === '--authorized-root') args.authorizedRoot = argv[++index] || null;
+    else if (arg === '--authorized-root') {
+      args.authorizedRoot = argv[++index];
+      if (!args.authorizedRoot || args.authorizedRoot.startsWith('-')) throw new Error('--authorized-root requires a directory argument');
+    }
     else if (!arg.startsWith('-') && !args.skillDir) args.skillDir = arg;
     else throw new Error(`Unknown or incomplete argument: ${arg}`);
   }
@@ -60,22 +63,9 @@ function unsupportedFrontmatter(message) {
 }
 
 
-function nearestExistingAncestor(absolutePath) {
-  let current = absolutePath;
-  while (true) {
-    try {
-      fs.lstatSync(current);
-      return current;
-    } catch {
-      const parent = path.dirname(current);
-      if (parent === current) return null;
-      current = parent;
-    }
-  }
-}
-
-
 function parseQuoted(value, lineNumber) {
+  const commented = value.match(/^("(?:[^"\\]|\\.)*"|'(?:[^']|'')*')[ \t]+#.*$/);
+  if (commented) value = commented[1];
   if (value.startsWith('"')) {
     if (!value.endsWith('"')) throw invalidFrontmatter(`line ${lineNumber}: unterminated double-quoted scalar`);
     try {
@@ -166,82 +156,50 @@ function validateSkill(options) {
   let totalTextBytes = 0;
   let secretLikeCount = 0;
   let inventoryHalted = false;
-  let rootSymlinkHalted = false;
-  let rootStat;
+  let realRoot = requestedRoot;
   let authorizedReal = null;
 
-  const symlinkSegment = findSymlinkSegment(requestedRoot);
-  if (symlinkSegment) {
-    findings.push(finding('skill_root_symlink_segment', 'path-safety', 'error', '.', 'Skill root path must not traverse a symbolic-link segment.'));
-    inventoryHalted = true;
-    rootSymlinkHalted = true;
-    findings.push(finding('inventory_halted_root_symlink', 'inventory', 'not_checked', null, 'Inventory skipped: the skill root traverses a symbolic-link segment, so no file is inventoried or read through it.'));
-  }
-
-  if (options.authorizedRoot) {
+  if (options.authorizedRoot != null) {
+    if (typeof options.authorizedRoot !== 'string' || !options.authorizedRoot) {
+      return stop('authorized_root_unavailable', 'path-safety', 'not_checked', 'No authorized root was specified.');
+    }
     const requestedAuthorizedRoot = path.resolve(options.authorizedRoot);
+    if (!isInside(requestedRoot, requestedAuthorizedRoot)) {
+      return stop('skill_root_outside_authorized_root', 'path-safety', 'error', 'Skill root is outside the authorized root.');
+    }
     try {
       authorizedReal = fs.realpathSync(requestedAuthorizedRoot);
-      if (!isInside(requestedRoot, requestedAuthorizedRoot)) {
-        findings.push(finding('skill_root_outside_authorized_root', 'path-safety', 'error', '.', 'Skill root is lexically outside the authorized root.'));
-      }
-      const nearest = nearestExistingAncestor(requestedRoot);
-      if (nearest) {
-        const nearestReal = fs.realpathSync(nearest);
-        if (!isInside(nearestReal, authorizedReal)) {
-          findings.push(finding('skill_root_outside_authorized_root', 'path-safety', 'error', '.', 'Nearest existing Skill ancestor resolves outside the authorized root.'));
-        }
-      }
     } catch (error) {
-      incomplete = true;
-      findings.push(finding('authorized_root_unavailable', 'path-safety', 'not_checked', null, error.message));
+      return stop('authorized_root_unavailable', 'path-safety', 'not_checked', error.message);
     }
   }
 
   try {
-    rootStat = fs.lstatSync(requestedRoot);
+    if (findSymlinkSegment(requestedRoot)) {
+      findings.push(finding('inventory_halted_root_symlink', 'inventory', 'not_checked', null, 'Directory inventory skipped.'));
+      findings.push(finding('skill_md_not_checked_root_symlink', 'frontmatter', 'not_checked', 'SKILL.md', 'SKILL.md was not read.'));
+      return stop('skill_root_symlink_segment', 'path-safety', 'error', 'Skill root path contains a symbolic link.');
+    }
+    if (!fs.lstatSync(requestedRoot).isDirectory()) {
+      return stop('skill_root_not_directory', 'input', 'error', 'Skill root must be a directory.');
+    }
   } catch (error) {
-    incomplete = true;
-    findings.push(finding('skill_root_unreadable', 'input', 'not_checked', null, error.message));
-    findings.sort((a, b) => (
-      STATUS_ORDER[a.status] - STATUS_ORDER[b.status]
-      || a.reason_code.localeCompare(b.reason_code)
-      || String(a.path || '').localeCompare(String(b.path || ''))
-    ));
-    const result = findings.some((item) => item.status === 'error') ? 'fail' : 'incomplete';
-    return {
-      schema_version: 'spec-write-skill.validator/v1',
-      skill_root: escapeUntrustedText(requestedRoot),
-      result,
-      ok: false,
-      findings,
-      inventory,
-    };
+    return stop('skill_root_unreadable', 'input', 'not_checked', error.message);
   }
 
-  if (rootStat.isSymbolicLink()) {
-    findings.push(finding('skill_root_symlink', 'path-safety', 'error', '.', 'Skill root must not be a symbolic link.'));
-  } else if (!rootStat.isDirectory()) {
-    findings.push(finding('skill_root_not_directory', 'input', 'error', '.', 'Skill root must be a directory.'));
-  }
-
-  let realRoot = requestedRoot;
   try {
     realRoot = fs.realpathSync(requestedRoot);
   } catch (error) {
-    incomplete = true;
-    findings.push(finding('skill_root_realpath_unavailable', 'path-safety', 'not_checked', '.', error.message));
+    return stop('skill_root_realpath_unavailable', 'path-safety', 'not_checked', error.message);
+  }
+  if (authorizedReal && !isInside(realRoot, authorizedReal)) {
+    return stop('skill_root_outside_authorized_root', 'path-safety', 'error', 'Skill root is outside the authorized root.');
   }
 
-  if (authorizedReal) {
-    try {
-      if (!isInside(realRoot, authorizedReal)) {
-        findings.push(finding('skill_root_outside_authorized_root', 'path-safety', 'error', '.', 'Skill root is outside the authorized root.'));
-      }
-    } catch (error) {
-      incomplete = true;
-      findings.push(finding('authorized_root_unavailable', 'path-safety', 'not_checked', null, error.message));
-    }
+  function stop(code, check, status, message) {
+    findings.unshift(finding(code, check, status, '.', message));
+    return { schema_version: 'spec-write-skill.validator/v1', skill_root: escapeUntrustedText(requestedRoot),
+      result: status === 'error' ? 'fail' : 'incomplete', ok: false, findings, inventory };
   }
 
   function walk(directory, depth) {
@@ -354,13 +312,10 @@ function validateSkill(options) {
     }
   }
 
-  if (rootStat.isDirectory() && !rootStat.isSymbolicLink()) walk(realRoot, 0);
+  walk(realRoot, 0);
 
   const skillMdPath = path.join(realRoot, 'SKILL.md');
-  if (rootSymlinkHalted) {
-    // Symlink-traversing root: nothing inside the target is read, including SKILL.md.
-    findings.push(finding('skill_md_not_checked_root_symlink', 'frontmatter', 'not_checked', 'SKILL.md', 'SKILL.md checks skipped: the skill root traverses a symbolic-link segment.'));
-  } else if (!fs.existsSync(skillMdPath)) {
+  if (!fs.existsSync(skillMdPath)) {
     findings.push(finding('skill_md_missing', 'frontmatter', 'error', 'SKILL.md', 'SKILL.md is required.'));
   } else {
     try {

@@ -2,7 +2,7 @@
 
 ## Discoverability Check
 
-After the refresh report is generated, check whether the project's instruction files would lead an agent to discover and search `docs/solutions/` before starting work in a documented area. This runs every time — the knowledge store only compounds value when agents can find it. If this check produces edits, they stay under the same Phase 5 commit and landing authority facts — see step 6 below.
+Before the final report, check whether the project instructions help readers find and search `docs/solutions/` before starting related work. Include recommendations and verified edits in the same report, clearly distinguished. The commit and landing rules in step 6 still apply.
 
 1. Identify the project's root instruction surface: AGENTS.md, CLAUDE.md, GEMINI.md, or the equivalent it actually uses. Read it and identify the substantive source; ignore include-only shims. If none exists, skip this check. A generated managed block is not a direct edit target: recommend its owning source and generator instead.
 2. Assess whether an agent reading the instruction files would learn three things:

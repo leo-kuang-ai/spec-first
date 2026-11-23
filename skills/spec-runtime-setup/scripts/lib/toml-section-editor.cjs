@@ -1,5 +1,7 @@
 'use strict';
 
+const { isDeepStrictEqual } = require('node:util');
+
 const MANAGED_FIELDS = [
   'command',
   'args',
@@ -536,10 +538,6 @@ function normalizeExpected(expected = {}) {
   return result;
 }
 
-function valuesEqual(left, right) {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
-
 function compareMcpSection(text, key, expected) {
   const extracted = extractMcpSection(text, key);
   if (!extracted.ok) return extracted;
@@ -551,7 +549,7 @@ function compareMcpSection(text, key, expected) {
   const normalized = normalizeExpected(expected);
   const driftFields = [];
   for (const [field, value] of Object.entries(normalized)) {
-    if (!parsed.assignments.has(field) || !valuesEqual(parsed.assignments.get(field).value, value)) {
+    if (!parsed.assignments.has(field) || !isDeepStrictEqual(parsed.assignments.get(field).value, value)) {
       driftFields.push(field);
     }
   }

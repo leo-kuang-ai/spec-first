@@ -468,6 +468,12 @@ function readAsyncRefreshStatus(workspaceRoot, {
       return { status: inFlight ? 'in-flight' : 'none', reason_code: null };
     }
     const parsed = JSON.parse(fs.readFileSync(target, 'utf8'));
+    if (!parsed || typeof parsed.ok !== 'boolean') {
+      return {
+        status: abandoned ? 'failed' : (inFlight ? 'in-flight' : 'unknown'),
+        reason_code: abandoned ? 'workspace-async-refresh-abandoned' : 'workspace-async-refresh-status-unreadable',
+      };
+    }
     if (abandoned) {
       return {
         status: 'failed',

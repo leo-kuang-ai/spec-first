@@ -586,7 +586,9 @@ def cmd_run_record(args):
     try:
         counts = json.loads(args.counts)
     except (ValueError, TypeError):
-        counts = {}
+        return emit("REFUSED", {"reason_code": "invalid-counts"})
+    if not isinstance(counts, dict):
+        return emit("REFUSED", {"reason_code": "invalid-counts"})
     data["last_run"] = {
         "timestamp": args.timestamp,
         "outcome": args.outcome,

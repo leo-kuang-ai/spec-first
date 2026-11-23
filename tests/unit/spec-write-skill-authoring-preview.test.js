@@ -119,6 +119,43 @@ test('returns incomplete when the host cannot prove exact pre-write binding and 
   ]));
 });
 
+test.each([['replace', 'pass'], ['preserve', 'fail']])('dirty file disposition %s must agree with the write set', (disposition, result) => {
+  const { root, manifest, scope, writeSet } = fixture();
+  const change = writeSet[0];
+  scope.dirty_paths = [change.path];
+  manifest.dirty_overlap = [{ path: change.path, current_sha256: change.before_sha256, disposition, authorization: true }];
+  const report = validateAuthoringPreview({ manifest, authorizedRoot: root, scope, writeSet });
+  expect(report.result).toBe(result);
+  if (disposition === 'preserve') {
+    expect(report.binding).toBeNull();
+    expect(report.findings).toContainEqual(expect.objectContaining({ reason_code: 'dirty_overlap_write_conflict' }));
+  }
+});
+
+test('the workbench example produces a valid preview but cannot replace a receipt', () => {
+  const { root, after } = fixture();
+  const before = fs.readFileSync(path.join(root, 'example-skill/SKILL.md'));
+  const workbench = fs.readFileSync(path.resolve(__dirname, '../../skills/spec-write-skill/references/authoring-workbench.md'), 'utf8');
+  const snippet = workbench.match(/```js\n([\s\S]*?)\n```/)[1];
+  const data = require('node:vm').runInNewContext(snippet, { require, root, before, after });
+  const preview = validateAuthoringPreview({ ...data, authorizedRoot: root });
+  expect(preview.result).toBe('pass');
+  expect(verifyWriteReceipt({ preview, root, writeSet: data.writeSet })).toMatchObject({
+    completion_claim_allowed: false, reason_code: 'actual_change_list_unavailable',
+  });
+});
+
+test('a dirty path cannot be marked for both replacement and preservation', () => {
+  const { root, manifest, scope, writeSet } = fixture();
+  const change = writeSet[0];
+  scope.dirty_paths = [change.path];
+  manifest.dirty_overlap = ['replace', 'preserve'].map(disposition => ({
+    path: change.path, current_sha256: change.before_sha256, disposition, authorization: true,
+  }));
+  const report = validateAuthoringPreview({ manifest, authorizedRoot: root, scope, writeSet });
+  expect(report).toMatchObject({ result: 'fail', binding: null, findings: [{ reason_code: 'dirty_overlap_duplicate' }] });
+});
+
 test('rejects writes outside canonical source root and requires snapshot/dirty-overlap coverage', () => {
   const { root, manifest, scope, writeSet } = fixture();
   fs.writeFileSync(path.join(root, 'README.md'), 'outside\n');

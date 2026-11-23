@@ -90,6 +90,19 @@ function gitIgnores(root, filePath) {
   return !result.error && result.status === 0;
 }
 
+function assertIgnoreRuleCanBeAdded(root, localPath) {
+  const options = { cwd: root, encoding: 'utf8', windowsHide: true };
+  const tracked = childProcess.spawnSync('git', ['ls-files', '--error-unmatch', '--', localPath], options);
+  if (tracked.status === 0) throw reasonError('local-config-already-tracked', 'Review the tracked local configuration before changing ignore rules.');
+  const matching = childProcess.spawnSync('git', ['check-ignore', '-v', '-z', '--stdin'], { ...options, input: `${localPath}\0` });
+  if (tracked.status !== 1 || ![0, 1].includes(matching.status)) {
+    throw reasonError('local-config-ignore-unverified', 'Git could not verify the effective ignore rules.');
+  }
+  if (matching.stdout.split('\0')[2]?.startsWith('!')) {
+    throw reasonError('local-config-explicitly-included', 'Review the existing Git inclusion rule; setup has not overridden it.');
+  }
+}
+
 function inspectLocalConfigContent(raw, localPath = '.spec-first/config.local.yaml') {
   const source = String(raw || '').replace(/\r\n/g, '\n');
   let document;
@@ -186,7 +199,7 @@ function inspectProjectConfig({ repoRoot, templatePath, targetKind }) {
   const localValidation = localPresent
     ? inspectLocalConfigContent(fs.readFileSync(localPath, 'utf8'), workspaceRelativePath(root, localPath))
     : null;
-  const gitignore = readIfExists(gitignorePath) || '';
+  if (fs.existsSync(gitignorePath) && !isFile(gitignorePath)) throw reasonError('local-config-ignore-unreadable', 'Expected .gitignore to be a regular file.');
   const legacyMarkdownPresent = isFile(legacyMarkdownPath);
   const exampleStatus = example === null
     ? 'missing'
@@ -194,7 +207,7 @@ function inspectProjectConfig({ repoRoot, templatePath, targetKind }) {
   let gitignoreStatus = 'not-applicable';
   if (localPresent) {
     gitignoreStatus = gitIgnores(root, localPath) ? 'ignored' : 'missing';
-  } else if (gitignore.split(/\r?\n/).includes(LOCAL_CONFIG_RULE)) {
+  } else if (gitIgnores(root, localPath)) {
     gitignoreStatus = 'ready-for-local-config';
   }
   const status = localValidation && localValidation.status === 'invalid'
@@ -342,11 +355,14 @@ function applyProjectConfig({ plan, templatePath }) {
         result.project.local_config_gitignore_status = 'not-applicable-non-git-folder';
       } else {
         const current = readIfExists(target) || '';
-        if (current.split(/\r?\n/).includes(LOCAL_CONFIG_RULE)) {
+        const localPath = '.spec-first/config.local.yaml';
+        if (gitIgnores(root, localPath)) {
           result.project.local_config_gitignore_status = 'already-present';
         } else {
+          assertIgnoreRuleCanBeAdded(root, localPath);
           const prefix = current.length > 0 && !current.endsWith('\n') ? `${current}\n` : current;
           atomicWriteContained(root, target, `${prefix}${LOCAL_CONFIG_RULE}\n`, 'gitignore-symlink-escape');
+          if (!gitIgnores(root, localPath)) throw reasonError('local-config-ignore-unverified', 'Git still reports the local configuration as not ignored.');
           result.project.local_config_gitignore_status = 'added';
         }
       }

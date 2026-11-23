@@ -12,7 +12,7 @@ Every issue you report maps to this item schema — the orchestrator's vocabular
 | `author_class` | `customer`, `teammate`, or `bot` — infer from the issue author's association with the repo; treat `github-actions`/app authors as `bot`. |
 | `body` | The issue title plus a one-line summary of the body. Never reproduce the body verbatim. |
 | `media` | List of `{name, url/ref, kind}` for images, videos, or attachments referenced in the issue body. Empty list when none. |
-| `existing_ack` | Boolean, scoped to the sweep's own identity: true when the configured ack label is present. Record the actor who applied it (from the issue timeline) when that is readable. A human coincidentally applying the same label name is still an ack signal, but note the actor so the orchestrator can judge. |
+| `existing_ack` | True only for the configured label confirmed from the sweep's own identity. If the label exists but another actor applied it or the actor cannot be verified, report that limitation; do not claim an own-identity acknowledgment. |
 | `existing_closeout` | Same, for the configured close-out label. |
 
 ## Invocation Contract
@@ -28,7 +28,7 @@ Map every qualifying issue updated since the cursor into the item schema above, 
 Run this once at run start, before any fetch. Verify BOTH capabilities:
 
 1. Read — the `gh` CLI (or equivalent GitHub tooling) is present and authenticated: `gh auth status` succeeds and `gh issue list` against the configured repo returns without an auth/transport error.
-2. Write — label-edit permission is available: `gh auth status` reports a token with `repo` scope, or a dry probe of `gh issue edit` permission signals write access to the repo.
+2. Write — check repository-specific permission evidence without editing an issue. Token scope or tool discovery alone does not establish label-edit permission. If uncertain, report read-only ingest and defer acknowledgment; never mutate an issue as a capability probe.
 
 - If GitHub tooling is not available or not authenticated for read, return exactly this sentence and stop:
 

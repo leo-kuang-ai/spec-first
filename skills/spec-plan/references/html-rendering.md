@@ -231,16 +231,15 @@ can open it directly. A long bare-text list of paths and ticket IDs is
 the format's biggest unforced UX miss — the reader has to copy-paste
 every entry into a browser or IDE.
 
-Resolve the repo's GitHub URL once at compose time:
-
-```bash
-git remote get-url origin
-```
-
 Apply linking to three reference shapes:
 
 - **Repo-relative code/doc paths** (`services/foo.ts`,
-  `docs/solutions/bar.md`) → `<repo-url>/blob/main/<path>`.
+  `docs/solutions/bar.md`) → `<repo-url>/blob/<commit>/<path>` only when
+  existing evidence identifies the web repository, a published commit there,
+  and the cited file at that revision. If citing working-tree content, verify
+  it matches that blob. For uncommitted changes, unpublished commits or
+  uncertain bindings, show the repo-relative path as text. A remote name or
+  default branch does not identify the revision the reader needs.
 - **Named GitHub PRs/issues** (`PR #636`, `issue #1048`) →
   `<repo-url>/pull/636` or `<repo-url>/issues/1048`.
 - **Named external trackers** (Linear `ESP-1705`, Jira `PROJ-123`) →
@@ -248,9 +247,8 @@ Apply linking to three reference shapes:
   (e.g., a `linear.app/<workspace>/...` URL appeared earlier in the
   session or in `AGENTS.md`); otherwise leave as text.
 
-**Do not invent URLs.** If `origin` isn't a GitHub URL (GitLab,
-Bitbucket, internal host) and the equivalent main-tree URL pattern
-isn't obvious, leave entries as `<code>` text. If the external
+**Do not invent URLs.** Use an established, credential-free web URL and
+the host's known link format; otherwise leave entries as `<code>` text. If the external
 tracker workspace isn't established, leave as text. A broken or
 guessed link is worse than no link.
 
@@ -327,11 +325,14 @@ bundles, and the artifact's longevity doesn't warrant a build dependency.
 How section types commonly render in HTML. These are patterns, not
 contracts — the agent picks shapes that fit the content.
 
-- **Goal Capsule** — an always-visible orientation panel near the top with the
-  objective, recommended approach, decision and verification focus, largest
-  risk/boundary, authority, stop conditions, execution profile, and tail
-  ownership. Keep it compact; link to detailed KTD, risk, and verification
-  anchors rather than duplicating their prose.
+- **Goal Capsule (unified plans)** — an always-visible panel before detailed
+  navigation. Lead with who sees what change and what stays the same. For an
+  implementation-ready plan, follow with why this approach, what the reviewer
+  must decide, and how they can check the result; then show the producer's
+  required authority, risk, stop and execution details. Keep it compact;
+  link to the detailed owners. For requirements-only output, show the intended
+  outcome, product authority and open blockers, not an execution checklist.
+  For ideation, use the producer's under-title candidate lead, not a Goal Capsule.
 - **Summary / Problem Frame** — semantic `<section>` with prose
   paragraphs. Optionally precede with an eyebrow label (small-caps tag
   above the title) for editorial polish.
@@ -599,6 +600,9 @@ looks identical. Compose so semantic understanding is reachable in source:
 
 Before returning the artifact, scan it for common slips:
 
+- **First screen.** Read the visible opening alone: can the intended reader
+  identify the change to check, the product question still open, or the
+  candidate worth exploring and its cost, as appropriate to this artifact?
 - **Single self-contained file.** No companion `.css` / `.js` / `.svg`.
 - **No hidden machine-readable metadata copy.** No
   `<script type="application/json">` frontmatter block, no `data-*`
@@ -611,8 +615,9 @@ Before returning the artifact, scan it for common slips:
   (downstream agents grep these).
 - **Source / composition signal** is present as a visible footer at
   the bottom of the doc (composition timestamp + source identifier).
-- **Repeating cards with 3+ instances put secondary content inside
-  default-closed `<details>`.** Fully-expanded unit cards in a long
+- **For 3+ implementation units, put secondary content inside
+  default-closed `<details>`.** Keep ranked idea cards expanded so readers
+  can compare their basis and tradeoffs. Fully-expanded unit cards in a long
   Implementation Units section is a failure mode — the reader can't see
   the unit list at a glance. Verify by skimming the rendered units:
   each `<article>` should render as its ID + title + metadata strip

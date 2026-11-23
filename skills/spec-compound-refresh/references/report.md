@@ -2,9 +2,9 @@
 
 ## Output Format
 
-**The full report MUST be printed as markdown output.** Do not summarize findings internally and then output a one-liner. The report is the deliverable — print every section in full, formatted as readable markdown with headers, tables, and bullet points.
+Deliver a full Markdown report by default. If the caller explicitly requests JSON only, use the requested fields and the same evidence standard. Lead with what readers can still rely on, which guidance or references changed, and whether this run actually edited any files. Complete the discoverability check first. Never present an unpublished candidate as current guidance.
 
-After processing the selected scope, output the following report:
+Count an action under `Updated`, `Consolidated`, `Replaced`, `Deleted`, or `Marked stale` only if it completed this run and was verified at its final paths. List the effects of partial publication by path without counting the group as complete. `Kept` counts files reviewed without edits, not publications.
 
 ```text
 Compound Refresh Summary
@@ -28,6 +28,7 @@ Then for EVERY file processed, list:
 - The classification (Keep/Update/Consolidate/Replace/Delete/Stale)
 - What evidence was found -- tag any memory-sourced findings with "(auto memory [claude])" to distinguish them from codebase-sourced evidence
 - What action was taken (or recommended)
+- For an Update, show the old and current references or guidance and explain what changes for the reader. For a recommendation, say what *would* change and make clear that the original is still in place. Identify sources and recheck conditions for unique guidance retained in a successor.
 - For Consolidate: which doc was canonical, what unique content was merged, what was deleted
 - For worth-based actions: affected claims and recovering artifacts with quoted reasoning; distinguish accuracy repairs from worth-based cuts
 - For implementation conflicts: the still-governing evidence and conflicting implementation path, reported as a potential regression without claiming a code fix
@@ -36,13 +37,15 @@ Applied means verified durable publication, not candidate preparation or a succe
 
 For **Keep** outcomes, list them under a reviewed-without-edits section so the result is visible without creating git churn.
 
+Example: a read-only check finds `docs/solutions/new.md` published before this run, but `docs/solutions/catalog.md` still points to `docs/solutions/old.md`. Report `status: partial`, no changes or deletions this run, and `Replaced: 0`. Repair and verify the catalog before removing the original. The new file's existence alone does not tell readers to switch.
+
 ### Headless mode report
 
 In headless mode, the report is the sole deliverable — there is no user present to ask follow-up questions, so the report must be self-contained and complete. **Print the full report. Do not abbreviate, summarize, or skip sections.**
 
 Split actions into two sections:
 
-**Applied** (writes that succeeded):
+**Applied** (published and all dependent checks complete):
 - For each **Updated** file: the file path, what references were fixed, and why
 - For each **Consolidated** cluster: the canonical doc, what unique content was merged from each subsumed doc, and the subsumed docs that were deleted
 - For each **Replaced** file: what the old learning recommended vs what the current code does, and the path to the new successor

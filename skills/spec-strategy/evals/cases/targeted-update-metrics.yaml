@@ -1,11 +1,10 @@
 id: targeted-update-metrics
 title: "The specified section shall be revisited specifically for that section and the rest shall be retained."
-description: "Verify Phase 0 Branch 2 + Phase 2: parameter naming metrics by redirecting to this section for re-interview (with pushback); leave other sections unchanged; the correct single-round flow is to announce \"found\" + follow-up targeted questions. Section names allow Chinese-English variants (e.g., metrics/indicators); targeting is validated by transcript."
+description: Assess whether the follow-up addresses an existing measure without reopening unrelated sections. This case does not verify file preservation.
 
 input:
   prompt: |
-    （spec-strategy skill 已安装，请按它工作。）
-    metrics 这部分想重新过一遍。
+    Use spec-strategy. I want to revisit our metrics.
 
 context:
   repo_fixture: evals/fixtures/repos/existing-strategy
@@ -14,6 +13,8 @@ context:
     checkout: main
 
 judge:
-  type: script
-  script_path: evals/fixtures/scripts/asks-a-question.sh
-  timeout_seconds: 30
+  type: agent_judge
+  model: anthropic/claude-haiku-4-5
+  criteria:
+    - Revisit an existing measure such as reconciliation time or weekly importers. Ask about its definition, target, measurement or decision value without asking which section to revisit or declaring an unapproved change.
+  pass_threshold: 1

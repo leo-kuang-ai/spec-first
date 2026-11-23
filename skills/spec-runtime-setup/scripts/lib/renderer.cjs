@@ -201,7 +201,7 @@ function renderDiagnostic({ preflight, snapshot, target, host } = {}) {
 
 function renderHumanSummary(
   { toolFacts = {}, runtimeCapabilities = {} } = {},
-  { executionSummary } = {},
+  { executionSummary, args = {} } = {},
 ) {
   const summary = runtimeCapabilities.setup_summary || {};
   const manifest = summary.generated_runtime_manifest || {};
@@ -262,15 +262,23 @@ function renderHumanSummary(
   }
   lines.push('', '后续步骤');
   const nextActions = [];
-  const providerNeedsInit = (toolFacts.provider_readiness || []).some((provider) => {
+  const selectedIds = execution.selected_ids || [];
+  const scopedProviders = (toolFacts.provider_readiness || []).filter((entry) =>
+    execution.scope === 'full' || selectedIds.includes(entry.provider));
+  const installation = execution.scope === 'installation';
+  const providerNeedsInit = !installation && scopedProviders.some((provider) => {
     const lifecycle = provider.lifecycle || {};
     return lifecycle.installed === true && (lifecycle.initialized !== true || lifecycle.artifact_exists !== true);
   });
-  const repoRoot = runtimeCapabilities.repo_root || (runtimeCapabilities.target && runtimeCapabilities.target.target_root);
-  if (execution.overall_status === 'action-required' && providerNeedsInit && repoRoot) {
-    const targetFlag = runtimeCapabilities.target && runtimeCapabilities.target.target_kind === 'non-git-folder' ? '--folder' : '--repo';
-    nextActions.push(`Run full project setup for host ${runtimeCapabilities.host || '<host>'} (select MCP_SETUP_HOST in your shell):\n${renderCommand(['spec-runtime-setup', '--only', 'codegraph,graphify', targetFlag, repoRoot])}`);
-    nextActions.push('仅需生成 setup facts 时使用 --verify-only；仅需本地配置覆盖时使用 --project-config。');
+  const target = toolFacts.target || runtimeCapabilities.target || {};
+  const repoRoot = target.target_root || toolFacts.repo_root || runtimeCapabilities.repo_root;
+  const manualRecovery = (toolFacts.items || []).some((item) => item.recovery || item.lock_release_status === 'failed');
+  if (!manualRecovery && execution.overall_status === 'action-required' && (installation || providerNeedsInit) && repoRoot && selectedIds.length) {
+    const targetFlag = target.target_kind === 'non-git-folder' ? '--folder' : '--repo';
+    nextActions.push(`在原目标预览所选范围：\n${renderCommand(['spec-runtime-setup', '--only', selectedIds.join(','), '--plan', ...(installation ? ['--installation-only'] : []), targetFlag, repoRoot,
+      ...(args.requirementWorkspace ? ['--requirement-workspace', args.requirementWorkspace] : []),
+      ...(args.workflows && args.workflows.length ? ['--workflow', args.workflows.join(',')] : []),
+      ...(args.refresh ? ['--refresh'] : []), ...(args.userScope ? ['--user-scope'] : [])])}`);
   }
   if (manifest.status === 'stale' || manifest.status === 'missing') {
     nextActions.push('对所选 topology 运行 spec-first init，然后重新运行 spec-runtime-setup --verify-only。');
@@ -278,7 +286,8 @@ function renderHumanSummary(
   for (const item of toolFacts.items || []) {
     if (item.result !== 'ready' && item.next_action) nextActions.push(item.next_action);
   }
-  for (const provider of toolFacts.provider_readiness || []) {
+  for (const provider of scopedProviders) {
+    if (installation || manualRecovery) continue;
     const hookBlocked = provider.steady_state && provider.steady_state.hook_status === 'blocked';
     if (provider.readiness_status === 'fresh' && !hookBlocked) continue;
     for (const action of provider.next_actions || []) {
@@ -286,12 +295,12 @@ function renderHumanSummary(
     }
   }
   if (execution.overall_status === 'partial') {
-    nextActions.push('当前仅完成 selected subset；运行标准 spec-runtime-setup 完成全部 required items，然后运行 spec-runtime-setup --verify-only 复核。');
+    nextActions.push('当前仅完成 selected subset；未验证范围不构成失败。需要完整图验证时，请先确认扩展范围。');
   } else if (execution.overall_status === 'action-required' && nextActions.length === 0) {
     nextActions.push('修复上述 action-required 项后，重新运行 spec-runtime-setup --verify-only。');
   }
   for (const action of [...new Set(nextActions)]) lines.push(`- ${action}`);
-  if (execution.overall_status === 'ready') {
+  if (execution.overall_status === 'ready' && !['stale', 'missing'].includes(manifest.status)) {
     lines.push('- 继续目标 spec-* workflow。');
   }
   return `${lines.join('\n')}\n`;

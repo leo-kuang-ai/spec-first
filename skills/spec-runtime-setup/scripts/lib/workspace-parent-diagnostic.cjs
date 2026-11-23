@@ -7,6 +7,7 @@
 // repo-local setup facts; use dual-path next_actions instead.
 
 const path = require('node:path');
+const { renderCommand } = require('./command-display.cjs');
 const {
   runWorkspaceGraphStatus,
 } = require('./workspace-graph-status.cjs');
@@ -25,30 +26,30 @@ function buildParentWorkspaceDiagnostic({
   const status = typeof runStatus === 'function'
     ? runStatus({
       cwd: workspaceRoot,
-      repos: reposArg.length ? reposArg : candidateIds,
+      repos: reposArg,
       allowDiscovery: reposArg.length === 0,
     })
     : null;
 
+  const statusCommand = renderCommand(['spec-runtime-setup', '--workspace-graph-status', ...(reposArg.length ? ['--repos', reposArg.join(',')] : [])]);
+  const buildIds = reposArg.length ? reposArg : [...new Set([
+    ...((status && status.repos) || []).map((repo) => repo.repo_id), ...((status && status.pending_confirm) || []),
+  ])];
+  const buildCommand = renderCommand(['spec-runtime-setup', '--only', 'codegraph,graphify', '--workspace-graph', ...(buildIds.length ? ['--repos', buildIds.join(',')] : [])]);
   const dualPaths = {
     child_provider_setup: {
       purpose: 'per-child CodeGraph/Graphify/MCP/host config',
       commands: [
-        'spec-runtime-setup --only codegraph,graphify --all-repos --repair-host-config',
-        'spec-runtime-setup --verify-only --all-repos',
+        ...(reposArg.length
+          ? reposArg.map((repo) => renderCommand(['spec-runtime-setup', '--plan', '--only', 'codegraph,graphify', '--repo', repo]))
+          : [renderCommand(['spec-runtime-setup', '--plan', '--only', 'codegraph,graphify', '--all-repos'])]),
       ],
     },
     workspace_two_layer_graph: {
       purpose: 'per-child CodeGraph + workspace Graphify merged graph + routing block',
       commands: [
-        reposArg.length
-          ? `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos ${reposArg.join(',')}`
-          : (candidateIds.length
-            ? `spec-runtime-setup --only codegraph,graphify --workspace-graph --repos ${candidateIds.join(',')}`
-            : 'spec-runtime-setup --only codegraph,graphify --workspace-graph --repos <a,b,...>'),
-        reposArg.length || candidateIds.length
-          ? `spec-runtime-setup --workspace-graph-status --repos ${(reposArg.length ? reposArg : candidateIds).join(',')}`
-          : 'spec-runtime-setup --workspace-graph-status --repos <a,b,...>',
+        buildCommand,
+        statusCommand,
         'spec-first clean --workspace-graph [--repos a,b] [--dry-run]',
       ],
       do_not: [
@@ -62,7 +63,8 @@ function buildParentWorkspaceDiagnostic({
     'This is a non-Git multi-repo requirement parent: parent-local tool-facts/provider rows are not_applicable (not a failure).',
   );
   nextActions.push(
-    `Child provider setup: ${dualPaths.child_provider_setup.commands[0]}`,
+    `先核对双层图状态：${statusCommand}`,
+    ...dualPaths.child_provider_setup.commands.map((command) => `逐仓预览 provider 配置：${command}`),
   );
   if (status && status.status === 'ready') {
     nextActions.push(
@@ -76,20 +78,16 @@ function buildParentWorkspaceDiagnostic({
       `Confirm repos then build: ${dualPaths.workspace_two_layer_graph.commands[0]}`,
     );
   } else if (status && (status.status === 'absent' || status.status === 'partial')) {
-    nextActions.push(
-      `Build or refresh workspace two-layer graph: ${dualPaths.workspace_two_layer_graph.commands[0]}`,
-    );
+    nextActions.push(`核对仓清单并确认需要构建后：${buildCommand}`);
+  } else if (status && status.status === 'invalid') {
+    nextActions.push(`先修正工作区声明：${status.reason_code}。`);
+    for (const entry of status.rejected || []) nextActions.push(`${entry.path}: ${entry.reason_code}`);
   } else {
     nextActions.push(
       `Workspace two-layer graph: ${dualPaths.workspace_two_layer_graph.commands[0]}`,
     );
   }
   nextActions.push(...dualPaths.workspace_two_layer_graph.do_not);
-  if (host) {
-    nextActions.push(
-      `If host MCP config drifts (e.g. user-level ~/.claude.json managed fields), re-run with --repair-host-config under MCP_SETUP_HOST=${host}.`,
-    );
-  }
 
   const overallStatus = deriveParentOverallStatus(status);
 

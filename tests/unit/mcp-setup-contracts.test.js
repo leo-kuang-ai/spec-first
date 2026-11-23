@@ -129,8 +129,14 @@ describe('spec-runtime-setup runner contracts', () => {
       expect(contents).toContain('git rev-parse --git-path hooks');
       expect(contents).toContain('manual-only');
     }
-    expect(skill).toContain('do not execute hook commands, do not read external hook content, do not modify local/global `core.hooksPath`');
-    expect(skill).toContain('Must not claim that external hooks do not exist, will not be executed, or that "installation failed');
+    const external = skill.split('\n').find((line) => line.startsWith('- **External hooks:**'));
+    expect(external).toContain('inspect only `post-commit` and `post-checkout` (regular files, at most 1 MiB each)');
+    expect(external).toContain('A post-commit marker and no detected legacy override permit `verified-external` only if inspection is complete');
+    expect(external).toContain('Missing markers, incomplete reads, or a checkout marker alone leave refresh `manual-only`');
+    expect(external).toContain('a detected `GRAPHIFY_OUT=.graphify` override reports `graphify-external-hook-legacy-artifact-override`');
+    expect(external).toContain('Never run `graphify hook status`, execute, modify, copy or chain external hooks, or change `core.hooksPath`');
+    expect(external).toContain('External execution is unverified; `hook_installed` and `hook_verified` stay false');
+    expect(external).toContain('Do not report an absent marker as an absent hook, a failed installation, or proof that Git will not run it');
     expect(skill).toContain('Never append or run `--refresh` solely because the status is unknown');
     expect(manual).toContain('git config --local core.hooksPath .githooks');
     expect(manual).toContain('仓库级 `core.hooksPath` 会覆盖全局值');

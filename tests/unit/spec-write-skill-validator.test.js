@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const {
   VALIDATION_LIMITS,
+  parseFrontmatterSubset,
   renderHuman,
   validateSkill,
 } = require('../../skills/spec-write-skill/scripts/validate-skill.cjs');
@@ -53,6 +54,40 @@ test('current spec-write-skill passes strict portable mechanical validation', ()
     'scripts/validate-skill.cjs',
   ]));
   expect(report.inventory.files).toContain('evals/export-trigger-evals.cjs');
+});
+
+test('does not list or open package contents when the authorized root cannot be verified', () => {
+  const { parent, skillRoot } = tempSkill();
+  const resolveRoot = jest.spyOn(fs, 'realpathSync').mockImplementationOnce(() => { throw new Error('Root temporarily unavailable'); });
+  const list = jest.spyOn(fs, 'readdirSync');
+  const open = jest.spyOn(fs, 'openSync');
+  try {
+    const report = validateSkill({ skillDir: skillRoot, authorizedRoot: parent });
+    expect(resolveRoot).toHaveBeenCalledWith(parent);
+    expect(list).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+    expect(report).toMatchObject({ result: 'incomplete', ok: false, findings: [{ reason_code: 'authorized_root_unavailable' }] });
+    expect(Object.values(report.inventory).every(entries => entries.length === 0)).toBe(true);
+  } finally {
+    jest.restoreAllMocks();
+  }
+});
+
+test.each([
+  ['"Case #12" # comment', 'Case #12'],
+  ['"See \\"A#1\\"" # comment', 'See "A#1"'],
+  ["'it''s #12' # comment", "it's #12"],
+])('quoted descriptions preserve their content and ignore a trailing comment: %s', (scalar, expected) => {
+  const { parent, skillRoot } = tempSkill('demo', scalar);
+  expect(parseFrontmatterSubset(`description: ${scalar}`).description).toBe(expected);
+  expect(validateSkill({ skillDir: skillRoot, authorizedRoot: parent }).result).toBe('pass');
+});
+
+test('an unclosed quote is not a trailing comment', () => {
+  const { parent, skillRoot } = tempSkill('demo', '"Unclosed # comment');
+  const report = validateSkill({ skillDir: skillRoot, authorizedRoot: parent });
+  expect(report.result).toBe('fail');
+  expect(report.findings).toContainEqual(expect.objectContaining({ reason_code: 'frontmatter_invalid' }));
 });
 
 test('reports angle brackets and directory mismatch as confirmed failures', () => {

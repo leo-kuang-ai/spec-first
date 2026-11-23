@@ -20,7 +20,7 @@ Load only after the Residual Work Gate/caller explicitly selects tracker deferra
 
 ## Fallback
 
-Use the documented fallback chain; if every sink is unavailable, return `no_sink` structured findings to the caller. Do not block a headless caller with a prompt and do not treat no sink as permission to forget the residual.
+If no authorized sink is available before any write, return `no_sink` structured findings to the caller. Once a write is attempted, resolve its outcome under Failure path before considering a fallback. Never lose the residual or prompt a headless caller.
 
 ---
 
@@ -33,7 +33,7 @@ Tracker-defer has two execution modes. The caller selects one; the detection, fa
 Used by `spec-work` Residual Work Gate and similar caller flows when the user chooses to file tickets. All user-facing prompts fire:
 
 - First Defer of the session with a generic (non-named) label confirms the effective tracker choice.
-- Execution failures prompt with Retry / Fall back to next sink / Convert to Skip.
+- Offer recovery choices only after the common Failure path confirms non-creation.
 - Labels in the routing question reflect `named_sink_available` (name the tracker) vs fallback generics.
 
 ### Non-interactive mode
@@ -43,8 +43,8 @@ Used by autonomous callers like `lfg` that must not prompt. Consider only destin
 Non-interactive mode still requires explicit tracker deferral authorization. The caller must supply `tracker_deferral_authorization: authorized`; headless/autonomous execution, delivery authorization, tracker availability, or a residual finding does not grant it. When the fact is missing, do not probe or invoke any external sink. Return every finding in `no_sink` with `tracker_deferral_authorization_missing` so the caller can preserve it in an already-authorized PR body or local artifact.
 
 - No confirmation on the first generic-label Defer; proceed directly.
-- On a confirmed failure, try another destination only if it is already authorized. For example, permission to file in a private Linear project does not authorize GitHub Issues. With no authorized fallback, retain the failure locally. If the creation result is unknown, reconcile it before retrying to avoid duplicate tickets.
-- On total chain exhaustion (every tier failed or no sink available), return findings in the `no_sink` bucket so the caller can route them to another surface (e.g., inline them in a PR description).
+- After confirmed non-creation, try another destination only if it is already authorized. For example, permission to file in a private Linear project does not authorize GitHub Issues. Apply the common Failure path to any uncertain write.
+- On exhaustion without a confirmed ticket, use `failed` for an attempted write; reserve `no_sink` for findings with no attempted write and no permitted, available sink.
 - Return a structured result: `{ filed: [{ finding_id, tracker, url }], failed: [{ finding_id, tracker, reason }], no_sink: [{ finding_id, title, severity, file, line }] }`.
 
 The caller decides how to surface the result to the user. The non-interactive mode treats "no sink available" as a data-producing outcome, not a prompt trigger.
@@ -104,9 +104,9 @@ When the named tracker is unavailable or no tracker is named, consider candidate
 
 1. **Named tracker** (MCP tool, CLI, or API the agent can invoke directly, identified via Detection above)
 2. **GitHub Issues via `gh`** — when `gh auth status` succeeds and the current repo has issues enabled (`gh repo view --json hasIssuesEnabled` returns `true`)
-3. **No sink** — findings remain in the review report's residual-work section (Interactive mode) or are returned in the `no_sink` bucket for the caller to route (Non-interactive mode). The agent does not re-display them through a transient surface.
+3. **No sink before any write** — retain the finding in the interactive report or return it in `no_sink` to a headless caller. After an attempted write, use the Failure path instead.
 
-Previously this chain included a third in-session fallback tier. That tier was removed because in-session tasks do not survive past the session and therefore do not meet the "durable filing" intent of a Defer action. When no durable tracker exists, the correct behavior is to leave findings in the report (Interactive) or return them to the caller (Non-interactive).
+An in-session task is not a durable fallback.
 
 ---
 
@@ -129,9 +129,13 @@ The finding_id is a stable fingerprint composed as `normalize(file) + line_bucke
 
 ## Failure path
 
-When ticket creation fails at execution (API error, auth expiry mid-session, rate limit, malformed body rejected, 4xx/5xx response):
+In both modes, a timeout, lost response or generic error after sending a create request is not evidence that the ticket was not created. Before another write, reconcile read-only at the original authorized destination using the exact `finding_id` in the ticket body and the finding context. Use an existing receipt or an authorized lookup; do not broaden access. An empty or partial search alone does not establish absence.
 
-**Interactive mode:** surface the failure inline and ask the user using the platform's blocking question tool.
+- Confirmed match: return `filed` with the existing URL; stop writing for this finding.
+- Unresolved (including multiple matches or no authorized lookup): return `failed` with the uncertainty in `reason`, retain the finding for reconciliation, and do not retry or switch destinations. This is not a confirmed rejection or `no_sink`.
+- Confirmed non-creation (for example, the service explicitly rejected the request before creating an issue): recovery may proceed within the caller's authorization.
+
+**Interactive mode:** only after confirmed non-creation, surface the failure inline and offer the applicable recovery choices using the platform's blocking question tool.
 
 Stem:
 > Defer failed: <tracker name> returned <error summary>. How should the agent handle this finding?
@@ -156,11 +160,11 @@ Concrete behavior per tracker at execution time. The agent may invoke any of the
 | Tracker | Interface | Invocation sketch | Body format | Labels |
 |---------|-----------|-------------------|-------------|--------|
 | Linear | MCP (preferred) or API | Create issue in the project/workspace identified by documentation; assign to the reporter if the MCP tool exposes user context | Markdown | Severity priority field if the MCP exposes it; otherwise include severity in body |
-| GitHub Issues | `gh issue create` | Repo defaults to the current repo. Use `--label` for severity tag when labels exist; omit `--label` if the repo has no label fixture. Fall back to a label-less issue on first failure. | Markdown | `--label P0` / `--label P1` / etc. when labels exist |
+| GitHub Issues | `gh issue create` | Target the authorized repo. Omit absent labels before creation. Retry without a label only after an explicit label rejection confirms the issue was not created, under the mode's recovery rules above. | Markdown | `--label P0` / `--label P1` / etc. when labels exist |
 | Jira | MCP or API | Create issue in the project identified by documentation; Jira's markdown dialect differs from GitHub's — use plain text in the body when MCP does not handle conversion | Plain text when MCP does not handle markdown | Severity priority field |
-| No sink available | — | Interactive: Defer option omitted, findings remain in the report's residual-work section. Non-interactive: findings returned in the `no_sink` bucket for caller routing. | — | — |
+| No sink available before any attempt | — | Interactive: Defer option omitted, findings remain in the report's residual-work section. Non-interactive: findings returned in the `no_sink` bucket for caller routing. | — | — |
 
-When uncertain, prefer "drop with explicit user-facing notice" over "pass through silently and hope." A Defer that produces no durable artifact and no user message is data loss.
+Return each finding exactly once, including when creation could not be confirmed; the caller retains the residual.
 
 ---
 

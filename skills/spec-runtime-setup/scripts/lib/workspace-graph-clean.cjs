@@ -21,7 +21,7 @@ const path = require('node:path');
 const { assertContainedPath } = require('./path-safety.cjs');
 const { resolveGitPath } = require('./git-path.cjs');
 const { removeManagedExclude } = require('./workspace-git-exclude.cjs');
-const { resolveWorkspaceTargets } = require('./workspace-target.cjs');
+const { resolveWorkspaceTargets, workspaceTargetError } = require('./workspace-target.cjs');
 const { stripRoutingInstruction } = require('./workspace-routing-inject.cjs');
 const { defaultWorkspaceExec } = require('./workspace-exec.cjs');
 const { readWorkspaceGraphState, resolveStateRepoIds } = require('./workspace-graph-state.cjs');
@@ -47,6 +47,8 @@ function runWorkspaceGraphClean({
   if (initial.targets.topology !== 'requirement-workspace') {
     return ineligibleCleanResult(initial.targets);
   }
+  const initialError = invalidCleanResult(initial.targets);
+  if (initialError) return initialError;
 
   const lifecycle = acquireWorkspaceGraphLifecycleLease({
     workspaceRoot: initial.targets.workspace_root,
@@ -91,10 +93,12 @@ function runWorkspaceGraphClean({
 function resolveCleanContext({ cwd, repos, allowDiscovery }) {
   const stateResult = readWorkspaceGraphState(cwd);
   const effectiveRepos = repos.length > 0 ? repos : resolveStateRepoIds(stateResult);
-  const targets = resolveWorkspaceTargets({ cwd, repos: effectiveRepos, allowDiscovery });
+  const targets = resolveWorkspaceTargets({ cwd, repos: effectiveRepos, allowDiscovery: allowDiscovery || stateResult.status !== 'ready' });
+  const requestedRoots = new Set(repos.map((repo) => path.resolve(cwd, String(repo).trim().replaceAll('\\', '/'))));
   return {
     stateResult,
     targets,
+    requestedRoots,
     explicitRefreshState: stateResult.status === 'ready'
       && stateResult.state.refresh_mode === 'explicit',
     specFirstHookState: stateResult.status === 'ready'
@@ -118,42 +122,39 @@ function runWorkspaceGraphCleanOwned({
   if (targets.topology !== 'requirement-workspace') {
     return ineligibleCleanResult(targets);
   }
-  if (targets.manifest_error) {
-    return {
-      schema_version: 'workspace-graph-clean.v1',
-      status: 'failed',
-      topology: targets.topology,
-      reason_code: targets.manifest_error,
-      workspace_root: targets.workspace_root,
-      repos: [],
-      routing: null,
-    };
-  }
-  if (targets.ambiguous.length > 0) {
-    return {
-      schema_version: 'workspace-graph-clean.v1',
-      status: 'failed',
-      topology: targets.topology,
-      reason_code: 'workspace-targets-ambiguous',
-      workspace_root: targets.workspace_root,
-      repos: [],
-      routing: null,
-    };
-  }
+  const selectionError = invalidCleanResult(targets);
+  if (selectionError) return selectionError;
 
   const workspaceRoot = targets.workspace_root;
-  const confirmed = targets.repos.filter((repo) => !repo.needs_confirm);
-  const pendingConfirm = targets.repos.filter((repo) => repo.needs_confirm);
-  if (confirmed.length === 0 && pendingConfirm.length > 0) {
+  const confirmed = targets.repos.filter((repo) => !repo.needs_confirm
+    && (!context.requestedRoots.size || context.requestedRoots.has(repo.git_root)));
+  const knownMembers = new Set([...resolveStateRepoIds(context.stateResult), ...targets.repos.map((repo) => repo.repo_id)]);
+  for (const repo of confirmed) knownMembers.delete(repo.repo_id);
+  const pendingConfirm = [...knownMembers].sort();
+  if (!confirmed.length || pendingConfirm.length) {
     return {
       schema_version: 'workspace-graph-clean.v1',
-      status: 'needs-confirmation',
+      status: confirmed.length ? 'partial' : 'needs-confirmation',
       topology: targets.topology,
       reason_code: 'workspace-repos-need-confirmation',
       workspace_root: workspaceRoot,
-      pending_confirm: pendingConfirm.map((repo) => repo.repo_id),
+      pending_confirm: pendingConfirm,
+      workspace_graphify_status: 'preserved',
+      workspace_graphify_removed: false,
+      next_action: '未清理任何仓或共享图。先用 --workspace-graph-status 核对成员；仅在确认清理整个工作区后，用完整仓清单重试。',
       repos: [],
       routing: null,
+    };
+  }
+  const graphifyRoots = ['graphify-out', '.graphify'].map((name) => path.join(workspaceRoot, name));
+  const unclaimed = unclaimedGraphDirectories(workspaceRoot, graphifyRoots, confirmed);
+  if (unclaimed.length) {
+    return {
+      schema_version: 'workspace-graph-clean.v1', status: 'partial', topology: targets.topology,
+      reason_code: 'workspace-graph-directory-unconfirmed', workspace_root: workspaceRoot,
+      repos: [], routing: null, workspace_graphify_status: 'preserved', workspace_graphify_removed: false,
+      unconfirmed_paths: unclaimed,
+      next_action: '未执行清理。核对 unconfirmed_paths 中的目录归属；先保全移出清单的仓图，再重试。',
     };
   }
   const repoResults = [];
@@ -273,33 +274,56 @@ function runWorkspaceGraphCleanOwned({
   const childOrRoutingFailed = repoFailed || routingFailed;
 
   // 5. Only remove state/tree after successfully cleaning up child/routing; otherwise retain receipt for bare retry.
-  const graphifyRoots = [
-    path.join(workspaceRoot, 'graphify-out'),
-    path.join(workspaceRoot, '.graphify'),
-  ];
   lifecycle.assertOwned('before-workspace-artifact-clean');
   const graphify = childOrRoutingFailed
     ? { ok: true, status: 'preserved', removed: false, reason_code: '' }
     : removeWorkspaceGraphRoots(workspaceRoot, graphifyRoots);
   const failed = childOrRoutingFailed || !graphify.ok;
-  const needsConfirmation = pendingConfirm.length > 0;
 
   return {
     schema_version: 'workspace-graph-clean.v1',
-    status: failed || needsConfirmation ? 'partial' : 'complete',
+    status: failed ? 'partial' : 'complete',
     topology: targets.topology,
     workspace_root: workspaceRoot,
     repos: repoResults,
-    pending_confirm: pendingConfirm.map((repo) => repo.repo_id),
+    pending_confirm: [],
     workspace_graphify_status: graphify.status,
     workspace_graphify_removed: graphify.removed,
     routing,
     // spec-first does not force-kill provider daemons; report the action for the user/host.
     codegraph_daemon_action: 'run `codegraph daemon` to stop any watcher bound to a removed workspace',
-    reason_code: failed
-      ? 'workspace-clean-partial'
-      : (needsConfirmation ? 'workspace-repos-need-confirmation' : ''),
+    reason_code: failed ? 'workspace-clean-partial' : '',
   };
+}
+
+function invalidCleanResult(targets) {
+  const issue = workspaceTargetError(targets);
+  return issue ? { ...ineligibleCleanResult(targets), status: 'failed', ...issue } : null;
+}
+
+function unclaimedGraphDirectories(workspaceRoot, roots, repos) {
+  const unknown = [];
+  const selected = new Set(repos.map((repo) => path.relative(workspaceRoot, repo.git_root)));
+  function check(directory, prefix) {
+    let entries;
+    try {
+      assertContainedPath(workspaceRoot, directory);
+      entries = fs.readdirSync(directory, { withFileTypes: true });
+    } catch (error) {
+      if (error.code !== 'ENOENT') unknown.push(path.relative(workspaceRoot, directory));
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const member = path.join(prefix, entry.name);
+      if (selected.has(member)) continue;
+      const child = path.join(directory, entry.name);
+      if (repos.some((repo) => path.relative(workspaceRoot, repo.git_root).startsWith(`${member}${path.sep}`))) check(child, member);
+      else unknown.push(path.relative(workspaceRoot, child));
+    }
+  }
+  for (const directory of roots) check(directory, '');
+  return unknown.sort();
 }
 
 function ineligibleCleanResult(targets) {
