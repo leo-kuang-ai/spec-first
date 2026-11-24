@@ -15,6 +15,12 @@ status: active
 
 ## Goal Capsule
 
+**2026-11-24 判分复验。** 两个读者任务加入默认评测。用 18 份正反样稿核对需求待定项、UTC 月份边界、默认结果和错误响应，修正两种正常排版被误拒的问题。详见[用例与逐轮实测](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-24-acceptance/reader-loop.md)。
+
+**2026-11-24 质量续验。** 同正文对照定位了开发与测试依据的不同分布，故障回放确认偏好读取失败需独立验例。另以真实项目旧版源码核实一处需求摘要与正文冲突。真人试读待回收。[验证方法与结果](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-24-acceptance/report.md)
+
+**2026-11-23 质量验收：** [固定候选版本的验证结果及真人试读入口](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-23-acceptance/report.md)。完成 135 项聚焦回归、3 项归档回放和八种宿主的隔离初始化检查。需求稿与两种技术方案目录的首次独立作答待回收。
+
 **2026-11-23 第三批：** [九包职责、逐文件审查和验证边界](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-23-phase-three/report.md)及[整改后逐项对账](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-23-phase-three/final-current.md)。阶段二提交 `5a55514d9` 上的 9 个现役包及共享目录共 270 个本机路径，已逐件审查。三批合计覆盖原名册中的 35 个现役技能，另外 3 个已退役。需求与技术方案的实际读者验收、正式语义评测和现场收益仍未验证。
 
 **2026-11-23 更新：** 第二批[分支验收包逐文件深化](2026-11-03-skill-optimization-initiative/reviews/runs/2026-11-20-phase-two/dogfood-deep-review.md)已区分实际观察、处置和放行；修复停止与转交误判。零执行、已测失败、浏览器全绿但套件失败三份材料已备，尚无真实读者签收。

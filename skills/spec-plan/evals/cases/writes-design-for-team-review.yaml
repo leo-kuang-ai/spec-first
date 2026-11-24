@@ -6,6 +6,8 @@ input:
     Run `node prepare-eval.cjs` once; only this step may create a fixture baseline commit.
     We want an optional UTC month filter on GET /entries. Without a month, return all entries as before. Return 400 for an invalid month.
     Client engineers and testers will review the design tomorrow. Write a technical design for that discussion at docs/reviews/month-filter-design-review.md and identify the source file that handles the request today.
+    Cite the repository-relative handler path. Include a Markdown acceptance table with the columns Request, HTTP status, and Entry IDs. Use GET /entries, GET /entries?month=2026-02, and GET /entries?month=2026-13 as the requests. Write a comma-separated list of numeric IDs, or none for an error response. These are proposed examples for the meeting.
+    Use these example records: 11 at 2026-01-31T23:59:59Z, 12 at 2026-03-01T00:15:00+01:00, and 13 at 2026-02-28T23:15:00-01:00.
     Deliver meeting material only. Do not change the service, run the application, commit the draft, or send it anywhere.
 context:
   repo_fixture: evals/fixtures/repos/mini-ledger

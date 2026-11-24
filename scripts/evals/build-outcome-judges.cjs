@@ -122,6 +122,7 @@ function buildGroup(skill, fixtures, judges, prepareTail = '') {
 }
 
 const planningReturnChecks = fs.readFileSync(path.join(__dirname, 'plan-handoff-checks.cjs'), 'utf8');
+const monthReviewCheck = fs.readFileSync(path.join(__dirname, 'month-review-check.cjs'), 'utf8');
 function decisionEvidence(storage, source) {
   return `const report = parseFinalMessage();
 assert.ok(['adopt', 'trial', 'retain', 'defer'].includes(report.decision), 'Missing adoption decision');
@@ -172,10 +173,8 @@ for (const [key, value] of Object.entries({ type: 'design-review', status: 'draf
   assert.equal(field, value);
 }
 assert.doesNotMatch(parts[1], /^(artifact_contract|artifact_readiness):/m);
-assert.match(parts[2], /\bserver\.js\b/);
-assert.match(parts[2], /\/entries\b/);
-assert.match(parts[2], /\b400\b/);
-assert.match(parts[2], /\bUTC\b/);
+${monthReviewCheck}
+checkMonthExamples(parts[2]);
 ` },
   'check-r2-no-code': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
   'check-always-plan-only': { fixtures: ['mini-ledger'], options: { allowNewDocs: true } },
@@ -246,6 +245,7 @@ buildGroup('spec-prd', ['rough-prd', 'large-resume'], {
 const report = JSON.parse(process.env.EVAL_FINAL_MESSAGE);
 assert.equal(report.can_enter_spec_plan, 'no', 'An explicit product decision still blocks planning');
 assert.deepEqual(report.blocking_questions, ['OQ-1'], 'Identify the explicit encoding blocker, not the unknown volume decision');
+assert.deepEqual(report.question_states, { 'OQ-1': 'yes', 'OQ-2': 'unknown' }, 'Preserve the recorded state of both product questions');
 assert.ok(typeof report.explanation === 'string' && report.explanation.trim(), 'Missing diagnostic explanation');
 ` },
   // resume-checkpoint-identity: checkpoint PRD allows incremental writes (template: 327), so only the PRD itself

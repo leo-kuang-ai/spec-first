@@ -5,6 +5,13 @@ const os = require('node:os');
 const path = require('node:path');
 const { execFileSync, spawnSync } = require('node:child_process');
 const root = path.resolve(__dirname, '../..');
+const monthTable = [
+  '| Request | HTTP status | Entry IDs |',
+  '| --- | --- | --- |',
+  '| GET /entries | 200 | 11, 12, 13 |',
+  '| GET /entries?month=2026-02 | 200 | 12 |',
+  '| GET /entries?month=2026-13 | 400 | none |',
+].join('\n');
 
 describe('CE outcome judge counterexamples and valid controls', () => {
   let workspace;
@@ -117,7 +124,7 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     setup('spec-plan', 'mini-ledger');
     const check = () => judge('spec-plan', 'check-team-design-review.sh', '会议材料已写好。').status;
     const file = path.join(workspace, 'docs/reviews/month-filter-design-review.md');
-    const draft = '---\ntype: "design-review"\nstatus: draft\n---\n# 按月筛选\n现状：src/server.js 比较整个请求地址，带查询参数时匹配不到。建议先匹配路径，再解析 UTC 月份；GET /entries 不传月份仍返回全部，非法月份返回 400。\n';
+    const draft = '---\ntype: "design-review"\nstatus: draft\n---\n# 按月筛选\n现状：src/server.js 比较整个请求地址，带查询参数时匹配不到。建议先匹配路径，再解析 UTC 月份；GET /entries 不传月份仍返回全部，非法月份返回 400。\n' + monthTable;
     expect(check()).toBe(1);
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, draft);
@@ -135,7 +142,7 @@ describe('CE outcome judge counterexamples and valid controls', () => {
 
   test('PRD validation rejects body mutation even with the original marker', () => {
     setup('spec-prd', 'rough-prd');
-    const report = { can_enter_spec_plan: 'no', blocking_questions: ['OQ-1'], explanation: 'The encoding decision blocks planning.' };
+    const report = { can_enter_spec_plan: 'no', blocking_questions: ['OQ-1'], question_states: { 'OQ-1': 'yes', 'OQ-2': 'unknown' }, explanation: 'The encoding decision blocks planning.' };
     const check = (update = {}) => judge('spec-prd', 'check-validate-report-only.sh', JSON.stringify({ ...report, ...update })).status;
     expect(check()).toBe(0);
     expect(check({ can_enter_spec_plan: 'yes' })).toBe(1);
@@ -147,6 +154,40 @@ describe('CE outcome judge counterexamples and valid controls', () => {
     fs.writeFileSync(file, original);
     fs.writeFileSync(path.join(workspace, 'docs/brainstorms/unrequested.md'), 'New unauthorized artifact');
     expect(check()).toBe(1);
+  });
+
+  test.each([
+    ['正确示例', monthTable, 'src/server.js', 0],
+    ['常用表格排版', monthTable.replaceAll('GET /entries', '`GET /entries').replaceAll(' | 200', '` | 200 OK').replace(' | 400', '` | 400 Bad Request').replace('11, 12, 13', '13,11,12').replace(/^\| | \|$/gm, ''), './src/server.js', 0],
+    ['只有关键词', '', 'src/server.js', 1],
+    ['错误同名源文件', monthTable, 'lib/server.js', 1],
+    ['以本地月份取代 UTC', monthTable.replace('| 200 | 12 |', '| 200 | 13 |'), 'src/server.js', 1],
+    ['漏掉默认返回的记录', monthTable.replace('11, 12, 13', '12'), 'src/server.js', 1],
+    ['无效月仍成功', monthTable.replace('400 | none', '200 | none'), 'src/server.js', 1],
+    ['同一请求两种结果', monthTable + '\n| GET /entries?month=2026-02 | 200 | 13 |', 'src/server.js', 1],
+    ['表格只在编辑备注', '<!--\n' + monthTable + '\n-->', 'src/server.js', 1],
+    ['句末的源码路径', monthTable, 'See src/server.js.', 0],
+    ['加粗栏目名', monthTable.replace('Request | HTTP status | Entry IDs', '**Request** | **HTTP status** | **Entry IDs**'), 'src/server.js', 0],
+    ['同名备份文件', monthTable, 'src/server.js.bak', 1],
+    ['错误响应仍返回数据', monthTable.replace('400 | none', '400 | 12'), 'src/server.js', 1],
+  ])('读者核对方案示例：%s', (_name, table, handler, expected) => {
+    setup('spec-plan', 'mini-ledger');
+    const dir = path.join(workspace, 'docs/reviews');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'month-filter-design-review.md'), `---\ntype: design-review\nstatus: draft\n---\n# Month filter\n${handler} handles GET /entries. Use UTC and return 400 for invalid months.\n\n${table}\n`);
+    expect(judge('spec-plan', 'check-team-design-review.sh').status).toBe(expected);
+  });
+
+  test.each([
+    ['保留产品未决项', { 'OQ-2': 'unknown', 'OQ-1': 'yes' }, 0],
+    ['省略整份问题状态', undefined, 1],
+    ['将待定记为放行', { 'OQ-1': 'yes', 'OQ-2': 'no' }, 1],
+    ['遗漏待定项', { 'OQ-1': 'yes' }, 1],
+    ['新增未出现的问题', { 'OQ-1': 'yes', 'OQ-2': 'unknown', 'OQ-3': 'yes' }, 1],
+  ])('读者核对需求裁决：%s', (_name, states, expected) => {
+    setup('spec-prd', 'rough-prd');
+    const report = { can_enter_spec_plan: 'no', blocking_questions: ['OQ-1'], explanation: 'Encoding requires a product decision.', question_states: states };
+    expect(judge('spec-prd', 'check-validate-report-only.sh', JSON.stringify(report)).status).toBe(expected);
   });
 
   test('checkpoint resume protects approved rules and answers but permits incremental evidence', () => {
