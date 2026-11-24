@@ -29,8 +29,8 @@
       "id": "codegraph",
       "ecosystem": "npm",
       "package": "@colbymchenry/codegraph",
-      "version": "1.6.0",
-      "integrity": "sha512-nCN40MqmYxF7gH1QTKqlxJ1d2mzwhw3fzSdGV2wjnQKsymjM3JZnH/5rpGqhBkcUEom0qWq0WjDRvOZh2t8mFA==",
+      "version": "1.6.4",
+      "integrity": "sha512-Vn4rKe3wTDi8jV3Ni3nUtCX17X3y+hv5rBGkOrO1dtE9ICj3eByVbHM/A9CmR68Cjl8QiGRoOhn7phnS1hyjZg==",
       "source": "npmjs",
       "command": "codegraph"
     },
@@ -38,10 +38,10 @@
       "id": "graphify",
       "ecosystem": "pypi",
       "package": "graphifyy",
-      "version": "0.9.57",
+      "version": "0.9.118",
       "command": "graphify",
       "python": {
-        "requires": ">=3.10",
+        "requires": ">=3.11.5,<3.15",
         "allow_managed_download": false
       },
       "installers": {
@@ -52,8 +52,8 @@
         "plain_pip_allowed": false
       },
       "distribution": {
-        "wheel_url": "https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl",
-        "sha256": "f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37",
+        "wheel_url": "https://files.pythonhosted.org/packages/1b/06/b3946a2f190bd175ca87afff1e6f26698814dc83ea92459b863f676aef99/graphifyy-0.9.118-py3-none-any.whl",
+        "sha256": "f572453c275e82dcc052f6cf7fa79c0a5a14eaefab08ac9112e31edf7b9d75aa",
         "index_url": "https://pypi.org/simple"
       },
       "hook_normalization_contract": "graphify-python-hook-normalization.v1"
@@ -637,7 +637,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -646,7 +646,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -655,7 +655,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -664,7 +664,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -673,7 +673,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -683,7 +683,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -692,7 +692,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         },
@@ -701,7 +701,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0"
             ]
           }
         }
@@ -712,7 +712,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           }
@@ -722,7 +722,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           }
@@ -732,7 +732,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           }
@@ -742,7 +742,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           }
@@ -751,8 +751,8 @@
       "readiness_policy": "always-required",
       "resolved_dependency": {
         "package": "@modelcontextprotocol/server-sequential-thinking",
-        "version": "2026.8.31",
-        "integrity": "sha512-/EMH++1j2e+VmHwpibw1IUPHxA0tcQY09Yo5/OIPwW/8irEKLAufJNGSZQhCK18n8TUvV6WwZyQOuaDKxe/CeQ==",
+        "version": "2.2.0",
+        "integrity": "sha512-Tv3AniI/gc+X2J4YjJmZ0BCP/82clUTvOt7Z9z8PWHEdE4/123iHUyJJk0dRMCE/mlskmOuBAgHv+pDq6KvBDA==",
         "source": "npmjs"
       }
     },
@@ -785,7 +785,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -794,7 +794,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -803,7 +803,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -812,7 +812,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -821,7 +821,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -831,7 +831,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -840,7 +840,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         },
@@ -849,7 +849,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7"
+              "@upstash/context7-mcp@4.7.3"
             ]
           }
         }
@@ -860,7 +860,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           }
@@ -870,7 +870,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           }
@@ -880,7 +880,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           }
@@ -890,7 +890,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           }
@@ -899,8 +899,8 @@
       "readiness_policy": "always-required",
       "resolved_dependency": {
         "package": "@upstash/context7-mcp",
-        "version": "4.0.7",
-        "integrity": "sha512-56+UVpy1Mwe7IE5ehRuvuqAdyCBRHEAOHh/ztFnlH1ZYkVVrp7ptWMAVhbdSZplD0rKC7byYsBYXyrqbMJHWmA==",
+        "version": "4.7.3",
+        "integrity": "sha512-pQqHHZPSx0vZOCluRkQuTHIiR7WnoMToyAUEG3xjvb/0VFMztUglJ6Xjfitw37ZoEEckpS48gv139C6dXik/1w==",
         "source": "npmjs"
       }
     },
@@ -1188,13 +1188,12 @@
       "safety": {
         "risk_flags": [
           "global-npm-install",
-          "browser-runtime-install",
-          "unpinned-latest"
+          "browser-runtime-install"
         ],
         "source": "npm",
         "source_repo": "https://github.com/vercel-labs/agent-browser",
         "version_policy": {
-          "pin_status": "latest"
+          "pin_status": "pinned"
         },
         "review_required": true,
         "install_effect": "global CLI, browser runtime, global skill"
@@ -1207,7 +1206,7 @@
       "platform_overrides": {
         "macos": {
           "installation": {
-            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+            "command": "CI=true npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -1217,7 +1216,7 @@
         },
         "linux": {
           "installation": {
-            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+            "command": "CI=true npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -1227,7 +1226,7 @@
         },
         "wsl": {
           "installation": {
-            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+            "command": "CI=true npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -1237,7 +1236,7 @@
         },
         "windows": {
           "installation": {
-            "command": "$env:CI='true'; npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error; if ($LASTEXITCODE -eq 0) { agent-browser install }; if ($LASTEXITCODE -eq 0) { npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y }"
+            "command": "$env:CI='true'; npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error; if ($LASTEXITCODE -eq 0) { agent-browser install }; if ($LASTEXITCODE -eq 0) { npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y }"
           },
           "platform_required_tools": [
             "node",
@@ -1322,7 +1321,7 @@
         },
         "windows": {
           "installation": {
-            "command": "winget install --id GitHub.cli -e",
+            "command": "winget install --id GitHub.cli -e --version 2.105.0",
             "operations": [
               {
                 "command": "winget",
@@ -1330,7 +1329,9 @@
                   "install",
                   "--id",
                   "GitHub.cli",
-                  "-e"
+                  "-e",
+                  "--version",
+                  "2.105.0"
                 ]
               }
             ]
@@ -1386,19 +1387,19 @@
         },
         "linux": {
           "installation": {
-            "command": "go install github.com/charmbracelet/vhs@latest"
+            "command": "go install github.com/charmbracelet/vhs@v0.12.1"
           },
           "platform_required_tools": []
         },
         "wsl": {
           "installation": {
-            "command": "go install github.com/charmbracelet/vhs@latest"
+            "command": "go install github.com/charmbracelet/vhs@v0.12.1"
           },
           "platform_required_tools": []
         },
         "windows": {
           "installation": {
-            "command": "go install github.com/charmbracelet/vhs@latest"
+            "command": "go install github.com/charmbracelet/vhs@v0.12.1"
           },
           "platform_required_tools": []
         }
@@ -1451,19 +1452,19 @@
         },
         "linux": {
           "installation": {
-            "command": "cargo install silicon --force"
+            "command": "cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked --force silicon"
           },
           "platform_required_tools": []
         },
         "wsl": {
           "installation": {
-            "command": "cargo install silicon --force"
+            "command": "cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked --force silicon"
           },
           "platform_required_tools": []
         },
         "windows": {
           "installation": {
-            "command": "cargo install silicon --force"
+            "command": "cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked --force silicon"
           },
           "platform_required_tools": []
         }
@@ -1546,7 +1547,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 ffmpeg",
-            "command": "winget install --id Gyan.FFmpeg -e",
+            "command": "winget install --id Gyan.FFmpeg -e --version 9.1",
             "operations": [
               {
                 "command": "winget",
@@ -1554,7 +1555,9 @@
                   "install",
                   "--id",
                   "Gyan.FFmpeg",
-                  "-e"
+                  "-e",
+                  "--version",
+                  "9.1"
                 ]
               }
             ]
@@ -1616,19 +1619,19 @@
         },
         "linux": {
           "installation": {
-            "command": "cargo install ast-grep --locked --force"
+            "command": "cargo install ast-grep --version 0.51.3 --locked --force"
           },
           "platform_required_tools": []
         },
         "wsl": {
           "installation": {
-            "command": "cargo install ast-grep --locked --force"
+            "command": "cargo install ast-grep --version 0.51.3 --locked --force"
           },
           "platform_required_tools": []
         },
         "windows": {
           "installation": {
-            "command": "npm install -g @ast-grep/cli@latest"
+            "command": "npm install -g @ast-grep/cli@0.51.3"
           },
           "platform_required_tools": []
         }
@@ -1659,17 +1662,15 @@
       },
       "safety": {
         "risk_flags": [
-          "global-skill-install",
-          "unpinned-npx"
+          "global-skill-install"
         ],
         "source": "npx",
         "source_repo": "https://ast-grep.github.io",
         "version_policy": {
-          "pin_status": "latest"
+          "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "global skill",
-        "pin_reassessment": "Version pin reevaluation conditions (lane finding DR-002, 2026-09-13): First, confirm the stable version number of the skills CLI in the connected environment and verify its supported features, referencing pinning (e.g., ast-grep/agent-skill@<ref>); then, replace skills@latest with the verified version and perform archive validation. Prior to this, execution was blocked by the unpinned-npx (review-required members) + review_required gate, resulting in plan output showing review-required status and preventing automatic execution; no silent installation will occur."
+        "install_effect": "global skill"
       },
       "runner_kind": "cross-platform",
       "installation": {
@@ -1679,15 +1680,15 @@
       "platform_overrides": {
         "macos": {
           "installation": {
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y",
             "operations": [
               {
                 "command": "npx",
                 "args": [
                   "-y",
-                  "skills@latest",
+                  "skills@1.9.0",
                   "add",
-                  "ast-grep/agent-skill",
+                  "https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460",
                   "-g",
                   "-y"
                 ]
@@ -1701,15 +1702,15 @@
         },
         "linux": {
           "installation": {
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y",
             "operations": [
               {
                 "command": "npx",
                 "args": [
                   "-y",
-                  "skills@latest",
+                  "skills@1.9.0",
                   "add",
-                  "ast-grep/agent-skill",
+                  "https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460",
                   "-g",
                   "-y"
                 ]
@@ -1723,15 +1724,15 @@
         },
         "wsl": {
           "installation": {
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y",
             "operations": [
               {
                 "command": "npx",
                 "args": [
                   "-y",
-                  "skills@latest",
+                  "skills@1.9.0",
                   "add",
-                  "ast-grep/agent-skill",
+                  "https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460",
                   "-g",
                   "-y"
                 ]
@@ -1745,15 +1746,15 @@
         },
         "windows": {
           "installation": {
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y",
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y",
             "operations": [
               {
                 "command": "npx",
                 "args": [
                   "-y",
-                  "skills@latest",
+                  "skills@1.9.0",
                   "add",
-                  "ast-grep/agent-skill",
+                  "https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460",
                   "-g",
                   "-y"
                 ]
@@ -2032,7 +2033,7 @@
         "hook_default": true,
         "usage_owner": "downstream-skill"
       },
-      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.57` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 Provider 原生 `graphify extract . --code-only`，唯一current artifact位于原生默认目录`graphify-out/`，不注入`GRAPHIFY_OUT`。仅有旧版spec-first适配目录`.graphify/`时，setup将其原子迁移到`graphify-out/`；两个目录同时存在则fail closed。已有`graphify-out/`时普通setup执行裸query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro/OpenCode使用Provider-native project integration（Zcode与Pi均映射 Graphify 原生`agents`平台写入共享`.agents/skills/`投影根——Graphify无zcode平台，其原生pi平台写`.pi/agent/skills/`且不在Pi项目级skills发现路径内），Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和Provider原生默认输出，不依赖spec-first环境变量。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
+      "usage_note": "标准 Runtime Setup（或高级子集 `spec-runtime-setup --only graphify`）优先使用已安装 uv、其次 pipx，将 pinned `graphifyy@0.9.118` direct wheel安装到隔离Python tool environment；缺少兼容Python或tool manager时返回action-required，不自动bootstrap、不使用plain pip。首次生成固定运行 Provider 原生 `graphify extract . --code-only`，唯一current artifact位于原生默认目录`graphify-out/`，不注入`GRAPHIFY_OUT`。仅有旧版spec-first适配目录`.graphify/`时，setup将其原子迁移到`graphify-out/`；两个目录同时存在则fail closed。已有`graphify-out/`时普通setup执行裸query；显式`--refresh`使用官方`graphify update <workspace>`原位更新代码索引，复用Provider lock、临时graph、shrink guard和未变节点保留能力，不创建spec-first顶层staging/backup。Claude/Codex/Cursor/Kiro/OpenCode使用Provider-native project integration（Zcode与Pi均映射 Graphify 原生`agents`平台写入共享`.agents/skills/`投影根——Graphify无zcode平台，其原生pi平台写`.pi/agent/skills/`且不在Pi项目级skills发现路径内），Qoder使用spec-first adapter；两个Git hook必须验证marker、interpreter和Provider原生默认输出，不依赖spec-first环境变量。Graphify mutation setup在Python package/artifact/query/host/hook全部verified后默认卸载已确认的全局npm incumbent，并只删除被证明归属该package的旧launcher symlink；诊断、plan、verify-only及未知PATH命令保持只读。Graphify MCP、watch与semantic extraction仍为opt-in。所有Graphify输出仅是provider_untrusted advisory candidate，结论必须回到source/test/log/contract或owner evidence。",
       "detection": {
         "kind": "command",
         "command": "graphify",
@@ -2058,12 +2059,12 @@
           "git-hook-write"
         ],
         "source": "pypi",
-        "source_repo": "https://pypi.org/project/graphifyy/0.9.57/",
+        "source_repo": "https://pypi.org/project/graphifyy/0.9.118/",
         "version_policy": {
           "pin_status": "pinned"
         },
         "review_required": true,
-        "install_effect": "Installs the release-reviewed `graphifyy@0.9.57` wheel with uv or pipx using compatible Python >=3.10, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
+        "install_effect": "Installs the release-reviewed `graphifyy@0.9.118` wheel with uv or pipx using compatible Python >=3.11.5,<3.15, no managed Python download, official PyPI index and verified direct SHA-256. Resolves an absolute launcher and confirms importlib distribution identity plus CLI version. Project setup normalizes only recognized Provider-owned instruction/skill/rule/steering/hook surfaces to the Provider-native `graphify-out/` root and the selected launcher. First generation is local AST `extract --code-only` with no `GRAPHIFY_OUT` override; a legacy `.graphify/` tree is atomically migrated when it is the sole artifact root, while dual roots fail closed. Explicit refresh uses provider-native `graphify update` against the existing graph and does not create spec-first top-level staging or backup directories. Git hook readiness requires both Provider marker blocks, verified interpreter and allowed rebuild command without a spec-first output override. After Python package/artifact/query/host/hook readiness is fully verified, mutation setup removes a confirmed global `@sentropic/graphify` incumbent and only stale launcher symlinks proven to resolve into that package. Setup never installs MCP extras, never bootstraps Python/tool managers, never edits shell profiles, and never promotes Graphify output beyond advisory evidence."
       },
       "readiness": {
         "producer": "spec-runtime-setup",
@@ -2082,7 +2083,7 @@
       "installation": {
         "strategy": "python-isolated-tool",
         "dependency_ref": "graphify",
-        "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。"
+        "next_action": "准备 Python >=3.11.5,<3.15 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。"
       },
       "platform_overrides": {
         "macos": {

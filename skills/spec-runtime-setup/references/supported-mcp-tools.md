@@ -6,12 +6,14 @@ This article summarizes the current `spec-runtime-setup` registry. The machine s
 
 | Tool | Required | Category | Host config | Command |
 | --- | --- | --- | --- | --- |
-| Sequential Thinking | Yes | `mcp` | Yes | `npx -y @modelcontextprotocol/server-sequential-thinking@2026.8.31` |
-| Context7 | Yes | `mcp` | Yes | `npx -y @upstash/context7-mcp@4.0.7` |
+| Sequential Thinking | Yes | `mcp` | Yes | `npx -y @modelcontextprotocol/server-sequential-thinking@2.2.0` |
+| Context7 | Yes | `mcp` | Yes | `npx -y @upstash/context7-mcp@4.7.3` |
 | CodeGraph | Yes, standard setup | `mcp` | Yes | `codegraph serve --mcp` |
 | Graphify | Yes, standard setup | `provider-cli` | Project skill/hook | `graphify` |
 
 ## Setup Rules
+
+Sequential Thinking requires Node.js 24 or later. Context7 requires Node.js 20.18.1 or later. The host that launches `npx` must provide the appropriate Node.js version.
 
 - See [Installation and Graph Readiness](../SKILL.md#installation-and-graph-readiness) for default scopes. With no flags, setup prepares the full artifact baseline in a single project but only diagnoses a multi-repository parent. Ordinary plan and verify calls use installation scope; `--only <graph-id>` and `--requirement-workspace` retain artifact scope.
 - Unified registry differentiates between `tools`, `helpers`, and `providers`, while centrally managing dependency pinning, host targeting, platform override, install safety, and artifact contract.
@@ -59,7 +61,7 @@ After setup:
 
 ### CodeGraph installation archive evidence
 
-The top-level npm archive for CodeGraph 1.6.0 has a fixed SHA-512 and source identifier in the source registry. Skip installation of packages owned by registry Provider during the baseline phase; share the same setup dependency phase and direct Provider apply for required npm warmup archive validation. Owner: first run `npm pack --ignore-scripts --json` to verify actual byte count and name/version, then pass the same `file:<archive>` to `npm install -g`; validation errors will prevent installation. After installation, still verify the actual command version; do not substitute readiness with a npm exit code of 0.
+The top-level npm archive for CodeGraph 1.6.4 has a fixed SHA-512 and source identifier in the source registry. Skip installation of packages owned by registry Provider during the baseline phase; share the same setup dependency phase and direct Provider apply for required npm warmup archive validation. Owner: first run `npm pack --ignore-scripts --json` to verify actual byte count and name/version, then pass the same `file:<archive>` to `npm install -g`; validation errors will prevent installation. After installation, still verify the actual command version; do not substitute readiness with a npm exit code of 0.
 
 `tool-facts.v2.provider_readiness[].dependency_identity` retains package/version/source/integrity, `installer=npm-pack+npm-install`, `integrity_status=verified`, and `verification_scope=top-level-package-archive`; the CLI normalizer retains valid identities and rejects expanded scopes. This field supports incremental processing; historical installation evidence is not generated for old facts or existing providers that were previously installed but are not installed in this deployment. The original warmup cache still only accepts `npm-pack+npx`. Temporary archiving is cleaned up after success or failure; no Provider installation success cache is generated.
 
@@ -67,7 +69,7 @@ This evidence only covers the top-level shim package and does not prove the trus
 
 ### Read-only boundary of CodeGraph npm launcher
 
-Official 1.6.0 npm shim will automatically download when platform packages are missing; even if CODEGRAPH_NO_DOWNLOAD is set, cached bundles will still be cleaned after a historical bundle is hit. The regular real runner (including sync worker) and workspace default runner of Runtime Setup parse the platform package that is installed and version-matched via Provider-owned `codegraph-launcher.cjs`, directly running its entry point; Windows uses the platform node.exe with an independent argv prefix, avoiding execution of the npm .cmd wrapper. Return a structured failure with explicit repair instructions for package missing or identity mismatch; do not rollback the shim or self-heal the cache. The absolute commands for asynchronous workspace are also re-parsed at actual startup time.
+Official 1.6.4 npm shim will automatically download when platform packages are missing; even if CODEGRAPH_NO_DOWNLOAD is set, cached bundles will still be cleaned after a historical bundle is hit. The regular real runner (including sync worker) and workspace default runner of Runtime Setup parse the platform package that is installed and version-matched via Provider-owned `codegraph-launcher.cjs`, directly running its entry point; Windows uses the platform node.exe with an independent argv prefix, avoiding execution of the npm .cmd wrapper. Return a structured failure with explicit repair instructions for package missing or identity mismatch; do not rollback the shim or self-heal the cache. The absolute commands for asynchronous workspace are also re-parsed at actual startup time.
 
 This check only identifies npm-known installation layouts and retains existing behavior for non-npm native launchers and non-CodeGraph commands; it is not an arbitrary shell/JS side-effect sandbox. The DI runner's substitute test does not verify the actual startup boundary; the independent, isolated execution covers the default runner. manifest/version match does not equal archive byte verification; supply chain proofs for platform packages and transit dependencies cannot be inferred from this.
 
@@ -117,7 +119,7 @@ After the final state is written, if budget review/cancellation occurs within th
 
 Index status uses the native `status --json`, requiring the initialized, version, projectPath/indexPath, worktreeMismatch, pendingChanges, and index fields to be valid. Only proceed to query validation when `index.state=complete`, there are no pending reference resolutions or pending files to process, reconstruction is not recommended, and the path matches. Old `state:null` does not directly support ready; explicit apply requires using the native `index -f` to rebuild and verify again. Missing fields, unknown text, invalid JSON, and work tree mismatches are not supported for indexed.
 
-CodeGraph 1.6.0 may recover or migrate a database when native status or query opens it. Setup uses those commands on the authorized build or repair path. Read-only verification uses the saved evidence described below; it does not run or timestamp a new query.
+CodeGraph 1.6.4 may recover or migrate a database when native status or query opens it. Setup uses those commands on the authorized build or repair path. Read-only verification uses the saved evidence described below; it does not run or timestamp a new query.
 
 
 ### CodeGraph artifact evidence (read-only consumption)

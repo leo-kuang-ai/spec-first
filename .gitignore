@@ -51,6 +51,7 @@ skills/*-workspace/
 
 # Published/package artifacts
 *.tgz
+!tests/fixtures/mcp-setup/npm-archives/*.tgz
 
 # Python artifacts
 __pycache__/

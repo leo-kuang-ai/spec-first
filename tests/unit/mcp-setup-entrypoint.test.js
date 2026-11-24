@@ -133,7 +133,7 @@ function fakeRunner(command, args, options = {}) {
       fs.chmodSync(launcher, 0o755);
     }
   }
-  if (command === 'npx' && args.includes('ast-grep/agent-skill')) {
+  if (command === 'npx' && args.some(arg => arg.startsWith('https://github.com/ast-grep/agent-skill/tree/'))) {
     const home = options.env && options.env.HOME;
     if (home) {
       const skillDir = path.join(home, '.agents', 'skills', 'ast-grep');
@@ -194,10 +194,10 @@ function fakeRunner(command, args, options = {}) {
     timeout: false,
     stdout: /^python(?:3(?:\.\d+)?)?$/.test(path.basename(command)) && args[0] === '-c'
       ? (String(args[1]).includes('importlib.metadata')
-        ? JSON.stringify({ version: '0.9.57', packages: [['graphifyy', '0.9.57']] })
+        ? JSON.stringify({ version: '0.9.118', packages: [['graphifyy', '0.9.118']] })
         : '3.12.1')
       : (graphifyCommand && args[0] === '--version'
-        ? 'graphify 0.9.57'
+        ? 'graphify 0.9.118'
         : (command === 'uv' && args.join(' ') === 'tool dir --bin'
           ? path.join((options.env && options.env.HOME) || os.homedir(), '.local', 'bin')
           : (args[0] === 'status' ? 'ready' : 'ok'))),
@@ -482,9 +482,9 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(updated).toContain('[mcp_servers.unrelated]');
     expect(updated).toContain('command = "keep-me"');
     expect(updated).toContain('[mcp_servers.context7]');
-    expect(updated).toContain('@upstash/context7-mcp@4.0.7');
+    expect(updated).toContain('@upstash/context7-mcp@4.7.3');
     expect(updated).toContain('[mcp_servers.sequential-thinking]');
-    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@2026.8.31');
+    expect(updated).toContain('@modelcontextprotocol/server-sequential-thinking@2.2.0');
     expect(updated).not.toContain('command = "user-owned"');
   });
 
@@ -531,7 +531,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const homeBefore = snapshot(homeDir);
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
       }
       if (command === 'codegraph' && args[0] === 'status') {
         return { ...fakeRunner(command, args, options), stdout: codegraphStatus(options.cwd) };
@@ -1156,7 +1156,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     fs.mkdirSync(nested, { recursive: true });
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(nested, '.codegraph'), { recursive: true });
@@ -1306,7 +1306,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options) => {
       calls.push([command, ...args]);
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(folder, '.codegraph'), { recursive: true });
@@ -1892,7 +1892,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(Object.keys(config.mcp).sort()).toEqual(['context7', 'sequential-thinking']);
     expect(config.mcp.context7).toEqual({
       type: 'local',
-      command: ['npx', '-y', '@upstash/context7-mcp@4.0.7'],
+      command: ['npx', '-y', '@upstash/context7-mcp@4.7.3'],
     });
     expect(config.permission.skill['using-spec-first']).toBe('allow');
     expect(config.permission.skill['spec-work']).toBe('allow');
@@ -2009,7 +2009,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options = {}) => {
       calls.push({ command, args: [...args], env: { ...(options.env || {}) } });
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
@@ -2076,7 +2076,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const target = tempRepo('codegraph-configured');
     const runner = (command, args, options) => {
       if (command === 'codegraph' && args[0] === '--version') {
-        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
       }
       if (command === 'codegraph' && args[0] === 'init') {
         fs.mkdirSync(path.join(target, '.codegraph'), { recursive: true });
@@ -2114,7 +2114,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const result = runSetup({
       argv: ['--installation-only'], cwd: target, skillRoot,
       runner: (command, args, options) => { calls.push([command, ...args]);
-        if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+        if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
         return fakeRunner(command, args, options); },
       env: { MCP_SETUP_HOST: 'qoder' },
       homeDir: fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-install-home-')),
@@ -2139,7 +2139,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       const context = { cwd: target, skillRoot, homeDir, env: { MCP_SETUP_HOST: 'qoder' }, bundledVersion: '1.13.2',
         runner: (command, args, options) => {
           calls.push([command, ...args]);
-          if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.0' };
+          if (command === 'codegraph' && args[0] === '--version') return { ...fakeRunner(command, args, options), stdout: 'codegraph 1.6.4' };
           return fakeRunner(command, args, options);
         },
       };
@@ -2319,7 +2319,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     expect(cachedRun.exit_code).toBe(0);
     expect(cachedRun.payload.tool_facts.items.find((entry) => entry.id === 'context7')).toMatchObject({
       install_source: 'official', mirror_used: false, attempts: [],
-      dependency_identity: { package: '@upstash/context7-mcp', version: '4.0.7', integrity_status: 'verified', verification_scope: 'top-level-package-archive' },
+      dependency_identity: { package: '@upstash/context7-mcp', version: '4.7.3', integrity_status: 'verified', verification_scope: 'top-level-package-archive' },
     });
     const normalized = require('../../src/cli/helpers/setup-facts').normalizeSetupFacts(cachedRun.payload.tool_facts);
     expect(normalized.items.find((entry) => entry.id === 'context7').dependency_identity)
@@ -2350,7 +2350,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     const runner = (command, args, options) => {
       calls.push([command, ...args]);
       if (command === 'codegraph' && args[0] === '--version') {
-        return installed ? { exit_code: 0, stdout: 'codegraph 1.6.0', stderr: '' }
+        return installed ? { exit_code: 0, stdout: 'codegraph 1.6.4', stderr: '' }
           : { exit_code: 1, stdout: '', stderr: 'missing' };
       }
       if (command === 'npm' && args[0] === 'install') installed = true;
@@ -2368,7 +2368,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
       const facts = result.payload.tool_facts;
       const readiness = facts.provider_readiness.find((entry) => entry.provider === 'codegraph');
       expect(readiness.dependency_identity).toMatchObject({
-        package: '@colbymchenry/codegraph', version: '1.6.0', installer: 'npm-pack+npm-install',
+        package: '@colbymchenry/codegraph', version: '1.6.4', installer: 'npm-pack+npm-install',
         integrity_status: 'verified', verification_scope: 'top-level-package-archive',
       });
       expect(calls.some(([command, verb, ...args]) => command === 'npm' && verb === 'install'
@@ -2432,7 +2432,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
         && env.npm_config_registry === 'https://registry.npmmirror.com';
       const context7Install = command === 'npx'
         && args.some((arg) => String(arg).includes('context7-mcp'));
-      const skillInstall = command === 'npx' && args.includes('ast-grep/agent-skill');
+      const skillInstall = command === 'npx' && args.some(arg => arg.startsWith('https://github.com/ast-grep/agent-skill/tree/'));
       if ((context7Install || skillInstall) && !mirror) {
         return failed(command, args, 'injected primary registry failure');
       }
@@ -2477,7 +2477,7 @@ describe('spec-runtime-setup unified Node entrypoint', () => {
     });
     const retriedInstalls = calls.filter((call) => (
       (call.command === 'npx' && call.args.some((arg) => String(arg).includes('context7-mcp')))
-      || (call.command === 'npx' && call.args.includes('ast-grep/agent-skill'))
+      || (call.command === 'npx' && call.args.some(arg => arg.startsWith('https://github.com/ast-grep/agent-skill/tree/')))
     ));
     expect(retriedInstalls).toHaveLength(4);
     for (let index = 0; index < retriedInstalls.length; index += 2) {

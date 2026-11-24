@@ -11,19 +11,19 @@ describe('CodeGraph 安装归档完整性', () => {
   let root;
   let context;
   let action;
-  const bytes = fs.readFileSync(path.join(__dirname, '../fixtures/mcp-setup/npm-archives/codegraph-1.6.0.tgz'));
+  const bytes = fs.readFileSync(path.join(__dirname, '../fixtures/mcp-setup/npm-archives/codegraph-1.6.4.tgz'));
   const integrity = `sha512-${crypto.createHash('sha512').update(bytes).digest('base64')}`;
   beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'codegraph-install-integrity-'));
     context = {
       repoRoot: root, host: 'codex', platform: 'macos', selected: true, installationOnly: true,
-      dependency: { package: '@colbymchenry/codegraph', version: '1.6.0', integrity, source: 'npmjs' },
+      dependency: { package: '@colbymchenry/codegraph', version: '1.6.4', integrity, source: 'npmjs' },
       runner: jest.fn((command, args) => {
         if (command === 'npm' && args[0] === 'pack') {
           fs.writeFileSync(path.join(args[args.indexOf('--pack-destination') + 1], 'codegraph.tgz'), bytes);
-          return { exit_code: 0, stdout: JSON.stringify([{ name: context.dependency.package, version: '1.6.0', filename: 'codegraph.tgz', integrity }]), stderr: '' };
+          return { exit_code: 0, stdout: JSON.stringify([{ name: context.dependency.package, version: '1.6.4', filename: 'codegraph.tgz', integrity }]), stderr: '' };
         }
-        return { exit_code: 0, stdout: '1.6.0', stderr: '' };
+        return { exit_code: 0, stdout: '1.6.4', stderr: '' };
       }),
     };
     action = provider.plan(context).actions.find((entry) => entry.kind === 'install-dependency');
@@ -38,7 +38,7 @@ describe('CodeGraph 安装归档完整性', () => {
     } });
     const installArgs = context.runner.mock.calls.find(([, args]) => args[0] === 'install')[1];
     expect(installArgs).toContain('-g');
-    expect(installArgs).not.toContain('@colbymchenry/codegraph@1.6.0');
+    expect(installArgs).not.toContain('@colbymchenry/codegraph@1.6.4');
     const archive = installArgs.find((arg) => arg.startsWith('file:')).slice(5);
     expect(fs.existsSync(archive)).toBe(false);
   });

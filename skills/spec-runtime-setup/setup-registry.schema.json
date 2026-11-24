@@ -498,7 +498,7 @@
           "properties": {
             "requires": {
               "type": "string",
-              "pattern": "^>=3\\.10$"
+              "pattern": "^>=3\\.11\\.5,<3\\.15$"
             },
             "allow_managed_download": {
               "const": false

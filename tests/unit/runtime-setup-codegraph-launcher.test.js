@@ -15,10 +15,10 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
     const packageRoot = path.join(root, 'node_modules', '@colbymchenry', 'codegraph');
     fs.mkdirSync(packageRoot, { recursive: true });
     fs.writeFileSync(path.join(packageRoot, 'npm-shim.js'), 'throw new Error("must not execute");');
-    fs.writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph', version: '1.6.0', optionalDependencies: { '@colbymchenry/codegraph-win32-x64': '1.6.0' } }));
+    fs.writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph', version: '1.6.4', optionalDependencies: { '@colbymchenry/codegraph-win32-x64': '1.6.4' } }));
     bundleRoot = path.join(root, 'node_modules', '@colbymchenry', 'codegraph-win32-x64');
     fs.mkdirSync(path.join(bundleRoot, 'lib', 'dist', 'bin'), { recursive: true });
-    fs.writeFileSync(path.join(bundleRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph-win32-x64', version: '1.6.0' }));
+    fs.writeFileSync(path.join(bundleRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph-win32-x64', version: '1.6.4' }));
     fs.writeFileSync(path.join(bundleRoot, 'node.exe'), 'fixture, not executed');
     fs.writeFileSync(path.join(bundleRoot, 'lib', 'dist', 'bin', 'codegraph.js'), 'fixture, not executed');
   });
@@ -30,11 +30,11 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
   });
   test('发布当前 npm 平台身份，argv 不参与安装身份', () => {
     const first = resolve(wrapper).provider_identity;
-    expect(first).toMatchObject({ package: '@colbymchenry/codegraph', version: '1.6.0', installer: 'npm', command: path.join(bundleRoot, 'node.exe'), inventory_sha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
+    expect(first).toMatchObject({ package: '@colbymchenry/codegraph', version: '1.6.4', installer: 'npm', command: path.join(bundleRoot, 'node.exe'), inventory_sha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
     expect(resolve(wrapper, ['status']).provider_identity).toEqual(first);
     const codegraph = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
-    const runner = jest.fn(() => ({ exit_code: 0, stdout: 'codegraph 1.6.0', stderr: '' }));
-    const context = { repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root, PATHEXT: '.EXE;.CMD' }, runner, installationOnly: true, dependency: { version: '1.6.0' } };
+    const runner = jest.fn(() => ({ exit_code: 0, stdout: 'codegraph 1.6.4', stderr: '' }));
+    const context = { repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root, PATHEXT: '.EXE;.CMD' }, runner, installationOnly: true, dependency: { version: '1.6.4' } };
     expect(codegraph.readCurrentIdentity(context)).toEqual({ status: 'confirmed', identity: first });
     expect(runner.mock.calls[0][0]).toBe(path.join(bundleRoot, 'node.exe'));
     expect(runner.mock.calls[0][2].timeoutMs).toBeLessThanOrEqual(5000);
@@ -77,14 +77,14 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
       ? { exit_code: 0, stdout: require('../fixtures/mcp-setup/codegraph-status.cjs')(root) }
       : args[0] === 'query' ? { exit_code: 0, stdout: '[]' }
       : command === path.join(bundleRoot, 'node.exe')
-      ? { exit_code: outcome === 'failed' ? 1 : 0, stdout: outcome === 'mismatch' ? 'codegraph 9.9.9' : 'codegraph 1.6.0' }
-      : { exit_code: 0, stdout: 'codegraph 1.6.0' };
-    const context = { repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root }, runner, configured: true, dependency: { version: '1.6.0' } };
+      ? { exit_code: outcome === 'failed' ? 1 : 0, stdout: outcome === 'mismatch' ? 'codegraph 9.9.9' : 'codegraph 1.6.4' }
+      : { exit_code: 0, stdout: 'codegraph 1.6.4' };
+    const context = { repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root }, runner, configured: true, dependency: { version: '1.6.4' } };
     const expected = { confirmed: 'fresh', failed: 'unknown', mismatch: 'degraded', missing: 'unknown' }[outcome];
     const unverified = codegraph.verify(context);
     expect(unverified.readiness_status).toBe(outcome === 'mismatch' ? 'degraded' : 'unknown');
     expect(unverified.lifecycle.query_verified).toBe(false);
-    for (const result of [codegraph.apply(context, { mutation: true, dependency_version: '1.6.0', actions: [] })]) {
+    for (const result of [codegraph.apply(context, { mutation: true, dependency_version: '1.6.4', actions: [] })]) {
       expect(result.readiness_status).toBe(expected);
       expect(result.lifecycle.query_verified).toBe(true);
       expect(codegraph.reconcileConfigured(result, { configured_status: 'ready' }).readiness_status).toBe(expected);
@@ -95,7 +95,7 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
     const codegraph = require('../../skills/spec-runtime-setup/scripts/providers/codegraph.cjs');
     const runner = () => {
       fs.writeFileSync(path.join(bundleRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph-win32-x64', version: '9.9.9' }));
-      return { exit_code: 0, stdout: 'codegraph 1.6.0' };
+      return { exit_code: 0, stdout: 'codegraph 1.6.4' };
     };
     expect(codegraph.readCurrentIdentity({ repoRoot: root, platform: 'windows', arch: 'x64', env: { PATH: root }, runner }).status).toBe('stale');
   });
@@ -146,9 +146,9 @@ describe('CodeGraph Windows launcher 解析合同（不执行 Windows 二进制�
     const shim = path.join(packageRoot, 'npm-shim.js');
     fs.writeFileSync(shim, '#!/bin/sh\nexit 99\n', { mode: 0o755 });
     fs.symlinkSync(shim, path.join(bin, 'codegraph'));
-    fs.writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph', version: '1.6.0', optionalDependencies: { [platformPackage]: '1.6.0' } }));
-    fs.writeFileSync(path.join(bundleRoot, 'package.json'), JSON.stringify({ name: platformPackage, version: '1.6.0' }));
-    fs.writeFileSync(path.join(bundleRoot, 'bin', 'codegraph'), '#!/bin/sh\nprintf "codegraph 1.6.0\\n"\n', { mode: 0o755 });
+    fs.writeFileSync(path.join(packageRoot, 'package.json'), JSON.stringify({ name: '@colbymchenry/codegraph', version: '1.6.4', optionalDependencies: { [platformPackage]: '1.6.4' } }));
+    fs.writeFileSync(path.join(bundleRoot, 'package.json'), JSON.stringify({ name: platformPackage, version: '1.6.4' }));
+    fs.writeFileSync(path.join(bundleRoot, 'bin', 'codegraph'), '#!/bin/sh\nprintf "codegraph 1.6.4\\n"\n', { mode: 0o755 });
     const snapshot = () => fs.readdirSync(root, { recursive: true }).sort().map((relative) => {
       const filename = path.join(root, relative);
       const stat = fs.lstatSync(filename);

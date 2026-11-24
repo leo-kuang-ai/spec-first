@@ -1750,7 +1750,7 @@ function graphifyProviderLimitations(
 function resolveCompatiblePython(context, repoRoot) {
   const commands = [...new Set([
     context.pythonCommand,
-    'python3.14', 'python3.13', 'python3.12', 'python3.11', 'python3.10', 'python3', 'python',
+    'python3.14', 'python3.13', 'python3.12', 'python3.11', 'python3', 'python',
   ].filter(Boolean))];
   let observedUnsupported = null;
   for (const command of commands) {
@@ -1763,7 +1763,8 @@ function resolveCompatiblePython(context, repoRoot) {
     if (!succeeded(result)) continue;
     const match = text(result).match(/(^|\s)(\d+)\.(\d+)\.(\d+)(\s|$)/);
     if (!match) continue;
-    const supported = Number(match[2]) > 3 || (Number(match[2]) === 3 && Number(match[3]) >= 10);
+    const [, , major, minor, patch] = match.map(Number);
+    const supported = major === 3 && minor < 15 && (minor > 11 || (minor === 11 && patch >= 5));
     if (!supported) {
       observedUnsupported = `${match[2]}.${match[3]}.${match[4]}`;
       continue;

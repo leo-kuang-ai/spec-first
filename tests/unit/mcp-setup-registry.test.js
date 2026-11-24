@@ -156,8 +156,8 @@ describe('spec-runtime-setup registry v11', () => {
         id: 'codegraph',
         ecosystem: 'npm',
         package: '@colbymchenry/codegraph',
-        version: '1.6.0',
-        integrity: 'sha512-nCN40MqmYxF7gH1QTKqlxJ1d2mzwhw3fzSdGV2wjnQKsymjM3JZnH/5rpGqhBkcUEom0qWq0WjDRvOZh2t8mFA==',
+        version: '1.6.4',
+        integrity: 'sha512-Vn4rKe3wTDi8jV3Ni3nUtCX17X3y+hv5rBGkOrO1dtE9ICj3eByVbHM/A9CmR68Cjl8QiGRoOhn7phnS1hyjZg==',
         source: 'npmjs',
         command: 'codegraph',
       },
@@ -165,10 +165,10 @@ describe('spec-runtime-setup registry v11', () => {
         id: 'graphify',
         ecosystem: 'pypi',
         package: 'graphifyy',
-        version: '0.9.57',
+        version: '0.9.118',
         command: 'graphify',
         python: {
-          requires: '>=3.10',
+          requires: '>=3.11.5,<3.15',
           allow_managed_download: false,
         },
         installers: {
@@ -176,8 +176,8 @@ describe('spec-runtime-setup registry v11', () => {
           plain_pip_allowed: false,
         },
         distribution: {
-          wheel_url: 'https://files.pythonhosted.org/packages/c8/c2/d1ce4a567a5bf4c36054cede2c70f745a239ed5080b70d7934c5c738b583/graphifyy-0.9.57-py3-none-any.whl',
-          sha256: 'f35c86410e7d92ace69a50ac8dbed568903c880482c656f43437ca657fee8c37',
+          wheel_url: 'https://files.pythonhosted.org/packages/1b/06/b3946a2f190bd175ca87afff1e6f26698814dc83ea92459b863f676aef99/graphifyy-0.9.118-py3-none-any.whl',
+          sha256: 'f572453c275e82dcc052f6cf7fa79c0a5a14eaefab08ac9112e31edf7b9d75aa',
           index_url: 'https://pypi.org/simple',
         },
         hook_normalization_contract: 'graphify-python-hook-normalization.v1',
@@ -259,12 +259,12 @@ describe('spec-runtime-setup registry v11', () => {
     });
     expect(byId(zcode.tools)['sequential-thinking'].host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@modelcontextprotocol/server-sequential-thinking@2026.8.31'],
+      args: ['-y', '@modelcontextprotocol/server-sequential-thinking@2.2.0'],
       json_container_path: ['mcp', 'servers'],
     });
     expect(byId(zcode.tools).context7.host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@upstash/context7-mcp@4.0.7'],
+      args: ['-y', '@upstash/context7-mcp@4.7.3'],
     });
     expect(byId(zcode.tools).codegraph.host_config).toMatchObject({
       command: 'codegraph',
@@ -367,7 +367,7 @@ describe('spec-runtime-setup registry v11', () => {
     });
     expect(context7.host_config).toMatchObject({
       command: 'npx',
-      args: ['-y', '@upstash/context7-mcp@4.0.7'],
+      args: ['-y', '@upstash/context7-mcp@4.7.3'],
       json_container_path: ['mcp'],
       server_representation: 'opencode-local',
       permission_policy: { kind: 'opencode-governed-assets-v1' },

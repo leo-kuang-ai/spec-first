@@ -8,7 +8,7 @@ const { runProcess, runProcessSync } = require('../../skills/spec-runtime-setup/
 const { defaultWorkspaceExec } = require('../../skills/spec-runtime-setup/scripts/lib/workspace-exec.cjs');
 
 const posixTest = process.platform === 'win32' ? test.skip : test;
-const archive = path.resolve(__dirname, '../fixtures/mcp-setup/npm-archives/codegraph-1.6.0.tgz');
+const archive = path.resolve(__dirname, '../fixtures/mcp-setup/npm-archives/codegraph-1.6.4.tgz');
 
 describe('真实 CodeGraph npm launcher 的只读启动边界', () => {
   let root;
@@ -30,9 +30,9 @@ describe('真实 CodeGraph npm launcher 的只读启动边界', () => {
     fs.symlinkSync(path.join(packageRoot, 'npm-shim.js'), command);
     const platform = `${process.platform}-${process.arch}`;
     const bundles = path.join(root, 'home', '.codegraph', 'bundles');
-    const cachedBin = path.join(bundles, `${platform}-1.6.0`, 'bin');
+    const cachedBin = path.join(bundles, `${platform}-1.6.4`, 'bin');
     fs.mkdirSync(cachedBin, { recursive: true });
-    writeLauncher(path.join(cachedBin, 'codegraph'), '1.6.0');
+    writeLauncher(path.join(cachedBin, 'codegraph'), '1.6.4');
     oldBundle = path.join(bundles, `${platform}-1.5.0`);
     fs.mkdirSync(oldBundle);
     fs.writeFileSync(path.join(oldBundle, 'keep'), 'must remain');
@@ -47,9 +47,9 @@ describe('真实 CodeGraph npm launcher 的只读启动边界', () => {
     const platformPackage = `codegraph-${process.platform}-${process.arch}`;
     const installed = path.join(packageRoot, 'node_modules', '@colbymchenry', platformPackage);
     fs.mkdirSync(path.join(installed, 'bin'), { recursive: true });
-    fs.writeFileSync(path.join(installed, 'package.json'), JSON.stringify({ name: `@colbymchenry/${platformPackage}`, version: '1.6.0' }));
+    fs.writeFileSync(path.join(installed, 'package.json'), JSON.stringify({ name: `@colbymchenry/${platformPackage}`, version: '1.6.4' }));
     const launcher = path.join(installed, 'bin', 'codegraph');
-    writeLauncher(launcher, 'INSTALLED_BUNDLE_1.6.0');
+    writeLauncher(launcher, 'INSTALLED_BUNDLE_1.6.4');
     return launcher;
   }
   async function invoke(kind) {
@@ -70,7 +70,7 @@ describe('真实 CodeGraph npm launcher 的只读启动边界', () => {
     const runnerPath = path.resolve(__dirname, '../../skills/spec-runtime-setup/scripts/lib/process-runner.cjs');
     const script = `
       const provider = require(${JSON.stringify(providerPath)});
-      const readiness = provider.verify({ repoRoot: process.cwd(), dependency: { version: '1.6.0' }, installationOnly: true });
+      const readiness = provider.verify({ repoRoot: process.cwd(), dependency: { version: '1.6.4' }, installationOnly: true });
       const probes = require(${JSON.stringify(executorPath)}).probeRegistry({
         runner: require(${JSON.stringify(runnerPath)}).runCommandSync,
         effectiveRegistry: { tools: [{ id: 'codegraph', dependencies: ['codegraph'], required: true, host_config_required: false }], helpers: [] },
@@ -85,7 +85,7 @@ describe('真实 CodeGraph npm launcher 的只读启动边界', () => {
     installPlatformBundle();
     const result = await invoke(kind);
     expect(result.exit_code ?? result.status).toBe(0);
-    expect(result.stdout.trim()).toBe('INSTALLED_BUNDLE_1.6.0');
+    expect(result.stdout.trim()).toBe('INSTALLED_BUNDLE_1.6.4');
     expect(fs.existsSync(path.join(oldBundle, 'keep'))).toBe(true);
   });
 });

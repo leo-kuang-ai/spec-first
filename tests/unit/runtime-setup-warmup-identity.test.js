@@ -17,8 +17,8 @@ describe('warmup 缓存的依赖身份与来源', () => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'warmup-identity-'));
     entry = {
       id: 'context7', required: true,
-      resolved_dependency: { package: '@upstash/context7-mcp', version: '4.0.7', integrity: archiveIntegrity, source: 'npmjs' },
-      installation: { kind: 'warmup', command: 'npx', args: ['-y', '@upstash/context7-mcp@4.0.7', '--help'] },
+      resolved_dependency: { package: '@upstash/context7-mcp', version: '4.7.3', integrity: archiveIntegrity, source: 'npmjs' },
+      installation: { kind: 'warmup', command: 'npx', args: ['-y', '@upstash/context7-mcp@4.7.3', '--help'] },
     };
     context = {
       env: {}, host: 'codex', platform: 'macos',

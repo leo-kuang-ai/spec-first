@@ -1,4 +1,6 @@
 # Changelog
+- v1.15.3 2026-11-24 codex: fix(runtime): 更新七项辅助工具的安装基线，固定全局技能来源和安装器，保留各系统包管理器的稳定渠道。 (user-visible)
+- v1.15.3 2026-11-24 codex: fix(runtime): 更新四项固定运行依赖及归档摘要。Graphify 使用 Python 3.11.5 至 3.14，Sequential Thinking 需要 Node.js 24 或更高版本。 (user-visible)
 - v1.15.3 2026-11-24 codex: test(skills): 为需求就绪报告和技术评审稿补充 18 个判分对照，核对待定问题状态、具体处理文件、UTC 月界和错误响应。 (internal)
 - v1.15.3 2026-11-24 09:46:08 codex: docs(review): 对照两种技术方案目录的依据分布，回放遗漏验例的后果，并用历史源码核实安装提醒需求中的矛盾陈述。 (internal)
 - v1.15.3 2026-11-23 16:05:55 codex: docs(review): 归档固定候选版本的质量验收结果，补充需求和技术方案独立试读题卡，校正偏好变化方向以便同题比较两种目录。 (internal)

@@ -45,7 +45,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "managed",
           "targets": {
@@ -81,7 +81,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "managed",
           "targets": {
@@ -190,7 +190,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "managed",
           "targets": {
@@ -226,7 +226,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "managed",
           "targets": {
@@ -335,7 +335,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "managed",
           "targets": {
@@ -371,7 +371,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "managed",
           "targets": {
@@ -480,7 +480,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "managed",
           "targets": {
@@ -516,7 +516,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "managed",
           "targets": {
@@ -619,7 +619,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "user",
           "targets": {
@@ -649,7 +649,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "user",
           "targets": {
@@ -740,7 +740,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "user",
           "targets": {
@@ -770,7 +770,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "user",
           "targets": {
@@ -861,7 +861,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "user",
           "targets": {
@@ -891,7 +891,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "user",
           "targets": {
@@ -982,7 +982,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "user",
           "targets": {
@@ -1012,7 +1012,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "user",
           "targets": {
@@ -1104,7 +1104,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "project",
           "targets": {
@@ -1135,7 +1135,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "project",
           "targets": {
@@ -1228,7 +1228,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "project",
           "targets": {
@@ -1259,7 +1259,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "project",
           "targets": {
@@ -1352,7 +1352,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "project",
           "targets": {
@@ -1383,7 +1383,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "project",
           "targets": {
@@ -1476,7 +1476,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "project",
           "targets": {
@@ -1507,7 +1507,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "project",
           "targets": {
@@ -1599,7 +1599,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "workspace",
           "targets": {
@@ -1629,7 +1629,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "workspace",
           "targets": {
@@ -1720,7 +1720,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "workspace",
           "targets": {
@@ -1750,7 +1750,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "workspace",
           "targets": {
@@ -1841,7 +1841,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "workspace",
           "targets": {
@@ -1871,7 +1871,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "workspace",
           "targets": {
@@ -1962,7 +1962,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "workspace",
           "targets": {
@@ -1992,7 +1992,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "workspace",
           "targets": {
@@ -2083,7 +2083,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "local",
           "targets": {
@@ -2113,7 +2113,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "local",
           "targets": {
@@ -2204,7 +2204,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "local",
           "targets": {
@@ -2234,7 +2234,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "local",
           "targets": {
@@ -2325,7 +2325,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "local",
           "targets": {
@@ -2355,7 +2355,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "local",
           "targets": {
@@ -2446,7 +2446,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@modelcontextprotocol/server-sequential-thinking@2026.8.31"
+            "@modelcontextprotocol/server-sequential-thinking@2.2.0"
           ],
           "scope": "local",
           "targets": {
@@ -2476,7 +2476,7 @@
           "command": "npx",
           "args": [
             "-y",
-            "@upstash/context7-mcp@4.0.7"
+            "@upstash/context7-mcp@4.7.3"
           ],
           "scope": "local",
           "targets": {
@@ -2545,7 +2545,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           },
@@ -2560,7 +2560,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           },
@@ -2610,7 +2610,7 @@
           "installation": {
             "strategy": "manual-command",
             "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
-            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+            "command": "CI=true npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error && agent-browser install && npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -2662,7 +2662,7 @@
           "installation": {
             "strategy": "skills-cli",
             "next_action": "安装全局 ast-grep skill",
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -2710,7 +2710,7 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "next_action": "准备 Python >=3.11.5,<3.15 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
             "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
@@ -2725,7 +2725,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           },
@@ -2740,7 +2740,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           },
@@ -2790,7 +2790,7 @@
           "installation": {
             "strategy": "manual-command",
             "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
-            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+            "command": "CI=true npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -2810,7 +2810,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 vhs",
-            "command": "go install github.com/charmbracelet/vhs@latest"
+            "command": "go install github.com/charmbracelet/vhs@v0.12.1"
           },
           "platform_required_tools": []
         },
@@ -2818,7 +2818,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 silicon",
-            "command": "cargo install silicon --force"
+            "command": "cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked --force silicon"
           },
           "platform_required_tools": []
         },
@@ -2834,7 +2834,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 ast-grep",
-            "command": "cargo install ast-grep --locked --force"
+            "command": "cargo install ast-grep --version 0.51.3 --locked --force"
           },
           "platform_required_tools": []
         },
@@ -2842,7 +2842,7 @@
           "installation": {
             "strategy": "skills-cli",
             "next_action": "安装全局 ast-grep skill",
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -2890,7 +2890,7 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "next_action": "准备 Python >=3.11.5,<3.15 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
             "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
@@ -2905,7 +2905,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           },
@@ -2920,7 +2920,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           },
@@ -2970,7 +2970,7 @@
           "installation": {
             "strategy": "manual-command",
             "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
-            "command": "CI=true npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y"
+            "command": "CI=true npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error && agent-browser install --with-deps && npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -2990,7 +2990,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 vhs",
-            "command": "go install github.com/charmbracelet/vhs@latest"
+            "command": "go install github.com/charmbracelet/vhs@v0.12.1"
           },
           "platform_required_tools": []
         },
@@ -2998,7 +2998,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 silicon",
-            "command": "cargo install silicon --force"
+            "command": "cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked --force silicon"
           },
           "platform_required_tools": []
         },
@@ -3014,7 +3014,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 ast-grep",
-            "command": "cargo install ast-grep --locked --force"
+            "command": "cargo install ast-grep --version 0.51.3 --locked --force"
           },
           "platform_required_tools": []
         },
@@ -3022,7 +3022,7 @@
           "installation": {
             "strategy": "skills-cli",
             "next_action": "安装全局 ast-grep skill",
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -3070,7 +3070,7 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "next_action": "准备 Python >=3.11.5,<3.15 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
             "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
@@ -3085,7 +3085,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@modelcontextprotocol/server-sequential-thinking@2026.8.31",
+              "@modelcontextprotocol/server-sequential-thinking@2.2.0",
               "--help"
             ]
           },
@@ -3100,7 +3100,7 @@
             "command": "npx",
             "args": [
               "-y",
-              "@upstash/context7-mcp@4.0.7",
+              "@upstash/context7-mcp@4.7.3",
               "--help"
             ]
           },
@@ -3150,7 +3150,7 @@
           "installation": {
             "strategy": "manual-command",
             "next_action": "运行 `spec-runtime-setup` 查看当前 agent-browser 安装命令；需要 browser automation 时再手动安装",
-            "command": "$env:CI='true'; npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error; if ($LASTEXITCODE -eq 0) { agent-browser install }; if ($LASTEXITCODE -eq 0) { npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y }"
+            "command": "$env:CI='true'; npm install -g agent-browser@0.44.0 --no-audit --no-fund --loglevel=error; if ($LASTEXITCODE -eq 0) { agent-browser install }; if ($LASTEXITCODE -eq 0) { npx -y skills@1.9.0 add https://github.com/vercel-labs/agent-browser/tree/v0.44.0 --skill agent-browser -g -y }"
           },
           "platform_required_tools": [
             "node",
@@ -3162,7 +3162,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 gh",
-            "command": "winget install --id GitHub.cli -e"
+            "command": "winget install --id GitHub.cli -e --version 2.105.0"
           },
           "platform_required_tools": []
         },
@@ -3170,7 +3170,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 vhs",
-            "command": "go install github.com/charmbracelet/vhs@latest"
+            "command": "go install github.com/charmbracelet/vhs@v0.12.1"
           },
           "platform_required_tools": []
         },
@@ -3178,7 +3178,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 silicon",
-            "command": "cargo install silicon --force"
+            "command": "cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked --force silicon"
           },
           "platform_required_tools": []
         },
@@ -3186,7 +3186,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 ffmpeg",
-            "command": "winget install --id Gyan.FFmpeg -e"
+            "command": "winget install --id Gyan.FFmpeg -e --version 9.1"
           },
           "platform_required_tools": []
         },
@@ -3194,7 +3194,7 @@
           "installation": {
             "strategy": "package-manager",
             "next_action": "安装 ast-grep",
-            "command": "npm install -g @ast-grep/cli@latest"
+            "command": "npm install -g @ast-grep/cli@0.51.3"
           },
           "platform_required_tools": []
         },
@@ -3202,7 +3202,7 @@
           "installation": {
             "strategy": "skills-cli",
             "next_action": "安装全局 ast-grep skill",
-            "command": "npx -y skills@latest add ast-grep/agent-skill -g -y"
+            "command": "npx -y skills@1.9.0 add https://github.com/ast-grep/agent-skill/tree/0613dc7f82bbfb3b557380b54726b92f73358460 -g -y"
           },
           "platform_required_tools": [
             "node",
@@ -3250,7 +3250,7 @@
           "installation": {
             "strategy": "python-isolated-tool",
             "dependency_ref": "graphify",
-            "next_action": "准备 Python >=3.10 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
+            "next_action": "准备 Python >=3.11.5,<3.15 与 uv（优先）或 pipx，然后运行 `spec-runtime-setup --only graphify`。Setup会安装verified `{{package}}@{{version}}` wheel并完成当前host integration、`graphify-out/` code-only生成、裸query与hook验证。",
             "command_display": "uv tool install（优先）或 pipx install verified {{package}}@{{version}} wheel；禁止managed Python download/plain pip；验证identity/launcher后执行host integration、Provider原生graphify-out extract --code-only、裸query与双hook结构检查；显式 --refresh 使用provider-native graphify update"
           }
         }
